@@ -51,9 +51,9 @@ or non-containment—not merely to answer boolean yes/no.
 | F1.b containment | ⬜ not yet | TBD | — |
 | F1.c safety violation | ⬜ not yet | TBD | — |
 
-**Generator controls (artifact):** `mode` (`constructive` | `random`, auto-select constructive when `min_distinguishing_trace_length ≥ 3`), `target_distinguishing_trace_length`, `min_distinguishing_trace_length` (default 2), `max_distinguishing_trace_length`, `state_count_a`, `state_count_b`, `alphabet_size`, `max_retries`. Constructive mode builds paired chain DFAs with a seeded witness sequence and shared sink; random mode uses rejection sampling. Smoke examples may set `min_distinguishing_trace_length=1`.
+**Generator controls (artifact):** `mode` (`constructive_decoy` | `constructive` | `random`; auto-select `constructive_decoy` when `min_distinguishing_trace_length ≥ 3`), `target_distinguishing_trace_length`, `min_distinguishing_trace_length` (default 2), `max_distinguishing_trace_length`, `state_count_a`, `state_count_b`, `alphabet_size`, `max_retries`. Default constructive mode builds paired DFAs with decoy branches and controlled witness divergence; legacy `constructive` uses chain+sink topology; random mode uses rejection sampling. Smoke examples may set `min_distinguishing_trace_length=1`.
 
-> **Exploratory warning:** Constructive F1 is intended for controlled `ℓ_dist` sweeps, not as a final difficulty axis. Items may exhibit high `final_acceptance_only_rate`, elevated `sink_transition_ratio`, and repeating gold traces. Use `audit_f1_items` on generated JSONL before drawing conclusions from capability-surface results.
+> **Exploratory warning:** Constructive F1 is intended for controlled `ℓ_dist` sweeps, not as a final difficulty axis. Legacy `constructive` items exhibit high `final_acceptance_only_rate` and elevated `sink_transition_ratio`; `constructive_decoy` reduces these signals but items may still share seeded witness structure. Use `audit_f1_items` on generated JSONL before drawing conclusions from capability-surface results.
 
 **Batch / smoke:** `generate_batch --family F1`, `evaluate_baseline_batch`, `run_f1_smoke_baselines`.
 

@@ -89,7 +89,7 @@ generator → oracle → certificate → verifier  ✅
 | Hard example (`ℓ_dist≥3`) | `examples/item_F1_separation_seed6_hard.json` |
 | F1 batch + smoke | `cli/generate_batch --family F1`, `run_f1_smoke_baselines.py` |
 
-**Generator defaults:** `min_distinguishing_trace_length=2`, `max_distinguishing_trace_length=12`, `max_retries=64`. Auto mode uses **constructive** generation when `min_distinguishing_trace_length ≥ 3` (chain+sink topology with exact witness length); lower levels use random rejection sampling unless `mode=constructive` is set explicitly. Smoke item seed 42 uses `--min-distinguishing-trace-length 1`.
+**Generator defaults:** `min_distinguishing_trace_length=2`, `max_distinguishing_trace_length=12`, `max_retries=64`. Auto mode uses **constructive_decoy** generation when `min_distinguishing_trace_length ≥ 3` (decoy branches with exact witness length); legacy **constructive** chain+sink mode remains for regression tests; lower levels use random rejection sampling unless a constructive mode is set explicitly. Smoke item seed 42 uses `--min-distinguishing-trace-length 1`.
 
 **CLI:** `python3 -m fsmreasonbench.cli.generate_one --family F1 --seed 42`
 

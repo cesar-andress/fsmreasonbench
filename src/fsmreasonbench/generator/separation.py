@@ -7,20 +7,23 @@ import uuid
 from dataclasses import dataclass
 from typing import Literal
 
-from fsmreasonbench.generator.separation_constructive import construct_separation_dfa_pair
+from fsmreasonbench.generator.separation_constructive import (
+    construct_separation_decoy_dfa_pair,
+    construct_separation_dfa_pair,
+)
 from fsmreasonbench.items.assembly import BenchmarkItem, assemble_separation_item, self_verify_item
 from fsmreasonbench.models.fsm import ExecutableFSM, FSMType, Transition
 from fsmreasonbench.oracle.separation import are_equivalent, shortest_distinguishing_trace
 
-SeparationGeneratorMode = Literal["constructive", "random"]
+SeparationGeneratorMode = Literal["constructive", "constructive_decoy", "random"]
 
 
 def resolve_separation_mode(config: SeparationGeneratorConfig) -> SeparationGeneratorMode:
-    """Return effective generator mode (constructive default when min length >= 3)."""
-    if config.mode in ("constructive", "random"):
+    """Return effective generator mode (constructive_decoy default when min length >= 3)."""
+    if config.mode in ("constructive", "constructive_decoy", "random"):
         return config.mode
     if config.min_distinguishing_trace_length >= 3:
-        return "constructive"
+        return "constructive_decoy"
     return "random"
 
 
@@ -74,8 +77,14 @@ class SeparationGeneratorConfig:
             raise ValueError("alphabet_size must be >= 1")
         if not 0.0 <= self.transition_density <= 1.0:
             raise ValueError("transition_density must be in [0, 1]")
-        if self.mode is not None and self.mode not in ("constructive", "random"):
-            raise ValueError("mode must be 'constructive', 'random', or None for auto")
+        if self.mode is not None and self.mode not in (
+            "constructive",
+            "constructive_decoy",
+            "random",
+        ):
+            raise ValueError(
+                "mode must be 'constructive', 'constructive_decoy', 'random', or None for auto"
+            )
         if self.min_distinguishing_trace_length < 0:
             raise ValueError("min_distinguishing_trace_length must be >= 0")
         if self.max_distinguishing_trace_length < self.min_distinguishing_trace_length:
@@ -96,12 +105,12 @@ class SeparationGeneratorConfig:
 
 
 def separation_config_for_level(level: int) -> SeparationGeneratorConfig:
-    """Capability-surface F1 config with constructive mode for higher levels."""
+    """Capability-surface F1 config with decoy constructive mode for higher levels."""
     return SeparationGeneratorConfig(
         min_distinguishing_trace_length=level,
         max_distinguishing_trace_length=level,
         target_distinguishing_trace_length=level,
-        mode="constructive" if level >= 3 else None,
+        mode="constructive_decoy" if level >= 3 else None,
     )
 
 
@@ -161,17 +170,25 @@ def generate_separation_item(
 ) -> BenchmarkItem:
     """Generate a self-verifying F1 non-equivalence item."""
     config = config or SeparationGeneratorConfig()
-    if resolve_separation_mode(config) == "constructive":
-        return _generate_constructive_separation_item(seed, config)
+    mode = resolve_separation_mode(config)
+    if mode in ("constructive", "constructive_decoy"):
+        return _generate_constructive_separation_item(seed, config, mode=mode)
     return _generate_random_separation_item(seed, config)
 
 
 def _generate_constructive_separation_item(
     seed: int,
     config: SeparationGeneratorConfig,
+    *,
+    mode: Literal["constructive", "constructive_decoy"],
 ) -> BenchmarkItem:
     target_k = resolve_target_distinguishing_length(seed, config)
-    fsm_a, fsm_b = construct_separation_dfa_pair(
+    builder = (
+        construct_separation_dfa_pair
+        if mode == "constructive"
+        else construct_separation_decoy_dfa_pair
+    )
+    fsm_a, fsm_b = builder(
         seed,
         target_k,
         alphabet_size=config.alphabet_size,

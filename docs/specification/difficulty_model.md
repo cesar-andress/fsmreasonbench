@@ -46,15 +46,15 @@ d_F1 = (|Q_A|, |Q_B|, |Σ|, ℓ_dist, transition_count_A, transition_count_B)
 
 | Control | Default | Notes |
 |---------|---------|-------|
-| `mode` | auto | `constructive` when `min_distinguishing_trace_length ≥ 3`, else `random`; explicit override supported |
-| `target_distinguishing_trace_length` | — | Exact shortest distinguishing length for constructive mode |
+| `mode` | auto | `constructive_decoy` when `min_distinguishing_trace_length ≥ 3`, else `random`; explicit `constructive` (legacy chain+sink) or `constructive_decoy` override supported |
+| `target_distinguishing_trace_length` | — | Exact shortest distinguishing length for constructive modes |
 | `min_distinguishing_trace_length` | 2 | Use 1 only for smoke / regression items |
-| `max_distinguishing_trace_length` | 12 | Items outside bounds retry (random) or fail validation (constructive) |
+| `max_distinguishing_trace_length` | 12 | Items outside bounds retry (random) or fail validation (constructive modes) |
 | `max_retries` | 64 | Per-item generation attempts (random mode only) |
 
-Constructive generation builds two chain-like DFAs that agree on all prefixes shorter than `ℓ_dist` and diverge on a witness trace of length exactly `ℓ_dist`. Capability-surface sweeps use constructive mode for F1 levels ≥ 3.
+Constructive generation builds two DFAs that agree on all prefixes shorter than `ℓ_dist` and diverge on a witness trace of length exactly `ℓ_dist`. The default **`constructive_decoy`** mode adds decoy branches that rejoin the witness prefix or enter equivalent non-accepting subgraphs, reducing chain+sink regularity while preserving exact `ℓ_dist`. Legacy **`constructive`** mode (chain + shared sink, acceptance-only divergence) remains available for regression tests. Capability-surface sweeps use `constructive_decoy` for F1 levels ≥ 3.
 
-> **Exploratory warning:** Constructive F1 items are **pattern-regular by design** (chain + shared sink, acceptance-only divergence at the witness end). Rising model scores at higher `ℓ_dist` may reflect generator regularity rather than deeper reasoning. Audit batches with `python -m fsmreasonbench.cli.audit_f1_items` before interpreting capability-surface curves. Treat constructive F1 difficulty as **exploratory** until a frozen cohort protocol separates structural regularity from reasoning depth.
+> **Exploratory warning:** Even decoy constructive F1 items are **partially regular by design** (seeded witness trace, controlled topology). Rising model scores at higher `ℓ_dist` may still reflect generator structure rather than deeper reasoning. Audit batches with `python -m fsmreasonbench.cli.audit_f1_items` before interpreting capability-surface curves. Treat constructive F1 difficulty as **exploratory** until a frozen cohort protocol separates structural regularity from reasoning depth.
 
 Legacy spec parameters (`sep_kind`, `min_witness_gap`) apply to future F1 subtypes.
 

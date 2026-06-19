@@ -41,7 +41,7 @@ seed and question content (UUID v5).
 
 ### F1 separation / witness
 
-- Generator: `fsmreasonbench.generator.separation` (random or constructive mode)
+- Generator: `fsmreasonbench.generator.separation` (random, constructive_decoy, or legacy constructive mode)
 - Constructive mode activates when `min_distinguishing_trace_length >= 3`
 - CLI: `python3 -m fsmreasonbench.cli.generate_one --family F1 --seed <int>`
 - Requires a **non-equivalent** DFA pair; generation fails fast if oracle finds equivalence

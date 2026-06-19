@@ -95,7 +95,7 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
 
 Default benchmark generation uses `min_distinguishing_trace_length=2`.
 
-> **Constructive F1 warning (levels ≥ 3):** Capability-surface F1 batches use chain+sink constructive generation. Scores may rise with `ℓ_dist` because gold traces follow regular patterns, not necessarily because models reason more deeply. Audit items before interpreting curves:
+> **Constructive F1 warning (levels ≥ 3):** Capability-surface F1 batches use `constructive_decoy` generation (decoy branches + controlled witness divergence). Legacy `constructive` chain+sink items remain available via `mode=constructive`. Scores may still rise with `ℓ_dist` because gold traces follow seeded structure, not necessarily because models reason more deeply. Audit items before interpreting curves:
 
 ```bash
 python -m fsmreasonbench.cli.audit_f1_items \
