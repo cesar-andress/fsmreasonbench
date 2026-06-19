@@ -1,0 +1,9 @@
+model,family,n,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate,failure_stage_counts
+qwen2.5-coder:7b,C2,20,1.0,0.75,0.1,0.1,"{""certificate_invalid"": 13, ""correct"": 2, ""not_extractable"": 0, ""verdict_wrong"": 5}"
+qwen2.5-coder:7b,F1,20,1.0,1.0,0.05,0.05,"{""certificate_invalid"": 19, ""correct"": 1, ""not_extractable"": 0, ""verdict_wrong"": 0}"
+llama3.1:8b,C2,20,1.0,0.45,0.2,0.2,"{""certificate_invalid"": 5, ""correct"": 4, ""not_extractable"": 0, ""verdict_wrong"": 11}"
+llama3.1:8b,F1,20,1.0,1.0,0.1,0.1,"{""certificate_invalid"": 18, ""correct"": 2, ""not_extractable"": 0, ""verdict_wrong"": 0}"
+mistral-nemo:12b,C2,20,1.0,0.6,0.05,0.05,"{""certificate_invalid"": 11, ""correct"": 1, ""not_extractable"": 0, ""verdict_wrong"": 8}"
+mistral-nemo:12b,F1,20,1.0,1.0,0.2,0.2,"{""certificate_invalid"": 16, ""correct"": 4, ""not_extractable"": 0, ""verdict_wrong"": 0}"
+gemma2:9b,C2,20,1.0,0.55,0.05,0.05,"{""certificate_invalid"": 10, ""correct"": 1, ""not_extractable"": 0, ""verdict_wrong"": 9}"
+gemma2:9b,F1,20,1.0,1.0,0.2,0.2,"{""certificate_invalid"": 16, ""correct"": 4, ""not_extractable"": 0, ""verdict_wrong"": 0}"

@@ -1,0 +1,145 @@
+{
+  "c2_items_source": "runs/capability_surface_smoke2/C2/min_witness_length_2/items.jsonl",
+  "f1_items_source": "runs/capability_surface_smoke2/F1/min_distinguishing_trace_length_2/items.jsonl",
+  "models": [
+    "qwen2.5-coder:7b",
+    "llama3.1:8b",
+    "mistral-nemo:12b",
+    "gemma2:9b"
+  ],
+  "n_per_family": 20,
+  "note": "Raw transcripts and per-model JSONL live under runs/pilot_v1/ (gitignored).",
+  "pilot_version": "v1",
+  "rows": [
+    {
+      "certificate_valid_rate": 0.1,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 13,
+        "correct": 2,
+        "not_extractable": 0,
+        "verdict_wrong": 5
+      },
+      "family": "C2",
+      "fully_correct_rate": 0.1,
+      "model": "qwen2.5-coder:7b",
+      "model_dir": "qwen2.5-coder_7b",
+      "n": 20,
+      "verdict_accuracy": 0.75
+    },
+    {
+      "certificate_valid_rate": 0.05,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 19,
+        "correct": 1,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "F1",
+      "fully_correct_rate": 0.05,
+      "model": "qwen2.5-coder:7b",
+      "model_dir": "qwen2.5-coder_7b",
+      "n": 20,
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 0.2,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 5,
+        "correct": 4,
+        "not_extractable": 0,
+        "verdict_wrong": 11
+      },
+      "family": "C2",
+      "fully_correct_rate": 0.2,
+      "model": "llama3.1:8b",
+      "model_dir": "llama3.1_8b",
+      "n": 20,
+      "verdict_accuracy": 0.45
+    },
+    {
+      "certificate_valid_rate": 0.1,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 18,
+        "correct": 2,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "F1",
+      "fully_correct_rate": 0.1,
+      "model": "llama3.1:8b",
+      "model_dir": "llama3.1_8b",
+      "n": 20,
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 0.05,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 11,
+        "correct": 1,
+        "not_extractable": 0,
+        "verdict_wrong": 8
+      },
+      "family": "C2",
+      "fully_correct_rate": 0.05,
+      "model": "mistral-nemo:12b",
+      "model_dir": "mistral-nemo_12b",
+      "n": 20,
+      "verdict_accuracy": 0.6
+    },
+    {
+      "certificate_valid_rate": 0.2,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 16,
+        "correct": 4,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "F1",
+      "fully_correct_rate": 0.2,
+      "model": "mistral-nemo:12b",
+      "model_dir": "mistral-nemo_12b",
+      "n": 20,
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 0.05,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 10,
+        "correct": 1,
+        "not_extractable": 0,
+        "verdict_wrong": 9
+      },
+      "family": "C2",
+      "fully_correct_rate": 0.05,
+      "model": "gemma2:9b",
+      "model_dir": "gemma2_9b",
+      "n": 20,
+      "verdict_accuracy": 0.55
+    },
+    {
+      "certificate_valid_rate": 0.2,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 16,
+        "correct": 4,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "F1",
+      "fully_correct_rate": 0.2,
+      "model": "gemma2:9b",
+      "model_dir": "gemma2_9b",
+      "n": 20,
+      "verdict_accuracy": 1.0
+    }
+  ],
+  "runs_location": "runs/pilot_v1/",
+  "temperature": 0.0
+}

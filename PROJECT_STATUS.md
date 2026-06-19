@@ -89,6 +89,30 @@ generator → oracle → certificate → verifier  ✅
 
 ---
 
+## Pilot evaluation summaries (committed)
+
+Exploratory local-model runs; **not frozen cohorts**. Raw transcripts and JSONL live under `runs/` (gitignored).
+
+| Pilot | Committed artifacts | Run data |
+|-------|---------------------|----------|
+| v0 (single model) | [`docs/pilot_v0_report.md`](docs/pilot_v0_report.md), [`docs/pilot_v0_summary.json`](docs/pilot_v0_summary.json) | `runs/pilot_v0/` |
+| v1 (multi-model) | [`docs/pilot_v1_report.md`](docs/pilot_v1_report.md), [`docs/pilot_v1_summary.json`](docs/pilot_v1_summary.json), [`docs/pilot_v1_summary.csv`](docs/pilot_v1_summary.csv) | `runs/pilot_v1/` |
+
+### Pilot v1 headline metrics (n=20 per family, temperature=0)
+
+Items: C2 `min_witness_length=2`, F1 `min_distinguishing_trace_length=2` from `capability_surface_smoke2`.
+
+| Model | C2 `fully_correct_rate` | F1 `fully_correct_rate` | C2 `verdict_accuracy` | F1 `verdict_accuracy` |
+|-------|-------------------------:|-------------------------:|------------------------:|------------------------:|
+| qwen2.5-coder:7b | 0.10 | 0.05 | 0.75 | 1.00 |
+| llama3.1:8b | 0.20 | 0.10 | 0.45 | 1.00 |
+| mistral-nemo:12b | 0.05 | 0.20 | 0.60 | 1.00 |
+| gemma2:9b | 0.05 | 0.20 | 0.55 | 1.00 |
+
+All models: **extractability_rate = 1.0** on both families. F1 **verdict_accuracy = 1.0** for every model, but **certificate_valid_rate ≤ 0.20** — verdict accuracy overstates end-to-end reasoning success.
+
+---
+
 ## Phase 1 deliverables
 
 | Component | Path |
