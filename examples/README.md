@@ -177,9 +177,17 @@ python -m fsmreasonbench.cli.run_capability_surface_models \
 
 python -m fsmreasonbench.cli.plot_capability_surface \
   --summary runs/capability_surface_models/combined_summary.json
+
+python -m fsmreasonbench.cli.export_capability_surface_report \
+  --summary runs/capability_surface_models/combined_summary.json \
+  --out-md docs/capability_surface_report.md \
+  --out-tex ../paper/tables/capability_surface_summary.tex \
+  --out-csv docs/capability_surface_summary.csv
 ```
 
 Requires `pip install 'fsmreasonbench[plot]'` (matplotlib) for plotting. Default output: `runs/capability_surface_models/` with per-level/per-model scores, `combined_summary.*`, `report.md`, and PNG curves.
+
+The export CLI accepts incomplete summaries (reports missing family/level/model cells). Pass `--strict` to fail on gaps. Synthetic example input: [`capability_surface_summary_synthetic.json`](capability_surface_summary_synthetic.json).
 
 ## Exploratory batch evaluation (non-frozen)
 

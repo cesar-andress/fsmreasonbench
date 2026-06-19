@@ -115,6 +115,7 @@ generator → oracle → certificate → verifier  ✅
 | Multi-model pilot runner | `runners/pilot_models.py`, `cli/run_pilot_models.py` |
 | Model capability-surface runner | `evaluator/capability_surface_models.py`, `cli/run_capability_surface_models.py` |
 | Capability-surface plotting | `evaluator/capability_surface_plots.py`, `cli/plot_capability_surface.py` |
+| Capability-surface report export | `evaluator/capability_surface_report_export.py`, `cli/export_capability_surface_report.py` |
 | Failure inspection CLI | `evaluator/inspect_failures.py`, `cli/inspect_failures.py` — rates + per-stage failure samples |
 | Pilot report generator | `evaluator/pilot_report.py`, `cli/generate_pilot_report.py` |
 
@@ -250,4 +251,9 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_capability_surface_models \
   --out-dir runs/capability_surface_models
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.plot_capability_surface \
   --summary runs/capability_surface_models/combined_summary.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.export_capability_surface_report \
+  --summary runs/capability_surface_models/combined_summary.json \
+  --out-md docs/capability_surface_report.md \
+  --out-tex ../paper/tables/capability_surface_summary.tex \
+  --out-csv docs/capability_surface_summary.csv
 ```

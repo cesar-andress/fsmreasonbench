@@ -1,0 +1,54 @@
+{
+  "families": ["C2", "F1"],
+  "models": ["mock-a", "mock-b"],
+  "n_per_level": 10,
+  "seed": 1,
+  "temperature": 0.0,
+  "rows": [
+    {
+      "family": "C2",
+      "difficulty_level": 1,
+      "model": "mock-a",
+      "extractability_rate": 1.0,
+      "verdict_accuracy": 0.9,
+      "certificate_valid_rate": 0.7,
+      "fully_correct_rate": 0.7
+    },
+    {
+      "family": "C2",
+      "difficulty_level": 2,
+      "model": "mock-a",
+      "extractability_rate": 1.0,
+      "verdict_accuracy": 0.8,
+      "certificate_valid_rate": 0.5,
+      "fully_correct_rate": 0.5
+    },
+    {
+      "family": "C2",
+      "difficulty_level": 1,
+      "model": "mock-b",
+      "extractability_rate": 1.0,
+      "verdict_accuracy": 0.85,
+      "certificate_valid_rate": 0.6,
+      "fully_correct_rate": 0.6
+    },
+    {
+      "family": "F1",
+      "difficulty_level": 1,
+      "model": "mock-a",
+      "extractability_rate": 1.0,
+      "verdict_accuracy": 1.0,
+      "certificate_valid_rate": 0.2,
+      "fully_correct_rate": 0.2
+    },
+    {
+      "family": "F1",
+      "difficulty_level": 2,
+      "model": "mock-a",
+      "extractability_rate": 1.0,
+      "verdict_accuracy": 1.0,
+      "certificate_valid_rate": 0.1,
+      "fully_correct_rate": 0.1
+    }
+  ]
+}
