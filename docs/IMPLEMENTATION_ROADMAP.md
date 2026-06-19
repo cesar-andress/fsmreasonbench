@@ -39,6 +39,7 @@
 | P3.8 Exploratory capability-surface runner (C2 + F1) | ✅ |
 | P3.9 Minimal Ollama batch runner (C2 + F1) | ✅ |
 | P3.10 Failure inspection CLI for scored model runs | ✅ |
+| P3.11 Multi-model pilot runner (C2 + F1) | ✅ |
 
 **Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 
@@ -125,4 +126,10 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.inspect_failures \
   --scores runs/ollama_c2_qwen7b/scores.jsonl \
   --results runs/ollama_c2_qwen7b.jsonl \
   --limit 5
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --c2-items runs/capability_surface_smoke2/C2/min_witness_length_2/items.jsonl \
+  --f1-items runs/capability_surface_smoke2/F1/min_distinguishing_trace_length_2/items.jsonl \
+  --max-items 20 \
+  --out-dir runs/pilot_v1
 ```

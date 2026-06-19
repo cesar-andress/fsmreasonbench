@@ -77,7 +77,9 @@ generator → oracle → certificate → verifier  ✅
 | C2 smoke baseline runner | `cli/run_c2_smoke_baselines.py` |
 | Exploratory capability surface | `evaluator/capability_surface.py`, `cli/run_capability_surface.py` |
 | Ollama batch runner | `runners/`, `cli/run_ollama_batch.py` |
+| Multi-model pilot runner | `runners/pilot_models.py`, `cli/run_pilot_models.py` |
 | Failure inspection CLI | `evaluator/inspect_failures.py`, `cli/inspect_failures.py` — rates + per-stage failure samples |
+| Pilot report generator | `evaluator/pilot_report.py`, `cli/generate_pilot_report.py` |
 
 **End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
 
@@ -128,7 +130,7 @@ Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 1. **F1 equivalent-pair proof certificates** (positive items)
 2. **F1 NFA / containment subtypes**
 
-**Not next:** frozen cohorts, contamination tooling, LLM runners, multi-track, F2 composition.
+**Not next:** frozen cohorts, contamination tooling, F2 composition.
 
 ---
 
@@ -181,4 +183,10 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.inspect_failures \
   --scores runs/ollama_c2_qwen7b/scores.jsonl \
   --results runs/ollama_c2_qwen7b.jsonl \
   --limit 5
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --c2-items runs/capability_surface_smoke2/C2/min_witness_length_2/items.jsonl \
+  --f1-items runs/capability_surface_smoke2/F1/min_distinguishing_trace_length_2/items.jsonl \
+  --max-items 20 \
+  --out-dir runs/pilot_v1
 ```

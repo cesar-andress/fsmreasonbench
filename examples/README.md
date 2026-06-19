@@ -147,6 +147,22 @@ python -m fsmreasonbench.cli.inspect_failures \
 
 Writes per-item transcripts under `{out-dir}/transcripts/`, scoring JSONL at `{out-dir}/scores.jsonl`, and `summary.json`. Exploratory only — not for paper claims.
 
+## Multi-model pilot runner
+
+Run the same C2/F1 item batches across multiple Ollama models and write a comparative report:
+
+```bash
+python -m fsmreasonbench.cli.run_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --c2-items runs/capability_surface_smoke2/C2/min_witness_length_2/items.jsonl \
+  --f1-items runs/capability_surface_smoke2/F1/min_distinguishing_trace_length_2/items.jsonl \
+  --max-items 20 \
+  --temperature 0 \
+  --out-dir runs/pilot_v1
+```
+
+Layout per model/family: `{out-dir}/{model_dir}/{family}/scores.jsonl`, `results.jsonl`, `transcripts/`. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md`. Exploratory only — not for paper claims.
+
 ## Exploratory batch evaluation (non-frozen)
 
 ```bash
