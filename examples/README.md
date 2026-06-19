@@ -95,6 +95,16 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
 
 Default benchmark generation uses `min_distinguishing_trace_length=2`.
 
+> **Constructive F1 warning (levels ≥ 3):** Capability-surface F1 batches use chain+sink constructive generation. Scores may rise with `ℓ_dist` because gold traces follow regular patterns, not necessarily because models reason more deeply. Audit items before interpreting curves:
+
+```bash
+python -m fsmreasonbench.cli.audit_f1_items \
+  --items runs/capability_surface_models/F1/min_distinguishing_trace_length_5/items.jsonl \
+  --out runs/f1_audit_level5.json
+```
+
+Summary fields: `repeated_trace_rate`, `final_acceptance_only_rate`, `average_branching_along_witness`, `sink_transition_ratio`, `unique_gold_traces`.
+
 ## Capability surface (exploratory, non-frozen)
 
 Sweep difficulty levels and summarize oracle/random/invalid baselines:

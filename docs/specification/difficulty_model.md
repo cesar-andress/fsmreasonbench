@@ -54,6 +54,8 @@ d_F1 = (|Q_A|, |Q_B|, |Σ|, ℓ_dist, transition_count_A, transition_count_B)
 
 Constructive generation builds two chain-like DFAs that agree on all prefixes shorter than `ℓ_dist` and diverge on a witness trace of length exactly `ℓ_dist`. Capability-surface sweeps use constructive mode for F1 levels ≥ 3.
 
+> **Exploratory warning:** Constructive F1 items are **pattern-regular by design** (chain + shared sink, acceptance-only divergence at the witness end). Rising model scores at higher `ℓ_dist` may reflect generator regularity rather than deeper reasoning. Audit batches with `python -m fsmreasonbench.cli.audit_f1_items` before interpreting capability-surface curves. Treat constructive F1 difficulty as **exploratory** until a frozen cohort protocol separates structural regularity from reasoning depth.
+
 Legacy spec parameters (`sep_kind`, `min_witness_gap`) apply to future F1 subtypes.
 
 ```
