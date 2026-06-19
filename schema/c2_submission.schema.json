@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsmreasonbench.org/schema/c2_submission.schema.json",
+  "title": "C2ReachabilitySubmission",
+  "description": "Submitted answer for a C2 basic reachability item.",
+  "type": "object",
+  "required": ["item_id", "verdict", "certificate"],
+  "additionalProperties": false,
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Must match the benchmark item_id."
+    },
+    "verdict": {
+      "type": "boolean",
+      "description": "True if target_state is reachable from q0."
+    },
+    "certificate": {
+      "type": "object",
+      "required": ["certificate_type", "version", "payload"],
+      "properties": {
+        "certificate_type": {
+          "type": "string",
+          "enum": ["trace_witness", "unreachability_witness"]
+        },
+        "version": { "type": "string" },
+        "fsm_id": { "type": "string" },
+        "verdict_supported": { "type": "boolean" },
+        "payload": { "type": "object" }
+      }
+    }
+  }
+}

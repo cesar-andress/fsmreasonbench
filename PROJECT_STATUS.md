@@ -15,7 +15,7 @@
 |-------|--------|-------|
 | **Phase 1** — Core infrastructure | ✅ **Complete** | FSM, oracle, verifier, tests |
 | **Phase 2** — First vertical (C2 reachability) | ✅ **Complete** | Difficulty controls + negative items |
-| **Phase 3** — Evaluation infrastructure | ⬜ Not started | Parser, scoring, baselines |
+| **Phase 3** — Evaluation infrastructure | 🔄 **In progress** | C2 parser, scoring, transcripts, rescore |
 | **Phase 4+** — Full benchmark | ⬜ Not started | F1–F4, cohorts, Zenodo |
 
 Roadmap detail: [`docs/IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)
@@ -34,7 +34,22 @@ generator → oracle → certificate → verifier  ✅
 - **CLI:** `python3 -m fsmreasonbench.cli.generate_one --seed 42`
 - **Difficulty controls:** `min_witness_length=1`, `max_witness_length=12`, `allow_initial_target=false`
 - **Negative items:** unreachable targets with `unreachability_witness`
-- **Tests:** 27 passing (`pytest`)
+- **Tests:** 35+ passing (`pytest`)
+
+---
+
+## Phase 3 deliverables (C2 evaluation)
+
+| Component | Path |
+|-----------|------|
+| C2 submission schema | `schema/c2_submission.schema.json` |
+| Answer parser + extractability gate | `src/fsmreasonbench/evaluator/parser.py` |
+| Scoring | `src/fsmreasonbench/evaluator/scorer.py` |
+| Transcript + rescore | `src/fsmreasonbench/evaluator/transcript.py` |
+| CLI score / rescore | `cli/score_submission.py`, `cli/rescore_transcript.py` |
+| Example submissions + transcript | `examples/submission_C2_*.json`, `transcript_C2_correct.json` |
+
+**End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
 
 ---
 
@@ -74,14 +89,11 @@ Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 
 ---
 
-## Next implementation milestone (Phase 3)
+## Next implementation milestone (Phase 3 remainder)
 
-1. **Answer parser** — JSON schema validation + extractability gate
-2. **Scoring** — split extractability vs certificate correctness
-3. **Transcript recording** — submission envelope
-4. **Baselines** — random witness, symbolic oracle ceiling on C2 slice
+1. **Baselines** — random witness, symbolic oracle ceiling on C2 slice
 
-**Not next:** F2 composition, F4 probes, frozen cohorts, contamination tooling.
+**Not next:** F2 composition, F4 probes, frozen cohorts, contamination tooling, LLM runners, multi-track.
 
 ---
 
@@ -100,5 +112,10 @@ Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 ```bash
 pip install -e ".[dev]"
 pytest -v
-python3 -m fsmreasonbench.cli.generate_one --seed 42
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --seed 42
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.score_submission \
+  --item examples/item_C2_reachability_seed42.json \
+  --submission examples/submission_C2_correct.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
+  --transcript examples/transcript_C2_correct.json
 ```

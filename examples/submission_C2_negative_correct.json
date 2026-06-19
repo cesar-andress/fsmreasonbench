@@ -1,0 +1,19 @@
+{
+  "certificate": {
+    "certificate_type": "unreachability_witness",
+    "fsm_id": "f00098af-6614-5104-9228-5484793c1793",
+    "payload": {
+      "reachable_states": [
+        "q0",
+        "q1",
+        "q3",
+        "q4"
+      ],
+      "target_state": "q2"
+    },
+    "verdict_supported": false,
+    "version": "1.0"
+  },
+  "item_id": "b07bdf36-d5db-5abf-ace1-80c863d007b5",
+  "verdict": false
+}

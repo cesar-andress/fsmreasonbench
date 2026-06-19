@@ -206,7 +206,25 @@ Short accepting or rejecting prefix witness. Verdict primary.
 
 Verdict primary for calibration scoring; certificate independently verifiable.
 
----
+### C2 submission envelope
+
+Structured C2 submissions wrap the certificate in a top-level object (schema: `schema/c2_submission.schema.json`):
+
+```json
+{
+  "item_id": "uuid",
+  "verdict": true,
+  "certificate": {
+    "certificate_type": "trace_witness",
+    "version": "1.0",
+    "payload": { "trace": ["a"], "state_sequence": ["q0", "q1"] }
+  }
+}
+```
+
+Extractability requires all three fields with structurally valid certificate payloads. Verdict–certificate mismatch (e.g. `verdict=true` with `unreachability_witness`) is **extractable** but scored as `verdict_wrong` or `certificate_invalid` depending on gold answer.
+
+Example submissions: `examples/submission_C2_*.json`.
 
 ## Extractability vs correctness
 

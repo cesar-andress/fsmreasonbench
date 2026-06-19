@@ -1,0 +1,22 @@
+{
+  "certificate": {
+    "certificate_type": "trace_witness",
+    "fsm_id": "4b3aacee-8d63-5c07-a401-f241fb421215",
+    "payload": {
+      "accepting": true,
+      "state_sequence": [
+        "q0",
+        "q2",
+        "q3"
+      ],
+      "trace": [
+        "b",
+        "a"
+      ]
+    },
+    "verdict_supported": true,
+    "version": "1.0"
+  },
+  "item_id": "185c3d47-1009-5de7-8c33-9ba9d023fd04",
+  "verdict": false
+}

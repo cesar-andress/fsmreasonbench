@@ -2,14 +2,49 @@
 
 Hand-generated and tool-generated **illustrative items** (not full cohorts).
 
+## Benchmark items
+
 | File | Description |
 |------|-------------|
-| `item_C2_reachability_seed42.json` | First self-verifying C2 reachability item (`seed=42`, `\|Q\|=5`) |
+| `item_C2_reachability_seed42.json` | Positive C2 reachability item (`seed=42`, `\|Q\|=5`) |
+| `item_C2_reachability_seed43_negative.json` | Negative C2 reachability item (`seed=43`, unreachable target) |
 
 Regenerate:
 
 ```bash
-python3 -m fsmreasonbench.cli.generate_one --seed 42 --output examples/item_C2_reachability_seed42.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --seed 42 \
+  --output examples/item_C2_reachability_seed42.json
 ```
 
 Each item passes `self_verify_item`: generator → oracle → certificate → verifier.
+
+## C2 submissions
+
+| File | Expected outcome |
+|------|------------------|
+| `submission_C2_correct.json` | `failure_stage=correct` (positive) |
+| `submission_C2_negative_correct.json` | `failure_stage=correct` (negative) |
+| `submission_C2_wrong_verdict.json` | `failure_stage=verdict_wrong` |
+| `submission_C2_invalid_certificate.json` | `failure_stage=certificate_invalid` |
+| `submission_C2_malformed.json` | `failure_stage=not_extractable` |
+
+Score a submission:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.score_submission \
+  --item examples/item_C2_reachability_seed42.json \
+  --submission examples/submission_C2_correct.json
+```
+
+## Transcripts
+
+| File | Description |
+|------|-------------|
+| `transcript_C2_correct.json` | Full evaluation transcript for correct positive submission |
+
+Rescore:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
+  --transcript examples/transcript_C2_correct.json
+```

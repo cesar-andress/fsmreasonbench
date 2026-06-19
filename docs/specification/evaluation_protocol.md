@@ -236,7 +236,63 @@ See [`../artifact/reproducibility_policy.md`](../artifact/reproducibility_policy
 
 ---
 
-## 12. CLI (planned)
+## 12. CLI
+
+### 12.1 Implemented (C2 calibration slice)
+
+Score a structured submission against a benchmark item:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.score_submission \
+  --item examples/item_C2_reachability_seed42.json \
+  --submission examples/submission_C2_correct.json
+```
+
+Deterministically recompute scoring from a saved transcript:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
+  --transcript examples/transcript_C2_correct.json
+```
+
+### 12.2 C2 submission schema
+
+Structured submissions MUST include:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `item_id` | string | Must match the evaluatee item |
+| `verdict` | boolean | `true` = reachable, `false` = unreachable |
+| `certificate` | object | `trace_witness` or `unreachability_witness` per [`certificate_formats.md`](certificate_formats.md) |
+
+Schema: `schema/c2_submission.schema.json`.
+
+Raw model text MAY be stored in transcripts; the parser extracts JSON objects or fenced code blocks.
+
+### 12.3 C2 scoring record
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `extractable` | bool | Parser produced a valid submission |
+| `verdict_correct` | bool \| null | Null if not extractable |
+| `certificate_valid` | bool \| null | Independent verifier result |
+| `fully_correct` | bool | Verdict and certificate both correct |
+| `failure_stage` | enum | `not_extractable`, `verdict_wrong`, `certificate_invalid`, `correct` |
+
+### 12.4 Transcript envelope
+
+Each evaluation transcript stores:
+
+- `item` — full benchmark item (including answer key for offline rescore)
+- `raw_response` — original model/system output string
+- `parsed_submission` — present only when extractable
+- `scoring_record` — result of scoring pipeline
+- `scorer_version` — pinned evaluator version
+- `timestamp` — ISO-8601 UTC
+
+Rescore recomputes `scoring_record` from `item` + `raw_response` (or parsed submission if present); fields MUST match the original score when inputs are unchanged.
+
+### 12.5 Planned (full benchmark)
 
 ```
 evaluate_submission.py \
@@ -245,4 +301,4 @@ evaluate_submission.py \
   --output capability_surface.json
 ```
 
-Not implemented in foundation phase.
+Multi-family batch evaluation and capability surfaces are not yet implemented.
