@@ -22,6 +22,41 @@ Roadmap detail: [`docs/IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.m
 
 ---
 
+## Empirical evaluation framing
+
+FSMReasonBench separates four **independent** measurement layers on every scored item:
+
+| Layer | Metric | Meaning |
+|-------|--------|---------|
+| 1 | **Extractability** | Parseable, schema-valid submission extracted from model output |
+| 2 | **Verdict accuracy** | Declared boolean verdict matches gold (when extractable) |
+| 3 | **Certificate validity** | Independent verifier accepts submitted certificate |
+| 4 | **Full correctness** | Verdict and certificate both correct |
+
+Reported rates: `extractability_rate`, `verdict_accuracy`, `certificate_valid_rate`, `fully_correct_rate`, plus `failure_stage` (`not_extractable`, `verdict_wrong`, `certificate_invalid`, `correct`).
+
+**Empirical risk under test:** verdict accuracy can **overstate verified reasoning success** — models may emit extractable JSON and plausible high-level verdicts while failing to produce executable certificates. Flagship scoring treats certificate validity as primary; verdict-only success is diagnostic, not sufficient.
+
+**Implemented families (artifact v0.2):**
+
+| Tier | Family | Role |
+|------|--------|------|
+| Calibration | **C2** Reachability | Operational literacy; sanity / drift detection |
+| Flagship | **F1** Separation / Witness (DFA non-equivalence) | First flagship vertical; `distinguishing_trace` certificate |
+
+**Evaluation tracks (current artifact):**
+
+| Track | Purpose |
+|-------|---------|
+| **Oracle baseline** | Symbolic ceiling (extractable + fully correct) |
+| **Random baseline** | Seeded wrong submissions; tests scoring separation |
+| **Invalid baseline** | Non-extractable output probe |
+| **Local Ollama (no tools)** | Exploratory model evaluation; temperature=0; not frozen |
+
+Exploratory runs (pilots, capability-surface sweeps) use **non-frozen** JSONL cohorts under `runs/` (gitignored). Committed summaries in `docs/pilot_v0_*` and `docs/pilot_v1_*` are illustrative only — not paper claims or final benchmark results.
+
+---
+
 ## Milestone achieved: first self-verifying item
 
 ```
@@ -100,18 +135,11 @@ Exploratory local-model runs; **not frozen cohorts**. Raw transcripts and JSONL 
 | v0 (single model) | [`docs/pilot_v0_report.md`](docs/pilot_v0_report.md), [`docs/pilot_v0_summary.json`](docs/pilot_v0_summary.json) | `runs/pilot_v0/` |
 | v1 (multi-model) | [`docs/pilot_v1_report.md`](docs/pilot_v1_report.md), [`docs/pilot_v1_summary.json`](docs/pilot_v1_summary.json), [`docs/pilot_v1_summary.csv`](docs/pilot_v1_summary.csv) | `runs/pilot_v1/` |
 
-### Pilot v1 headline metrics (n=20 per family, temperature=0)
+### Pilot v1 exploratory observations (non-frozen, n=20 per family)
 
-Items: C2 `min_witness_length=2`, F1 `min_distinguishing_trace_length=2` from `capability_surface_smoke2`.
+Items: C2 `min_witness_length=2`, F1 `min_distinguishing_trace_length=2` from `capability_surface_smoke2`. See [`docs/pilot_v1_report.md`](docs/pilot_v1_report.md) for full tables.
 
-| Model | C2 `fully_correct_rate` | F1 `fully_correct_rate` | C2 `verdict_accuracy` | F1 `verdict_accuracy` |
-|-------|-------------------------:|-------------------------:|------------------------:|------------------------:|
-| qwen2.5-coder:7b | 0.10 | 0.05 | 0.75 | 1.00 |
-| llama3.1:8b | 0.20 | 0.10 | 0.45 | 1.00 |
-| mistral-nemo:12b | 0.05 | 0.20 | 0.60 | 1.00 |
-| gemma2:9b | 0.05 | 0.20 | 0.55 | 1.00 |
-
-All models: **extractability_rate = 1.0** on both families. F1 **verdict_accuracy = 1.0** for every model, but **certificate_valid_rate ≤ 0.20** — verdict accuracy overstates end-to-end reasoning success.
+**Pattern (not a general claim):** all four pilot models achieved extractability_rate = 1.0; F1 verdict_accuracy = 1.0 for every model, while certificate_valid_rate and fully_correct_rate remained low — consistent with the verdict-overstatement risk above.
 
 ---
 

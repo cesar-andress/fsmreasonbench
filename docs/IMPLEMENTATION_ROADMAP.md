@@ -44,6 +44,38 @@
 
 **Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 
+## Empirical evaluation framing (documentation)
+
+The artifact reports capability as **layered rates**, not a single accuracy number:
+
+1. **Extractability** — can the evaluator parse a schema-valid submission?
+2. **Verdict accuracy** — does the declared verdict match gold (conditional on extractability)?
+3. **Certificate validity** — does the independent verifier accept the certificate?
+4. **Full correctness** — verdict and certificate both correct.
+
+**Design hypothesis (under empirical test):** models may score well on verdict accuracy while failing certificate validation; headline reporting must not collapse these layers.
+
+**Current implemented scope:**
+
+| Family | Tier | Status |
+|--------|------|--------|
+| C2 Reachability | Calibration | ✅ end-to-end |
+| F1 DFA non-equivalence | Flagship (first) | ✅ end-to-end |
+| F2–F4, C1 | Planned | ⬜ |
+
+**Current evaluation tracks:**
+
+| Track | CLI / module | Role |
+|-------|--------------|------|
+| Oracle baseline | `run_baseline --baseline oracle` | Ceiling |
+| Random baseline | `run_baseline --baseline random` | Wrong-but-extractable control |
+| Invalid baseline | `run_baseline --baseline invalid` | Extractability floor |
+| Local Ollama (no tools) | `run_ollama_batch`, `run_pilot_models`, `run_capability_surface_models` | Exploratory model sweeps |
+
+Committed docs (`docs/pilot_v0_*`, `docs/pilot_v1_*`) summarize exploratory pilots; multi-model capability-surface runs produce `runs/capability_surface_models/` summaries locally. None of these are frozen cohorts or final benchmark claims.
+
+---
+
 ## Phase 4 — Flagship verticals 🔄
 
 | Milestone | Status |
