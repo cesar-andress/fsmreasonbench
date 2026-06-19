@@ -95,6 +95,24 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
 
 Default benchmark generation uses `min_distinguishing_trace_length=2`.
 
+## Capability surface (exploratory, non-frozen)
+
+Sweep difficulty levels and summarize oracle/random/invalid baselines:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_capability_surface \
+  --families C2,F1 --n-per-level 50 --seed 1 --out-dir runs/capability_surface
+```
+
+| Family | Difficulty axis | Levels swept |
+|--------|-----------------|--------------|
+| C2 | `min_witness_length` | 1–5 |
+| F1 | `min_distinguishing_trace_length` | 1–5 |
+
+Writes per family/level items, baseline scores, summaries, plus `combined_summary.json` and `combined_summary.csv`. Generation failures abort by default; pass `--skip-failed-levels` to record skipped levels instead.
+
+Not a frozen cohort and not for paper claims.
+
 ## Exploratory batch evaluation (non-frozen)
 
 ```bash

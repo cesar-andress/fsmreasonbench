@@ -36,6 +36,7 @@
 | P3.5 Baselines: random, oracle ceiling, invalid | ✅ |
 | P3.6 C2 batch generation + baseline batch evaluation + summaries | ✅ |
 | P3.7 C2 smoke baseline batch runner (oracle / random / invalid) | ✅ |
+| P3.8 Exploratory capability-surface runner (C2 + F1) | ✅ |
 
 **Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 
@@ -74,11 +75,13 @@ src/fsmreasonbench/
   verifier/        # independent verification (no oracle import)
   generator/       # C2 reachability + F1 separation generation
   items/           # benchmark item assembly + self_verify
-  evaluator/       # family-aware parser, scorer, transcripts, batch, summary
+  evaluator/       # family-aware parser, scorer, transcripts, batch, summary,
+                   # capability_surface
   baselines/       # C2/F1 reference systems (oracle, random, invalid)
   cli/             # generate_one, score_submission, rescore_transcript, run_baseline,
                    # generate_batch, evaluate_baseline_batch, summarize_scores,
-                   # run_c2_smoke_baselines, run_f1_smoke_baselines
+                   # run_c2_smoke_baselines, run_f1_smoke_baselines,
+                   # run_capability_surface
 ```
 
 ## Run
@@ -105,4 +108,6 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_c2_smoke_baselines \
   --n 100 --seed 1 --out-dir runs/c2_smoke
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
   --n 100 --seed 1 --out-dir runs/f1_smoke
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_capability_surface \
+  --families C2,F1 --n-per-level 50 --seed 1 --out-dir runs/capability_surface
 ```
