@@ -117,7 +117,7 @@ generator → oracle → certificate → verifier  ✅
 | Capability-surface plotting | `evaluator/capability_surface_plots.py`, `cli/plot_capability_surface.py` |
 | Capability-surface report export | `evaluator/capability_surface_report_export.py`, `cli/export_capability_surface_report.py` |
 | Documentation consistency checker | `dev/doc_consistency.py`, `cli/check_docs.py` |
-| Artifact health check | `dev/artifact_health.py`, `cli/artifact_health.py` |
+| Artifact health check | `dev/artifact_health.py`, `cli/artifact_health.py` — package import, required schemas, example self-verify, CLI imports; `--json` |
 | F1 item audit diagnostics | `evaluator/f1_item_audit.py`, `cli/audit_f1_items.py` |
 | Failure inspection CLI | `evaluator/inspect_failures.py`, `cli/inspect_failures.py` — rates + per-stage failure samples |
 | Pilot report generator | `evaluator/pilot_report.py`, `cli/generate_pilot_report.py` |

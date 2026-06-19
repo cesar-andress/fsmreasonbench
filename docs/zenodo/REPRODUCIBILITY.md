@@ -175,6 +175,10 @@ Seed-based regeneration (R3) may remain under embargo until documented in the re
 # Generate and self-verify one item
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --family C2 --seed 42
 
+# Artifact health (schemas, examples, CLI imports)
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health --json
+
 # Run unit tests (oracle, verifier, scorer, rescore)
 PYTHONPATH=src python3.11 -m pytest -v
 

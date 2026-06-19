@@ -9,106 +9,99 @@ import pytest
 
 from fsmreasonbench.cli.artifact_health import main as artifact_health_main
 from fsmreasonbench.dev.artifact_health import (
+    REQUIRED_SCHEMAS,
     build_artifact_health_report,
-    discover_schemas,
+    check_required_schemas,
     format_artifact_health_report,
-    verify_example_items,
 )
 
 
-def test_discover_schemas_finds_repo_schemas() -> None:
-    from fsmreasonbench.dev.doc_consistency import find_repo_root
-
-    repo = find_repo_root()
-    schemas = discover_schemas(repo)
-    assert "schema/fsm.schema.json" in schemas
-    assert "schema/certificate/reachability.schema.json" in schemas
-
-
-def test_verify_example_items_in_real_repo() -> None:
-    from fsmreasonbench.dev.doc_consistency import find_repo_root
-
-    repo = find_repo_root()
-    results = verify_example_items(repo)
-    assert results
-    assert all(result.ok for result in results), results
-
-
-def test_build_report_ok_in_real_repo() -> None:
+def test_build_report_passes_in_real_repo() -> None:
     from fsmreasonbench.dev.doc_consistency import find_repo_root
 
     report = build_artifact_health_report(find_repo_root())
-    assert report.package_version
-    assert ("C2", "calibration") in report.families
-    assert ("F1", "flagship") in report.families
-    assert report.schemas
     assert report.ok
+    assert report.status == "PASS"
+    check_names = {check.name for check in report.checks}
+    assert check_names == {
+        "package_import",
+        "required_schemas",
+        "example_items",
+        "cli_imports",
+    }
+    assert all(check.ok for check in report.checks)
 
 
-def test_format_report_includes_sections() -> None:
+def test_format_report_includes_pass_fail_summary() -> None:
     from fsmreasonbench.dev.doc_consistency import find_repo_root
 
     report = build_artifact_health_report(find_repo_root())
     text = format_artifact_health_report(report)
-    assert "Package version:" in text
-    assert "Available families:" in text
-    assert "Schemas present" in text
-    assert "Example items (self-verify):" in text
-    assert "Tests:" in text
+    assert "[PASS] package_import" in text
+    assert "[PASS] required_schemas" in text
+    assert "[PASS] example_items" in text
+    assert "[PASS] cli_imports" in text
+    assert "Status: PASS" in text
 
 
-def test_min_repo_missing_examples_marks_unhealthy(tmp_path: Path) -> None:
-    repo = _make_min_repo(tmp_path)
+def test_missing_schema_marks_report_unhealthy(tmp_path: Path) -> None:
+    repo = _make_repo_with_schemas(tmp_path, omit="schema/question.schema.json")
+    schema_check = check_required_schemas(repo)
+    assert not schema_check.ok
+    assert "schema/question.schema.json" in schema_check.message
+
     report = build_artifact_health_report(repo)
     assert not report.ok
-    assert report.examples == ()
+    assert report.status == "FAIL"
+    schema_report = next(check for check in report.checks if check.name == "required_schemas")
+    assert not schema_report.ok
 
 
-def test_min_repo_with_valid_example(tmp_path: Path) -> None:
-    from fsmreasonbench.dev.doc_consistency import find_repo_root
+def test_json_output_shape(capsys: pytest.CaptureFixture[str]) -> None:
+    rc = artifact_health_main(["--json"])
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "PASS"
+    assert isinstance(payload["checks"], list)
+    assert {check["name"] for check in payload["checks"]} == {
+        "package_import",
+        "required_schemas",
+        "example_items",
+        "cli_imports",
+    }
+    for check in payload["checks"]:
+        assert isinstance(check["ok"], bool)
+        assert isinstance(check["message"], str)
 
-    repo = find_repo_root()
-    source = repo / "examples" / "item_C2_reachability_seed42.json"
-    target_repo = _make_min_repo(tmp_path)
-    examples = target_repo / "examples"
-    examples.mkdir(exist_ok=True)
-    (examples / "item_C2_reachability_seed42.json").write_text(
-        source.read_text(encoding="utf-8"),
-        encoding="utf-8",
-    )
 
-    report = build_artifact_health_report(target_repo)
-    assert len(report.examples) == 1
-    assert report.examples[0].ok
+def test_cli_fails_when_required_schema_missing(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = _make_repo_with_schemas(tmp_path, omit="schema/answer.schema.json")
+    rc = artifact_health_main(["--repo-root", str(repo), "--json"])
+    assert rc == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "FAIL"
+    schema_check = next(check for check in payload["checks"] if check["name"] == "required_schemas")
+    assert schema_check["ok"] is False
+    assert "schema/answer.schema.json" in schema_check["message"]
 
 
-def test_cli_on_real_repo(capsys: pytest.CaptureFixture[str]) -> None:
+def test_cli_success_on_real_repo(capsys: pytest.CaptureFixture[str]) -> None:
     rc = artifact_health_main([])
     assert rc == 0
     out = capsys.readouterr().out
-    assert "artifact health" in out.lower()
-    assert "pytest" in out
+    assert "Status: PASS" in out
 
 
-def test_cli_fails_when_example_invalid(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    repo = _make_min_repo(tmp_path)
-    examples = repo / "examples"
-    examples.mkdir(exist_ok=True)
-    (examples / "item_bad.json").write_text(
-        json.dumps({"family": "C2", "item_id": "x", "answer_key": {}}),
-        encoding="utf-8",
-    )
-    rc = artifact_health_main(["--repo-root", str(repo)])
-    assert rc == 1
-    assert "FAIL" in capsys.readouterr().out
-
-
-def _make_min_repo(tmp_path: Path) -> Path:
+def _make_repo_with_schemas(tmp_path: Path, *, omit: str | None = None) -> Path:
     repo = tmp_path / "repo"
-    (repo / "schema" / "certificate").mkdir(parents=True)
-    (repo / "examples").mkdir(parents=True)
-    (repo / "src" / "fsmreasonbench").mkdir(parents=True)
+    for relative_path in REQUIRED_SCHEMAS:
+        if relative_path == omit:
+            continue
+        path = repo / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("{}", encoding="utf-8")
     (repo / "pyproject.toml").write_text("[project]\nname='fsmreasonbench'\n", encoding="utf-8")
-    (repo / "schema" / "fsm.schema.json").write_text("{}", encoding="utf-8")
-    (repo / "schema" / "VERSION").write_text("1.0.0-draft\n", encoding="utf-8")
     return repo

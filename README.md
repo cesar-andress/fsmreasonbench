@@ -127,6 +127,19 @@ See [`PROJECT_STATUS.md`](PROJECT_STATUS.md).
 
 ---
 
+## Artifact health
+
+Quick sanity check before release prep or after cloning:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health --json
+```
+
+Verifies package import, required schemas, reference example self-verification, and core CLI imports. Exits non-zero on failure.
+
+---
+
 ## Citation
 
 Use `CITATION.cff` after DOI minting. Until then, do not cite `-draft` specifications.

@@ -2,66 +2,194 @@
 
 from __future__ import annotations
 
-import sys
+import importlib
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
-import fsmreasonbench
 from fsmreasonbench.dev.doc_consistency import find_repo_root
 from fsmreasonbench.evaluator.io import load_item
 from fsmreasonbench.items.assembly import self_verify_item
 
-AVAILABLE_FAMILIES: tuple[tuple[str, str], ...] = (
-    ("C2", "calibration"),
-    ("F1", "flagship"),
+REQUIRED_SCHEMAS: tuple[str, ...] = (
+    "schema/fsm.schema.json",
+    "schema/question.schema.json",
+    "schema/answer.schema.json",
+    "schema/c2_submission.schema.json",
+    "schema/certificate/separation.schema.json",
 )
 
-DEFAULT_TESTS_COMMAND = "PYTHONPATH=src python3.11 -m pytest -v"
+REQUIRED_EXAMPLES: tuple[str, ...] = (
+    "examples/item_C2_reachability_seed42.json",
+    "examples/item_F1_separation_seed42.json",
+    "examples/item_F1_separation_seed6_hard.json",
+)
+
+REQUIRED_CLI_MODULES: tuple[str, ...] = (
+    "fsmreasonbench.cli.generate_one",
+    "fsmreasonbench.cli.generate_batch",
+    "fsmreasonbench.cli.run_baseline",
+    "fsmreasonbench.cli.run_c2_smoke_baselines",
+    "fsmreasonbench.cli.run_f1_smoke_baselines",
+    "fsmreasonbench.cli.run_capability_surface",
+    "fsmreasonbench.cli.run_ollama_batch",
+    "fsmreasonbench.cli.run_pilot_models",
+    "fsmreasonbench.cli.run_capability_surface_models",
+    "fsmreasonbench.cli.plot_capability_surface",
+    "fsmreasonbench.cli.export_capability_surface_report",
+    "fsmreasonbench.cli.audit_f1_items",
+)
 
 
 @dataclass(frozen=True, slots=True)
-class ExampleVerifyResult:
-    """Self-verification outcome for one example item."""
+class HealthCheck:
+    """Outcome of one artifact health check."""
 
-    path: str
-    family: str
+    name: str
     ok: bool
-    error: str = ""
+    message: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "ok": self.ok,
+            "message": self.message,
+        }
 
 
 @dataclass(frozen=True, slots=True)
 class ArtifactHealthReport:
     """Summary of artifact health signals."""
 
-    package_version: str
-    families: tuple[tuple[str, str], ...]
-    schemas: tuple[str, ...]
-    schema_version: str | None
-    examples: tuple[ExampleVerifyResult, ...]
-    tests_command: str
+    checks: tuple[HealthCheck, ...]
 
     @property
     def ok(self) -> bool:
-        return (
-            bool(self.schemas)
-            and bool(self.examples)
-            and all(example.ok for example in self.examples)
-        )
+        return all(check.ok for check in self.checks)
+
+    @property
+    def status(self) -> str:
+        return "PASS" if self.ok else "FAIL"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "status": self.status,
+            "checks": [check.to_dict() for check in self.checks],
+        }
 
 
 def build_artifact_health_report(repo_root: Path | None = None) -> ArtifactHealthReport:
     """Collect artifact health information without reading ``runs/``."""
     root = repo_root or find_repo_root()
-    schemas = discover_schemas(root)
-    schema_version = read_schema_version(root)
-    examples = verify_example_items(root)
-    return ArtifactHealthReport(
-        package_version=fsmreasonbench.__version__,
-        families=AVAILABLE_FAMILIES,
-        schemas=schemas,
-        schema_version=schema_version,
-        examples=examples,
-        tests_command=suggest_tests_command(),
+    checks = (
+        check_package_import(),
+        check_required_schemas(root),
+        check_example_items(root),
+        check_cli_imports(),
+    )
+    return ArtifactHealthReport(checks=checks)
+
+
+def check_package_import() -> HealthCheck:
+    """Verify the package imports and expose a version string."""
+    try:
+        import fsmreasonbench
+
+        version = getattr(fsmreasonbench, "__version__", "")
+        if not version:
+            return HealthCheck(
+                name="package_import",
+                ok=False,
+                message="fsmreasonbench imported but __version__ is missing",
+            )
+        return HealthCheck(
+            name="package_import",
+            ok=True,
+            message=f"fsmreasonbench {version}",
+        )
+    except Exception as exc:  # noqa: BLE001 - report any import failure
+        return HealthCheck(
+            name="package_import",
+            ok=False,
+            message=str(exc),
+        )
+
+
+def check_required_schemas(repo_root: Path) -> HealthCheck:
+    """Verify required JSON Schema files exist under the repository root."""
+    missing = [
+        relative_path
+        for relative_path in REQUIRED_SCHEMAS
+        if not (repo_root / relative_path).is_file()
+    ]
+    if missing:
+        return HealthCheck(
+            name="required_schemas",
+            ok=False,
+            message=f"missing: {', '.join(missing)}",
+        )
+    return HealthCheck(
+        name="required_schemas",
+        ok=True,
+        message=f"{len(REQUIRED_SCHEMAS)}/{len(REQUIRED_SCHEMAS)} present",
+    )
+
+
+def check_example_items(repo_root: Path) -> HealthCheck:
+    """Self-verify the committed reference example items."""
+    failures: list[str] = []
+    verified = 0
+    for relative_path in REQUIRED_EXAMPLES:
+        path = repo_root / relative_path
+        if not path.is_file():
+            failures.append(f"{relative_path}: missing")
+            continue
+        try:
+            item = load_item(path)
+            self_verify_item(item)
+        except (AssertionError, ValueError, KeyError, TypeError, OSError) as exc:
+            failures.append(f"{relative_path}: {exc}")
+            continue
+        verified += 1
+
+    if failures:
+        return HealthCheck(
+            name="example_items",
+            ok=False,
+            message="; ".join(failures),
+        )
+    return HealthCheck(
+        name="example_items",
+        ok=True,
+        message=f"{verified}/{len(REQUIRED_EXAMPLES)} self-verify",
+    )
+
+
+def check_cli_imports() -> HealthCheck:
+    """Verify core CLI modules are importable."""
+    failures: list[str] = []
+    imported = 0
+    for module_name in REQUIRED_CLI_MODULES:
+        try:
+            module = importlib.import_module(module_name)
+        except Exception as exc:  # noqa: BLE001 - report any import failure
+            failures.append(f"{module_name}: {exc}")
+            continue
+        if not callable(getattr(module, "main", None)):
+            failures.append(f"{module_name}: missing main()")
+            continue
+        imported += 1
+
+    if failures:
+        return HealthCheck(
+            name="cli_imports",
+            ok=False,
+            message="; ".join(failures),
+        )
+    return HealthCheck(
+        name="cli_imports",
+        ok=True,
+        message=f"{imported}/{len(REQUIRED_CLI_MODULES)} importable",
     )
 
 
@@ -70,99 +198,10 @@ def format_artifact_health_report(report: ArtifactHealthReport) -> str:
     lines = [
         "FSMReasonBench artifact health",
         "",
-        f"Package version: {report.package_version}",
-        "",
-        "Available families:",
     ]
-    for family, tier in report.families:
-        lines.append(f"  - {family} ({tier})")
-
-    lines.extend(["", f"Schemas present ({len(report.schemas)}):"])
-    if report.schemas:
-        lines.extend(f"  - {path}" for path in report.schemas)
-    else:
-        lines.append("  (none)")
-
-    if report.schema_version is not None:
-        lines.extend(["", f"Schema bundle version: {report.schema_version}"])
-
-    lines.extend(["", "Example items (self-verify):"])
-    if report.examples:
-        for example in report.examples:
-            status = "OK" if example.ok else "FAIL"
-            lines.append(f"  [{status}] {example.path} ({example.family})")
-            if example.error:
-                lines.append(f"         {example.error}")
-    else:
-        lines.append("  (none)")
-
-    lines.extend(["", f"Tests: {report.tests_command}", ""])
-    if report.ok:
-        lines.append("Status: healthy")
-    else:
-        lines.append("Status: unhealthy")
+    for check in report.checks:
+        status = "PASS" if check.ok else "FAIL"
+        suffix = f": {check.message}" if check.message else ""
+        lines.append(f"[{status}] {check.name}{suffix}")
+    lines.extend(["", f"Status: {report.status}"])
     return "\n".join(lines)
-
-
-def discover_schemas(repo_root: Path) -> tuple[str, ...]:
-    """List JSON schema files under ``schema/``."""
-    schema_root = repo_root / "schema"
-    if not schema_root.is_dir():
-        return ()
-    paths = sorted(
-        path.relative_to(repo_root).as_posix()
-        for path in schema_root.rglob("*.json")
-        if path.is_file()
-    )
-    return tuple(paths)
-
-
-def read_schema_version(repo_root: Path) -> str | None:
-    """Read ``schema/VERSION`` when present."""
-    version_path = repo_root / "schema" / "VERSION"
-    if not version_path.is_file():
-        return None
-    return version_path.read_text(encoding="utf-8").strip()
-
-
-def verify_example_items(repo_root: Path) -> tuple[ExampleVerifyResult, ...]:
-    """Run self-verification on committed ``examples/item_*.json`` files."""
-    examples_dir = repo_root / "examples"
-    if not examples_dir.is_dir():
-        return ()
-
-    results: list[ExampleVerifyResult] = []
-    for path in sorted(examples_dir.glob("item_*.json")):
-        relative = path.relative_to(repo_root).as_posix()
-        family = "?"
-        try:
-            item = load_item(path)
-            family = item.family
-            self_verify_item(item)
-        except (AssertionError, ValueError, KeyError, TypeError) as exc:
-            results.append(
-                ExampleVerifyResult(
-                    path=relative,
-                    family=family,
-                    ok=False,
-                    error=str(exc),
-                )
-            )
-        else:
-            results.append(
-                ExampleVerifyResult(
-                    path=relative,
-                    family=family,
-                    ok=True,
-                )
-            )
-    return tuple(results)
-
-
-DEFAULT_TESTS_COMMAND = "PYTHONPATH=src python3.11 -m pytest -v"
-
-
-def suggest_tests_command() -> str:
-    """Suggest a pytest command using the current interpreter."""
-    version = f"{sys.version_info.major}.{sys.version_info.minor}"
-    return DEFAULT_TESTS_COMMAND.replace("python3.11", f"python{version}")
