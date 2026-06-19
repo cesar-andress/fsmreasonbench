@@ -6,22 +6,27 @@
       "payload": {
         "accepting": true,
         "state_sequence": [
-          "q0"
+          "q0",
+          "q2",
+          "q3"
         ],
-        "trace": []
+        "trace": [
+          "b",
+          "a"
+        ]
       },
       "verdict_supported": true,
       "version": "1.0"
     },
-    "item_id": "16c1896b-62da-57db-8b7b-9f4fba484503",
+    "item_id": "185c3d47-1009-5de7-8c33-9ba9d023fd04",
     "verdict": true
   },
   "contamination": {
-    "public_fingerprint": "925fddd913f1b5cc6d47e9bf79f206bf516f1a7501f21a994a88d6aaaef771b4"
+    "public_fingerprint": "3b1f91adc662856e41450ba3cbf0a972637e75e4558cd48504fc4e918da92dba"
   },
   "difficulty": {
     "core": {
-      "witness_length": 0,
+      "witness_length": 2,
       "|Q|": 5
     },
     "generator_seed": 42
@@ -99,10 +104,10 @@
       }
     ]
   },
-  "item_id": "16c1896b-62da-57db-8b7b-9f4fba484503",
+  "item_id": "185c3d47-1009-5de7-8c33-9ba9d023fd04",
   "question": {
     "family": "C2",
     "prompt_id": "reachability.v1",
-    "target_state": "q0"
+    "target_state": "q3"
   }
 }

@@ -8,24 +8,46 @@ import sys
 
 from fsmreasonbench.generator.reachability import (
     ReachabilityGeneratorConfig,
-    generate_reachability_fsm,
-    pick_target_state,
+    generate_reachability_item,
 )
-from fsmreasonbench.items.assembly import assemble_reachability_item, self_verify_item
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Generate one C2 reachability item")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--state-count", type=int, default=5)
+    parser.add_argument("--min-witness-length", type=int, default=1)
+    parser.add_argument("--max-witness-length", type=int, default=12)
+    parser.add_argument(
+        "--allow-initial-target",
+        action="store_true",
+        help="Allow positive items with empty trace to initial state",
+    )
+    parser.add_argument(
+        "--positive-only",
+        action="store_true",
+        help="Force a reachable target",
+    )
+    parser.add_argument(
+        "--negative-only",
+        action="store_true",
+        help="Force an unreachable target",
+    )
     parser.add_argument("--output", type=str, default="-")
     args = parser.parse_args(argv)
 
-    config = ReachabilityGeneratorConfig(state_count=args.state_count)
-    fsm = generate_reachability_fsm(args.seed, config)
-    target = pick_target_state(args.seed, fsm)
-    item = assemble_reachability_item(fsm, target, seed=args.seed)
-    self_verify_item(item)
+    if args.positive_only and args.negative_only:
+        parser.error("--positive-only and --negative-only are mutually exclusive")
+
+    force = True if args.positive_only else False if args.negative_only else None
+    config = ReachabilityGeneratorConfig(
+        state_count=args.state_count,
+        min_witness_length=args.min_witness_length,
+        max_witness_length=args.max_witness_length,
+        allow_initial_target=args.allow_initial_target,
+        include_negative=not args.positive_only,
+    )
+    item = generate_reachability_item(args.seed, config, force_positive=force)
 
     payload = item.to_full_dict()
     text = json.dumps(payload, indent=2, sort_keys=True)

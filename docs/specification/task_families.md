@@ -234,7 +234,19 @@ Scoring: probe traces where reference and submitted query disagree → failure.
 
 **Purpose:** Basic graph-reachability literacy; drift detection across model versions.
 
-**Scoring:** Verdict + optional reachability trace.
+**Generator controls (implementation v0.2+):**
+
+| Parameter | Default | Role |
+|-----------|---------|------|
+| `min_witness_length` | `1` | Positive items require non-empty witness unless initial target explicitly allowed |
+| `max_witness_length` | `12` | Cap witness length for calibration strata |
+| `allow_initial_target` | `false` | If false, empty trace to `q₀` is excluded from positive items |
+
+**Positive items:** `answer_key.verdict = true` with `trace_witness` (shortest path).
+
+**Negative items:** `answer_key.verdict = false` with `unreachability_witness` listing the complete reachable state set from `q₀`.
+
+**Scoring:** Verdict primary; certificate required for self-verification pipeline.
 
 **Reporting:** Calibration panel only.
 

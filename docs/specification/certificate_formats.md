@@ -197,7 +197,14 @@ Short accepting or rejecting prefix witness. Verdict primary.
 
 ### C2 — `trace_witness` or `unreachability_witness`
 
-As in legacy design. Verdict primary.
+| Verdict | Certificate | Verification |
+|---------|-------------|--------------|
+| `true` (reachable) | `trace_witness` | Replay trace; ends at `target_state`; length ≥ `min_witness_length` when generator policy applies |
+| `false` (unreachable) | `unreachability_witness` | `target_state ∉ reachable_states`; set equals BFS reachable set from `q₀` |
+
+**Generator policy:** empty trace (`trace: []`) is valid only when `target_state == q₀` **and** `allow_initial_target=true`. Default generator settings forbid trivial empty-trace positive items.
+
+Verdict primary for calibration scoring; certificate independently verifiable.
 
 ---
 

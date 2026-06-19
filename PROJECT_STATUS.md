@@ -14,7 +14,7 @@
 | Phase | Status | Notes |
 |-------|--------|-------|
 | **Phase 1** — Core infrastructure | ✅ **Complete** | FSM, oracle, verifier, tests |
-| **Phase 2** — First vertical (C2 reachability) | ✅ **Complete** | First self-verifying item |
+| **Phase 2** — First vertical (C2 reachability) | ✅ **Complete** | Difficulty controls + negative items |
 | **Phase 3** — Evaluation infrastructure | ⬜ Not started | Parser, scoring, baselines |
 | **Phase 4+** — Full benchmark | ⬜ Not started | F1–F4, cohorts, Zenodo |
 
@@ -32,7 +32,9 @@ generator → oracle → certificate → verifier  ✅
 - **Difficulty dimension:** `|Q|` (state count) only
 - **Example:** `examples/item_C2_reachability_seed42.json`
 - **CLI:** `python3 -m fsmreasonbench.cli.generate_one --seed 42`
-- **Tests:** 20 passing (`pytest`)
+- **Difficulty controls:** `min_witness_length=1`, `max_witness_length=12`, `allow_initial_target=false`
+- **Negative items:** unreachable targets with `unreachability_witness`
+- **Tests:** 27 passing (`pytest`)
 
 ---
 
@@ -58,6 +60,7 @@ generator → oracle → certificate → verifier  ✅
 | Component | Path |
 |-----------|------|
 | Seeded reachability generator | `src/fsmreasonbench/generator/reachability.py` |
+| | Controls: `min_witness_length`, `max_witness_length`, `allow_initial_target`, negative items |
 | Item assembly + self-verify | `src/fsmreasonbench/items/assembly.py` |
 | CLI | `src/fsmreasonbench/cli/generate_one.py` |
 
