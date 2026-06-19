@@ -38,6 +38,7 @@
 | P3.7 C2 smoke baseline batch runner (oracle / random / invalid) | ✅ |
 | P3.8 Exploratory capability-surface runner (C2 + F1) | ✅ |
 | P3.9 Minimal Ollama batch runner (C2 + F1) | ✅ |
+| P3.10 Failure inspection CLI for scored model runs | ✅ |
 
 **Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 
@@ -118,4 +119,10 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_ollama_batch \
   --items runs/c2_items.jsonl \
   --out runs/ollama_c2_qwen7b.jsonl \
   --temperature 0
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
+  --scores runs/ollama_c2_qwen7b/scores.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.inspect_failures \
+  --scores runs/ollama_c2_qwen7b/scores.jsonl \
+  --results runs/ollama_c2_qwen7b.jsonl \
+  --limit 5
 ```

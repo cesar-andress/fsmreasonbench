@@ -11,37 +11,39 @@ from typing import Any
 from fsmreasonbench.evaluator.jsonl import read_jsonl
 from fsmreasonbench.evaluator.models import FailureStage, ScoringRecord
 from fsmreasonbench.evaluator.parser import parse_submission
+from fsmreasonbench.evaluator.summary import summarize_scoring_records
 
 
 DEFAULT_EXCERPT_LENGTH = 500
 _FAILURE_STAGE_ORDER = tuple(stage.value for stage in FailureStage)
+_FAILURE_SAMPLE_STAGES = tuple(
+    stage.value for stage in FailureStage if stage is not FailureStage.CORRECT
+)
 
 
 @dataclass(frozen=True, slots=True)
 class FailureSample:
-    """Representative scored item for one failure stage."""
+    """Representative failed item for one failure stage."""
 
     item_id: str
+    family: str
     failure_stage: str
-    raw_response_excerpt: str
-    parsed_submission: dict[str, Any] | None
-    parse_errors: tuple[str, ...]
-    certificate_errors: tuple[str, ...]
     verdict_correct: bool | None
     certificate_valid: bool | None
-    fully_correct: bool
+    certificate_errors: tuple[str, ...]
+    raw_response_excerpt: str
+    parsed_submission: dict[str, Any] | None
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "item_id": self.item_id,
+            "family": self.family,
             "failure_stage": self.failure_stage,
-            "raw_response_excerpt": self.raw_response_excerpt,
-            "parsed_submission": self.parsed_submission,
-            "parse_errors": list(self.parse_errors),
-            "certificate_errors": list(self.certificate_errors),
             "verdict_correct": self.verdict_correct,
             "certificate_valid": self.certificate_valid,
-            "fully_correct": self.fully_correct,
+            "certificate_errors": list(self.certificate_errors),
+            "raw_response_excerpt": self.raw_response_excerpt,
+            "parsed_submission": self.parsed_submission,
         }
 
 
@@ -53,7 +55,7 @@ def inspect_failures(
     excerpt_length: int = DEFAULT_EXCERPT_LENGTH,
 ) -> dict[str, Any]:
     """
-    Aggregate failure stages and collect representative samples per stage.
+    Aggregate failure stages and collect representative failure samples.
 
     ``scores_path`` is a flat scoring-records JSONL. ``results_path`` is the
     companion run JSONL (e.g. Ollama batch output) keyed by ``item_id``.
@@ -65,34 +67,44 @@ def inspect_failures(
 
     records = [ScoringRecord.from_dict(row) for row in read_jsonl(scores_path)]
     results_by_id = _index_results(read_jsonl(results_path))
+    summary = summarize_scoring_records(records)
 
     stage_counts = Counter(record.failure_stage.value for record in records)
-    samples_by_stage: dict[str, list[FailureSample]] = {
-        stage: [] for stage in _FAILURE_STAGE_ORDER
-    }
-
     grouped: dict[str, list[ScoringRecord]] = defaultdict(list)
     for record in records:
         grouped[record.failure_stage.value].append(record)
 
-    for stage in _FAILURE_STAGE_ORDER:
-        for record in grouped[stage][:limit]:
+    sample_item_ids_by_stage: dict[str, list[str]] = {}
+    samples_by_stage: dict[str, list[FailureSample]] = {}
+
+    for stage in _FAILURE_SAMPLE_STAGES:
+        stage_records = grouped[stage][:limit]
+        sample_item_ids_by_stage[stage] = [record.item_id for record in stage_records]
+        stage_samples: list[FailureSample] = []
+        for record in stage_records:
             run_record = results_by_id.get(record.item_id)
             if run_record is None:
                 continue
-            samples_by_stage[stage].append(
+            stage_samples.append(
                 _build_sample(record, run_record, excerpt_length=excerpt_length)
             )
+        if stage_samples:
+            samples_by_stage[stage] = stage_samples
 
     return {
-        "n": len(records),
+        "n": summary["n"],
+        "extractability_rate": summary["extractability_rate"],
+        "verdict_accuracy": summary["verdict_accuracy"],
+        "certificate_valid_rate": summary["certificate_valid_rate"],
+        "fully_correct_rate": summary["fully_correct_rate"],
         "failure_stage_counts": {
             stage: stage_counts.get(stage, 0) for stage in _FAILURE_STAGE_ORDER
         },
+        "sample_item_ids_by_stage": sample_item_ids_by_stage,
         "samples_by_stage": {
             stage: [sample.to_dict() for sample in samples_by_stage[stage]]
-            for stage in _FAILURE_STAGE_ORDER
-            if samples_by_stage[stage]
+            for stage in _FAILURE_SAMPLE_STAGES
+            if stage in samples_by_stage
         },
     }
 
@@ -102,13 +114,27 @@ def format_inspection_report(payload: dict[str, Any]) -> str:
     lines = [
         f"Failure inspection (n={payload['n']})",
         "=" * 32,
+        f"extractability_rate: {payload['extractability_rate']:.3f}",
+        f"verdict_accuracy: {payload['verdict_accuracy']:.3f}",
+        f"certificate_valid_rate: {payload['certificate_valid_rate']:.3f}",
+        f"fully_correct_rate: {payload['fully_correct_rate']:.3f}",
+        "",
         "failure_stage counts:",
     ]
     for stage, count in payload["failure_stage_counts"].items():
         lines.append(f"  {stage}: {count}")
 
+    sample_ids = payload.get("sample_item_ids_by_stage", {})
+    if sample_ids:
+        lines.append("")
+        lines.append("sample item_ids by failure_stage:")
+        for stage in _FAILURE_SAMPLE_STAGES:
+            ids = sample_ids.get(stage, [])
+            if ids:
+                lines.append(f"  {stage}: {', '.join(ids)}")
+
     samples_by_stage = payload.get("samples_by_stage", {})
-    for stage in _FAILURE_STAGE_ORDER:
+    for stage in _FAILURE_SAMPLE_STAGES:
         samples = samples_by_stage.get(stage, [])
         if not samples:
             continue
@@ -144,17 +170,16 @@ def _build_sample(
     parsed_submission = _parsed_submission_from_run(raw_response, family)
     return FailureSample(
         item_id=record.item_id,
+        family=family,
         failure_stage=record.failure_stage.value,
+        verdict_correct=record.verdict_correct,
+        certificate_valid=record.certificate_valid,
+        certificate_errors=record.certificate_errors,
         raw_response_excerpt=_raw_response_excerpt(
             run_record,
             excerpt_length=excerpt_length,
         ),
         parsed_submission=parsed_submission,
-        parse_errors=record.parse_errors,
-        certificate_errors=record.certificate_errors,
-        verdict_correct=record.verdict_correct,
-        certificate_valid=record.certificate_valid,
-        fully_correct=record.fully_correct,
     )
 
 
@@ -196,12 +221,11 @@ def _raw_response_excerpt(
 def _format_sample_lines(sample: dict[str, Any]) -> list[str]:
     lines = [
         f"[item_id={sample['item_id']}]",
+        f"  family: {sample['family']}",
+        f"  failure_stage: {sample['failure_stage']}",
         f"  verdict_correct: {sample['verdict_correct']}",
         f"  certificate_valid: {sample['certificate_valid']}",
-        f"  fully_correct: {sample['fully_correct']}",
     ]
-    if sample["parse_errors"]:
-        lines.append(f"  parse_errors: {sample['parse_errors']}")
     if sample["certificate_errors"]:
         lines.append(f"  certificate_errors: {sample['certificate_errors']}")
     lines.append(f"  raw_response excerpt: {sample['raw_response_excerpt']!r}")

@@ -135,7 +135,7 @@ python -m fsmreasonbench.cli.inspect_failures \
   --limit 5
 ```
 
-Inspect failure stages (`not_extractable`, `verdict_wrong`, `certificate_invalid`) with representative raw-response excerpts and parsed submissions. Pass `--json` for machine-readable output.
+Inspect failure stages (`not_extractable`, `verdict_wrong`, `certificate_invalid`) with aggregate rates, sample `item_id`s per stage, raw-response excerpts, and parsed submissions when extractable. Pass `--json` for machine-readable output.
 
 ```bash
 python -m fsmreasonbench.cli.inspect_failures \
