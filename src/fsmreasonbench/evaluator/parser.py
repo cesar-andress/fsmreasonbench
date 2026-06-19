@@ -8,7 +8,7 @@ from typing import Any
 from fsmreasonbench.evaluator.models import ParseResult, ParsedSubmission
 
 _C2_CERTIFICATE_TYPES = frozenset({"trace_witness", "unreachability_witness"})
-_F1_CERTIFICATE_TYPES = frozenset({"distinguishing_trace"})
+_F1_CERTIFICATE_TYPES = frozenset({"distinguishing_trace", "equivalence_witness"})
 
 
 def parse_submission(raw_response: Any, family: str) -> ParseResult:
@@ -109,7 +109,10 @@ def _validate_f1_certificate(certificate: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     cert_type = certificate.get("certificate_type")
     if cert_type not in _F1_CERTIFICATE_TYPES:
-        errors.append(f"certificate_type must be distinguishing_trace, got {cert_type!r}")
+        errors.append(
+            "certificate_type must be distinguishing_trace or equivalence_witness, "
+            f"got {cert_type!r}"
+        )
     fsm_ids = certificate.get("fsm_ids")
     if not isinstance(fsm_ids, list) or len(fsm_ids) != 2:
         errors.append("fsm_ids must be an array of length 2")
@@ -117,15 +120,33 @@ def _validate_f1_certificate(certificate: dict[str, Any]) -> list[str]:
         errors.append("fsm_ids entries must be non-empty strings")
     if "payload" not in certificate or not isinstance(certificate["payload"], dict):
         errors.append("certificate.payload must be an object")
+    elif cert_type == "distinguishing_trace":
+        errors.extend(_validate_distinguishing_trace_payload(certificate["payload"]))
+    elif cert_type == "equivalence_witness":
+        errors.extend(_validate_equivalence_witness_payload(certificate["payload"]))
+    return errors
+
+
+def _validate_distinguishing_trace_payload(payload: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if "trace" not in payload or not isinstance(payload["trace"], list):
+        errors.append("distinguishing_trace.payload.trace must be an array")
+    acceptance = payload.get("acceptance")
+    if not isinstance(acceptance, dict):
+        errors.append("distinguishing_trace.payload.acceptance must be an object")
     else:
-        payload = certificate["payload"]
-        if "trace" not in payload or not isinstance(payload["trace"], list):
-            errors.append("distinguishing_trace.payload.trace must be an array")
-        acceptance = payload.get("acceptance")
-        if not isinstance(acceptance, dict):
-            errors.append("distinguishing_trace.payload.acceptance must be an object")
-        else:
-            for key in ("A", "B"):
-                if key not in acceptance or not isinstance(acceptance[key], bool):
-                    errors.append(f"distinguishing_trace.payload.acceptance.{key} must be boolean")
+        for key in ("A", "B"):
+            if key not in acceptance or not isinstance(acceptance[key], bool):
+                errors.append(f"distinguishing_trace.payload.acceptance.{key} must be boolean")
+    return errors
+
+
+def _validate_equivalence_witness_payload(payload: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if payload.get("equivalent") is not True:
+        errors.append("equivalence_witness.payload.equivalent must be true")
+    for field in ("minimized_hash_A", "minimized_hash_B"):
+        value = payload.get(field)
+        if not isinstance(value, str) or not value:
+            errors.append(f"equivalence_witness.payload.{field} must be a non-empty string")
     return errors

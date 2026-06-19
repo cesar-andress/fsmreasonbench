@@ -12,7 +12,7 @@ from fsmreasonbench.evaluator.models import (
 from fsmreasonbench.evaluator.parser import parse_f1_response
 from fsmreasonbench.evaluator.scoring_common import score_parsed_with_verifier
 from fsmreasonbench.items.assembly import BenchmarkItem
-from fsmreasonbench.verifier.separation import verify_distinguishing_trace_certificate
+from fsmreasonbench.verifier.separation import verify_f1_certificate
 
 
 def score_f1_item(item: BenchmarkItem, raw_response: object) -> ScoringRecord:
@@ -54,7 +54,7 @@ def _score_parsed_submission(
         )
 
     def verify(_item: BenchmarkItem, certificate: dict[str, Any]) -> tuple[bool, tuple[str, ...]]:
-        result = verify_distinguishing_trace_certificate(
+        result = verify_f1_certificate(
             _item.fsm_a,
             _item.fsm_b,
             certificate,

@@ -1,13 +1,28 @@
-"""F1 separation certificate verification (distinguishing_trace)."""
+"""F1 separation certificate verification."""
 
 from __future__ import annotations
 
 from typing import Any
 
 from fsmreasonbench.models.fsm import ExecutableFSM, FSMType
+from fsmreasonbench.runtime.dfa_minimize import are_equivalent_dfas, minimized_dfa_hash
 from fsmreasonbench.runtime.acceptance import accepts_trace
 from fsmreasonbench.runtime.simulation import simulate
 from fsmreasonbench.verifier.result import VerifyResult
+
+
+def verify_f1_certificate(
+    fsm_a: ExecutableFSM,
+    fsm_b: ExecutableFSM,
+    certificate: dict[str, Any],
+) -> VerifyResult:
+    """Verify an F1 certificate based on its declared type."""
+    cert_type = certificate.get("certificate_type")
+    if cert_type == "distinguishing_trace":
+        return verify_distinguishing_trace_certificate(fsm_a, fsm_b, certificate)
+    if cert_type == "equivalence_witness":
+        return verify_equivalence_witness_certificate(fsm_a, fsm_b, certificate)
+    return VerifyResult.fail(f"unsupported certificate_type: {cert_type!r}")
 
 
 def verify_distinguishing_trace_certificate(
@@ -71,4 +86,60 @@ def verify_distinguishing_trace_certificate(
 
     # Shortestness is oracle metadata only in this vertical slice.
     _ = simulate(fsm_a, trace)
+    return VerifyResult.ok()
+
+
+def verify_equivalence_witness_certificate(
+    fsm_a: ExecutableFSM,
+    fsm_b: ExecutableFSM,
+    certificate: dict[str, Any],
+) -> VerifyResult:
+    """Verify an equivalence witness by recomputing minimization and equivalence."""
+    if fsm_a.fsm_type != FSMType.DFA or fsm_b.fsm_type != FSMType.DFA:
+        return VerifyResult.fail("equivalence_witness verification requires DFA inputs")
+    if fsm_a.input_alphabet != fsm_b.input_alphabet:
+        return VerifyResult.fail("DFA alphabets must match")
+
+    cert_type = certificate.get("certificate_type")
+    if cert_type != "equivalence_witness":
+        return VerifyResult.fail(f"unsupported certificate_type: {cert_type!r}")
+
+    fsm_ids = certificate.get("fsm_ids")
+    if not isinstance(fsm_ids, list) or len(fsm_ids) != 2:
+        return VerifyResult.fail("fsm_ids must be an array of length 2")
+    if fsm_ids != [fsm_a.fsm_id, fsm_b.fsm_id]:
+        return VerifyResult.fail(
+            f"fsm_ids mismatch: expected {[fsm_a.fsm_id, fsm_b.fsm_id]!r}, got {fsm_ids!r}"
+        )
+
+    payload = certificate.get("payload")
+    if not isinstance(payload, dict):
+        return VerifyResult.fail("certificate payload must be an object")
+
+    equivalent = payload.get("equivalent")
+    hash_a = payload.get("minimized_hash_A")
+    hash_b = payload.get("minimized_hash_B")
+    if equivalent is not True:
+        return VerifyResult.fail("payload.equivalent must be true")
+    if not isinstance(hash_a, str) or not hash_a:
+        return VerifyResult.fail("payload.minimized_hash_A must be a non-empty string")
+    if not isinstance(hash_b, str) or not hash_b:
+        return VerifyResult.fail("payload.minimized_hash_B must be a non-empty string")
+
+    if not are_equivalent_dfas(fsm_a, fsm_b):
+        return VerifyResult.fail("equivalence check reports non-equivalent DFAs")
+
+    try:
+        recomputed_a = minimized_dfa_hash(fsm_a)
+        recomputed_b = minimized_dfa_hash(fsm_b)
+    except Exception as exc:  # noqa: BLE001
+        return VerifyResult.fail(f"minimization failed: {exc}")
+
+    if recomputed_a != hash_a:
+        return VerifyResult.fail("minimized_hash_A mismatch")
+    if recomputed_b != hash_b:
+        return VerifyResult.fail("minimized_hash_B mismatch")
+    if recomputed_a != recomputed_b:
+        return VerifyResult.fail("minimized hashes differ for equivalent DFAs")
+
     return VerifyResult.ok()

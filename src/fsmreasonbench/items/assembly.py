@@ -7,13 +7,19 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from fsmreasonbench.certificates.reachability import build_reachability_certificate
-from fsmreasonbench.certificates.separation import build_distinguishing_trace_certificate
+from fsmreasonbench.certificates.separation import (
+    build_distinguishing_trace_certificate,
+    build_equivalence_witness_certificate,
+)
 from fsmreasonbench.models.fsm import ExecutableFSM
 from fsmreasonbench.models.serialization import canonical_json, content_hash, fsm_to_dict
 from fsmreasonbench.oracle.reachability import is_reachable, shortest_reachability_witness
 from fsmreasonbench.oracle.separation import are_equivalent, shortest_distinguishing_trace
 from fsmreasonbench.verifier.reachability import verify_reachability_certificate
-from fsmreasonbench.verifier.separation import verify_distinguishing_trace_certificate
+from fsmreasonbench.verifier.separation import (
+    verify_distinguishing_trace_certificate,
+    verify_equivalence_witness_certificate,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -116,13 +122,32 @@ def assemble_separation_item(
     item_id: str | None = None,
 ) -> BenchmarkItem:
     """
-    Assemble F1 DFA non-equivalence item with oracle-produced distinguishing trace.
+    Assemble F1 separation item with oracle-produced gold certificate.
 
-    Verdict convention: ``verdict=false`` means the DFAs are **not equivalent**.
+    Verdict convention: ``verdict=true`` means equivalent; ``verdict=false`` means not equivalent.
     """
     if are_equivalent(fsm_a, fsm_b):
-        raise ValueError("F1 generator requires non-equivalent DFA pair")
+        return _assemble_equivalent_separation_item(
+            fsm_a,
+            fsm_b,
+            seed=seed,
+            item_id=item_id,
+        )
+    return _assemble_non_equivalent_separation_item(
+        fsm_a,
+        fsm_b,
+        seed=seed,
+        item_id=item_id,
+    )
 
+
+def _assemble_non_equivalent_separation_item(
+    fsm_a: ExecutableFSM,
+    fsm_b: ExecutableFSM,
+    *,
+    seed: int,
+    item_id: str | None = None,
+) -> BenchmarkItem:
     certificate = build_distinguishing_trace_certificate(fsm_a, fsm_b)
     witness = shortest_distinguishing_trace(fsm_a, fsm_b)
     if witness is None:
@@ -171,6 +196,67 @@ def assemble_separation_item(
                 "distinguishing_trace_length": len(witness.trace),
                 "transition_count_A": len(fsm_a.transitions),
                 "transition_count_B": len(fsm_b.transitions),
+                "equivalent": False,
+            },
+            "generator_seed": seed,
+        },
+        contamination={"public_fingerprint": public_fingerprint},
+    )
+
+
+def _assemble_equivalent_separation_item(
+    fsm_a: ExecutableFSM,
+    fsm_b: ExecutableFSM,
+    *,
+    seed: int,
+    item_id: str | None = None,
+) -> BenchmarkItem:
+    certificate = build_equivalence_witness_certificate(fsm_a, fsm_b)
+
+    question = {
+        "family": "F1",
+        "prompt_id": "separation.equivalence.v1",
+        "task": "equivalence",
+        "fsm_a_id": fsm_a.fsm_id,
+        "fsm_b_id": fsm_b.fsm_id,
+    }
+    fingerprint_input = canonical_json(
+        {
+            "fsm_a": fsm_to_dict(fsm_a, include_metadata=False),
+            "fsm_b": fsm_to_dict(fsm_b, include_metadata=False),
+            "question": question,
+        }
+    )
+    public_fingerprint = content_hash({"canonical": fingerprint_input})
+
+    resolved_item_id = item_id or str(
+        uuid.uuid5(
+            uuid.NAMESPACE_URL,
+            f"fsmreasonbench:item:F1:eq:{seed}:{fsm_a.fsm_id}:{fsm_b.fsm_id}",
+        )
+    )
+
+    return BenchmarkItem(
+        item_id=resolved_item_id,
+        family="F1",
+        family_tier="flagship",
+        fsm=fsm_a,
+        fsm_b=fsm_b,
+        question=question,
+        answer_key={
+            "item_id": resolved_item_id,
+            "verdict": True,
+            "certificate": certificate,
+        },
+        difficulty={
+            "core": {
+                "|Q_A|": fsm_a.state_count,
+                "|Q_B|": fsm_b.state_count,
+                "alphabet_size": len(fsm_a.input_alphabet),
+                "distinguishing_trace_length": 0,
+                "transition_count_A": len(fsm_a.transitions),
+                "transition_count_B": len(fsm_b.transitions),
+                "equivalent": True,
             },
             "generator_seed": seed,
         },
@@ -215,17 +301,26 @@ def _self_verify_f1_item(item: BenchmarkItem) -> None:
         raise AssertionError("F1 item missing fsm_b")
     certificate = item.answer_key["certificate"]
     expected_verdict = item.answer_key["verdict"]
-    if expected_verdict is not False:
-        raise AssertionError("F1 non-equivalence items must have verdict=false")
+    cert_type = certificate["certificate_type"]
+
+    if expected_verdict is True:
+        result = verify_equivalence_witness_certificate(item.fsm_a, item.fsm_b, certificate)
+        if not result.valid:
+            raise AssertionError(f"self-verification failed: {result.errors}")
+        if cert_type != "equivalence_witness":
+            raise AssertionError(
+                f"expected equivalence_witness certificate, got {cert_type!r}"
+            )
+        if not are_equivalent(item.fsm_a, item.fsm_b):
+            raise AssertionError("oracle reports non-equivalent DFAs for equivalence item")
+        return
 
     result = verify_distinguishing_trace_certificate(item.fsm_a, item.fsm_b, certificate)
     if not result.valid:
         raise AssertionError(f"self-verification failed: {result.errors}")
-
-    if certificate["certificate_type"] != "distinguishing_trace":
+    if cert_type != "distinguishing_trace":
         raise AssertionError(
-            f"expected distinguishing_trace certificate, got {certificate['certificate_type']!r}"
+            f"expected distinguishing_trace certificate, got {cert_type!r}"
         )
-
     if are_equivalent(item.fsm_a, item.fsm_b):
         raise AssertionError("oracle reports equivalent DFAs for non-equivalence item")

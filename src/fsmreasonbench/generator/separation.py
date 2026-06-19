@@ -1,4 +1,4 @@
-"""Seeded F1 DFA non-equivalence generator."""
+"""Seeded F1 DFA separation generator (equivalent and non-equivalent pairs)."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from fsmreasonbench.generator.separation_constructive import (
     construct_separation_decoy_dfa_pair,
     construct_separation_dfa_pair,
 )
+from fsmreasonbench.generator.separation_equivalent import generate_equivalent_partner
 from fsmreasonbench.items.assembly import BenchmarkItem, assemble_separation_item, self_verify_item
 from fsmreasonbench.models.fsm import ExecutableFSM, FSMType, Transition
 from fsmreasonbench.oracle.separation import are_equivalent, shortest_distinguishing_trace
@@ -69,6 +70,8 @@ class SeparationGeneratorConfig:
     min_distinguishing_trace_length: int = 2
     max_distinguishing_trace_length: int = 12
     max_retries: int = 64
+    include_equivalent: bool = False
+    equivalent_ratio: float = 0.5
 
     def __post_init__(self) -> None:
         if self.state_count_a < 2 or self.state_count_b < 2:
@@ -102,15 +105,19 @@ class SeparationGeneratorConfig:
             )
         if self.max_retries < 1:
             raise ValueError("max_retries must be >= 1")
+        if not 0.0 <= self.equivalent_ratio <= 1.0:
+            raise ValueError("equivalent_ratio must be in [0, 1]")
 
 
 def separation_config_for_level(level: int) -> SeparationGeneratorConfig:
-    """Capability-surface F1 config with decoy constructive mode for higher levels."""
+    """Capability-surface F1 config with mixed equivalent/non-equivalent pairs."""
     return SeparationGeneratorConfig(
         min_distinguishing_trace_length=level,
         max_distinguishing_trace_length=level,
         target_distinguishing_trace_length=level,
         mode="constructive_decoy" if level >= 3 else None,
+        include_equivalent=True,
+        equivalent_ratio=0.5,
     )
 
 
@@ -168,12 +175,45 @@ def generate_separation_item(
     seed: int,
     config: SeparationGeneratorConfig | None = None,
 ) -> BenchmarkItem:
-    """Generate a self-verifying F1 non-equivalence item."""
+    """Generate a self-verifying F1 separation item (equivalent or non-equivalent)."""
     config = config or SeparationGeneratorConfig()
+    if _should_generate_equivalent(seed, config):
+        return _generate_equivalent_separation_item(seed, config)
     mode = resolve_separation_mode(config)
     if mode in ("constructive", "constructive_decoy"):
         return _generate_constructive_separation_item(seed, config, mode=mode)
     return _generate_random_separation_item(seed, config)
+
+
+def _should_generate_equivalent(seed: int, config: SeparationGeneratorConfig) -> bool:
+    if not config.include_equivalent or config.equivalent_ratio <= 0.0:
+        return False
+    if config.equivalent_ratio >= 1.0:
+        return True
+    rng = random.Random(seed + 7919)
+    return rng.random() < config.equivalent_ratio
+
+
+def _generate_equivalent_separation_item(
+    seed: int,
+    config: SeparationGeneratorConfig,
+) -> BenchmarkItem:
+    from fsmreasonbench.runtime.dfa_minimize import complete_dfa
+
+    fsm_a = complete_dfa(
+        generate_separation_dfa(
+            seed,
+            config,
+            label="A",
+            state_count=config.state_count_a,
+        )
+    )
+    fsm_b = generate_equivalent_partner(fsm_a, seed + 1)
+    if not are_equivalent(fsm_a, fsm_b):
+        raise RuntimeError(f"equivalent generator produced non-equivalent pair for seed={seed}")
+    item = assemble_separation_item(fsm_a, fsm_b, seed=seed)
+    self_verify_item(item)
+    return item
 
 
 def _generate_constructive_separation_item(
@@ -240,7 +280,9 @@ def _validate_generated_constraints(
     item: BenchmarkItem,
     config: SeparationGeneratorConfig,
 ) -> None:
-    """Assert generator policy on assembled F1 item."""
+    """Assert generator policy on assembled non-equivalent F1 item."""
+    if item.answer_key["verdict"] is True:
+        return
     witness = shortest_distinguishing_trace(item.fsm_a, item.fsm_b)
     if witness is None:
         raise AssertionError("non-equivalent pair must have a distinguishing trace")
