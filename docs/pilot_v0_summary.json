@@ -1,0 +1,428 @@
+{
+  "families": {
+    "C2": {
+      "certificate_valid_rate": 0.1,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 13,
+        "correct": 2,
+        "not_extractable": 0,
+        "verdict_wrong": 5
+      },
+      "family": "C2",
+      "fully_correct_rate": 0.1,
+      "n": 20,
+      "results_path": "runs/pilot_v0/qwen7b_c2.jsonl",
+      "sample_failures_by_stage": {
+        "certificate_invalid": [
+          {
+            "certificate_errors": [
+              "trace symbols must be strings"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "C2",
+            "item_id": "3af8a71a-b8b1-5033-b939-1b1b6f16207f",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "trace_witness",
+                "payload": {
+                  "state_sequence": [
+                    "q0",
+                    "q2",
+                    "q3"
+                  ],
+                  "trace": [
+                    {
+                      "input": "a",
+                      "state": "q0"
+                    },
+                    {
+                      "input": "b",
+                      "state": "q2"
+                    },
+                    {
+                      "input": "c",
+                      "state": "q3"
+                    }
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "3af8a71a-b8b1-5033-b939-1b1b6f16207f",
+              "verdict": true
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"3af8a71a-b8b1-5033-b939-1b1b6f16207f\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"a\"\n        },\n        {\n          \"state\": \"q2\",\n          \"input\": \"b\"\n        },\n        {\n          \"state\": \"q3\",\n          \"input\": \"c\"\n        }\n      ],\n      \"state_sequence\": [\n        \"q0\",\n        \"q2\",\n        \"q3\"\n      ]\n    }\n  }\n}",
+            "verdict_correct": true
+          },
+          {
+            "certificate_errors": [
+              "missing reachable states: ['q2', 'q4']"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "C2",
+            "item_id": "0bd7e316-1a35-577d-9ca7-37f49e9b6c69",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "unreachability_witness",
+                "payload": {
+                  "reachable_states": [
+                    "q0"
+                  ],
+                  "target_state": "q1"
+                },
+                "version": "1.0"
+              },
+              "item_id": "0bd7e316-1a35-577d-9ca7-37f49e9b6c69",
+              "verdict": false
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"0bd7e316-1a35-577d-9ca7-37f49e9b6c69\",\n  \"verdict\": false,\n  \"certificate\": {\n    \"certificate_type\": \"unreachability_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"reachable_states\": [\"q0\"],\n      \"target_state\": \"q1\"\n    }\n  }\n}",
+            "verdict_correct": true
+          },
+          {
+            "certificate_errors": [
+              "trace symbols must be strings"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "C2",
+            "item_id": "96ba0e25-c1b9-5ab2-8e1f-8b81205ba6ac",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "trace_witness",
+                "payload": {
+                  "state_sequence": [
+                    "q0",
+                    "q3"
+                  ],
+                  "trace": [
+                    {
+                      "input": "c",
+                      "state": "q0"
+                    },
+                    {
+                      "input": "b",
+                      "state": "q3"
+                    }
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "96ba0e25-c1b9-5ab2-8e1f-8b81205ba6ac",
+              "verdict": true
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"96ba0e25-c1b9-5ab2-8e1f-8b81205ba6ac\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"c\"\n        },\n        {\n          \"state\": \"q3\",\n          \"input\": \"b\"\n        }\n      ],\n      \"state_sequence\": [\"q0\", \"q3\"]\n    }\n  }\n}",
+            "verdict_correct": true
+          }
+        ],
+        "verdict_wrong": [
+          {
+            "certificate_errors": [
+              "trace symbols must be strings"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "verdict_wrong",
+            "family": "C2",
+            "item_id": "ba3cc0c9-1732-541d-baed-20703ee26c4c",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "trace_witness",
+                "payload": {
+                  "state_sequence": [
+                    "q0",
+                    "q3"
+                  ],
+                  "trace": [
+                    {
+                      "input": "b",
+                      "state": "q0"
+                    },
+                    {
+                      "input": "a",
+                      "state": "q3"
+                    }
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "ba3cc0c9-1732-541d-baed-20703ee26c4c",
+              "verdict": true
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"ba3cc0c9-1732-541d-baed-20703ee26c4c\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"b\"\n        },\n        {\n          \"state\": \"q3\",\n          \"input\": \"a\"\n        }\n      ],\n      \"state_sequence\": [\"q0\", \"q3\"]\n    }\n  }\n}",
+            "verdict_correct": false
+          },
+          {
+            "certificate_errors": [
+              "trace symbols must be strings"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "verdict_wrong",
+            "family": "C2",
+            "item_id": "5db35a30-0f23-5a19-ba28-9c66e2f9cd32",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "trace_witness",
+                "payload": {
+                  "state_sequence": [
+                    "q0",
+                    "q0"
+                  ],
+                  "trace": [
+                    {
+                      "input": "a",
+                      "state": "q0"
+                    },
+                    {
+                      "input": "c",
+                      "state": "q0"
+                    }
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "5db35a30-0f23-5a19-ba28-9c66e2f9cd32",
+              "verdict": true
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"5db35a30-0f23-5a19-ba28-9c66e2f9cd32\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"a\"\n        },\n        {\n          \"state\": \"q0\",\n          \"input\": \"c\"\n        }\n      ],\n      \"state_sequence\": [\"q0\", \"q0\"]\n    }\n  }\n}",
+            "verdict_correct": false
+          },
+          {
+            "certificate_errors": [
+              "trace symbols must be strings"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "verdict_wrong",
+            "family": "C2",
+            "item_id": "e03698a4-1816-51c7-a275-7dea05584b95",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "trace_witness",
+                "payload": {
+                  "state_sequence": [
+                    "q0",
+                    "q1"
+                  ],
+                  "trace": [
+                    {
+                      "input": "a",
+                      "state": "q0"
+                    },
+                    {
+                      "input": null,
+                      "state": "q1"
+                    }
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "e03698a4-1816-51c7-a275-7dea05584b95",
+              "verdict": true
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"e03698a4-1816-51c7-a275-7dea05584b95\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"a\"\n        },\n        {\n          \"state\": \"q1\",\n          \"input\": null\n        }\n      ],\n      \"state_sequence\": [\"q0\", \"q1\"]\n    }\n  }\n}",
+            "verdict_correct": false
+          }
+        ]
+      },
+      "scores_path": "runs/pilot_v0/qwen7b_c2/scores.jsonl",
+      "top_certificate_failure_reasons": [
+        {
+          "count": 14,
+          "reason": "trace symbols must be strings"
+        },
+        {
+          "count": 1,
+          "reason": "missing reachable states: ['q2', 'q4']"
+        },
+        {
+          "count": 1,
+          "reason": "missing reachable states: ['q2', 'q3', 'q4']"
+        },
+        {
+          "count": 1,
+          "reason": "extra non-reachable states: ['q1']"
+        },
+        {
+          "count": 1,
+          "reason": "missing reachable states: ['q4']"
+        }
+      ],
+      "verdict_accuracy": 0.75
+    },
+    "F1": {
+      "certificate_valid_rate": 0.05,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 19,
+        "correct": 1,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "F1",
+      "fully_correct_rate": 0.05,
+      "n": 20,
+      "results_path": "runs/pilot_v0/qwen7b_f1.jsonl",
+      "sample_failures_by_stage": {
+        "certificate_invalid": [
+          {
+            "certificate_errors": [
+              "trace replay failed: no transition from 'q0' on 'a'"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "F1",
+            "item_id": "16fee15f-15bf-57f6-ad8d-9a82201f0b02",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "distinguishing_trace",
+                "fsm_ids": [
+                  "10f6860f-2bfa-55f6-b6c3-170b9223c0a2",
+                  "3f731e9c-fe61-5f34-be91-d4201bda022c"
+                ],
+                "payload": {
+                  "acceptance": {
+                    "A": false,
+                    "B": true
+                  },
+                  "trace": [
+                    "a",
+                    "b"
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "16fee15f-15bf-57f6-ad8d-9a82201f0b02",
+              "verdict": false
+            },
+            "raw_response_excerpt": "```json\n{\n  \"item_id\": \"16fee15f-15bf-57f6-ad8d-9a82201f0b02\",\n  \"verdict\": false,\n  \"certificate\": {\n    \"certificate_type\": \"distinguishing_trace\",\n    \"version\": \"1.0\",\n    \"fsm_ids\": [\"10f6860f-2bfa-55f6-b6c3-170b9223c0a2\", \"3f731e9c-fe61-5f34-be91-d4201bda022c\"],\n    \"payload\": {\n      \"trace\": [\"a\", \"b\"],\n      \"acceptance\": { \"A\": false, \"B\": true }\n    }\n  }\n}\n```",
+            "verdict_correct": true
+          },
+          {
+            "certificate_errors": [
+              "trace replay failed: no transition from 'q0' on 'a'"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "F1",
+            "item_id": "08cf0120-b857-5984-8cb4-e9916b9cce3b",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "distinguishing_trace",
+                "fsm_ids": [
+                  "c47db9c5-e80e-5d73-ba6d-78dfa542b667",
+                  "4020ebab-997f-5502-93ff-76c12ca62684"
+                ],
+                "payload": {
+                  "acceptance": {
+                    "A": false,
+                    "B": true
+                  },
+                  "trace": [
+                    "a",
+                    "b"
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "08cf0120-b857-5984-8cb4-e9916b9cce3b",
+              "verdict": false
+            },
+            "raw_response_excerpt": "```json\n{\n  \"item_id\": \"08cf0120-b857-5984-8cb4-e9916b9cce3b\",\n  \"verdict\": false,\n  \"certificate\": {\n    \"certificate_type\": \"distinguishing_trace\",\n    \"version\": \"1.0\",\n    \"fsm_ids\": [\"c47db9c5-e80e-5d73-ba6d-78dfa542b667\", \"4020ebab-997f-5502-93ff-76c12ca62684\"],\n    \"payload\": {\n      \"trace\": [\"a\", \"b\"],\n      \"acceptance\": { \"A\": false, \"B\": true }\n    }\n  }\n}\n```",
+            "verdict_correct": true
+          },
+          {
+            "certificate_errors": [
+              "trace replay failed: no transition from 'q2' on 'b'"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "F1",
+            "item_id": "a3553aa3-1550-5e9a-9046-6515a569d4bd",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "distinguishing_trace",
+                "fsm_ids": [
+                  "b9088544-1f84-5997-af39-b08c3ffee88f",
+                  "c348da51-2d0b-5eef-82a4-d61594945c0d"
+                ],
+                "payload": {
+                  "acceptance": {
+                    "A": false,
+                    "B": true
+                  },
+                  "trace": [
+                    "a",
+                    "b"
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "a3553aa3-1550-5e9a-9046-6515a569d4bd",
+              "verdict": false
+            },
+            "raw_response_excerpt": "```json\n{\n  \"item_id\": \"a3553aa3-1550-5e9a-9046-6515a569d4bd\",\n  \"verdict\": false,\n  \"certificate\": {\n    \"certificate_type\": \"distinguishing_trace\",\n    \"version\": \"1.0\",\n    \"fsm_ids\": [\"b9088544-1f84-5997-af39-b08c3ffee88f\", \"c348da51-2d0b-5eef-82a4-d61594945c0d\"],\n    \"payload\": {\n      \"trace\": [\"a\", \"b\"],\n      \"acceptance\": { \"A\": false, \"B\": true }\n    }\n  }\n}\n```",
+            "verdict_correct": true
+          }
+        ]
+      },
+      "scores_path": "runs/pilot_v0/qwen7b_f1/scores.jsonl",
+      "top_certificate_failure_reasons": [
+        {
+          "count": 7,
+          "reason": "trace replay failed: no transition from 'q0' on 'a'"
+        },
+        {
+          "count": 4,
+          "reason": "trace replay failed: no transition from 'q2' on 'b'"
+        },
+        {
+          "count": 2,
+          "reason": "acceptance.A mismatch: replay=True, declared=False"
+        },
+        {
+          "count": 2,
+          "reason": "trace replay failed: no transition from 'q0' on 'b'"
+        },
+        {
+          "count": 1,
+          "reason": "trace replay failed: no transition from 'q3' on 'b'"
+        },
+        {
+          "count": 1,
+          "reason": "trace replay failed: no transition from 'q1' on 'c'"
+        },
+        {
+          "count": 1,
+          "reason": "acceptance.A mismatch: replay=False, declared=True"
+        },
+        {
+          "count": 1,
+          "reason": "trace replay failed: no transition from 'q1' on 'b'"
+        }
+      ],
+      "verdict_accuracy": 1.0
+    }
+  },
+  "interpretation": "Verdict accuracy overstates reasoning success: the model often emits extractable JSON and correct high-level verdicts while failing to produce executable certificates.",
+  "model": "qwen2.5-coder:7b",
+  "n_per_family": 20,
+  "pilot_version": "v0",
+  "representative_failure_modes": [
+    {
+      "description": "C2 trace payload uses objects instead of symbol strings",
+      "family": "C2",
+      "mode": "trace_payload_objects"
+    },
+    {
+      "description": "C2 unreachability witness omits reachable states",
+      "family": "C2",
+      "mode": "unreachability_incomplete"
+    },
+    {
+      "description": "F1 repeatedly emits generic traces such as [\"a\", \"b\"] that are not replayable",
+      "family": "F1",
+      "mode": "generic_non_replayable_trace"
+    }
+  ],
+  "temperature": 0.0
+}

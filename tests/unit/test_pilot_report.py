@@ -10,8 +10,11 @@ from fsmreasonbench.cli.generate_pilot_report import main as generate_pilot_repo
 from fsmreasonbench.evaluator.jsonl import write_jsonl
 from fsmreasonbench.evaluator.pilot_report import (
     build_pilot_report,
+    build_pilot_v0_summary,
     render_pilot_report_markdown,
+    render_pilot_v0_markdown,
     write_pilot_report,
+    PilotV0FamilyRun,
 )
 
 
@@ -150,3 +153,126 @@ def test_cli_writes_default_style_report(tmp_path: Path, capsys: pytest.CaptureF
     captured = capsys.readouterr()
     assert "Wrote pilot report" in captured.out
     assert out_path.exists()
+
+
+def test_build_pilot_v0_summary_from_synthetic_runs(tmp_path: Path) -> None:
+    c2_scores = tmp_path / "c2_scores.jsonl"
+    f1_scores = tmp_path / "f1_scores.jsonl"
+    c2_results = tmp_path / "c2_results.jsonl"
+    f1_results = tmp_path / "f1_results.jsonl"
+    _write_scores(c2_scores)
+    write_jsonl(
+        f1_scores,
+        [
+            {
+                **dict(_score_record(item_id="f1_ok", failure_stage="correct")),
+                "family": "F1",
+            },
+            {
+                **dict(
+                    _score_record(
+                        item_id="f1_bad",
+                        failure_stage="certificate_invalid",
+                        certificate_valid=False,
+                        fully_correct=False,
+                        certificate_errors=["trace replay failed: no transition from 'q0' on 'a'"],
+                    )
+                ),
+                "family": "F1",
+            },
+        ],
+    )
+    write_jsonl(
+        c2_results,
+        [
+            {
+                "item_id": "item_bad_verdict",
+                "family": "C2",
+                "raw_response_text": '{"verdict": false}',
+                "raw_response": {"verdict": False},
+            }
+        ],
+    )
+    write_jsonl(
+        f1_results,
+        [
+            {
+                "item_id": "f1_bad",
+                "family": "F1",
+                "raw_response_text": '{"trace": ["a", "b"]}',
+                "raw_response": {
+                    "item_id": "f1_bad",
+                    "verdict": False,
+                    "certificate": {
+                        "certificate_type": "distinguishing_trace",
+                        "payload": {"trace": ["a", "b"]},
+                    },
+                },
+            }
+        ],
+    )
+
+    payload = build_pilot_v0_summary(
+        [
+            PilotV0FamilyRun("C2", c2_scores, c2_results),
+            PilotV0FamilyRun("F1", f1_scores, f1_results),
+        ],
+        model="mock-model",
+        temperature=0.0,
+        sample_limit=2,
+    )
+    assert payload["model"] == "mock-model"
+    assert payload["families"]["C2"]["extractability_rate"] == 0.8
+    assert payload["families"]["F1"]["n"] == 2
+    assert payload["representative_failure_modes"]
+    markdown = render_pilot_v0_markdown(payload)
+    assert "# FSMReasonBench Pilot v0 Report" in markdown
+    assert "## Interpretation" in markdown
+
+
+def test_cli_pilot_v0_mode(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    c2_scores = tmp_path / "c2_scores.jsonl"
+    f1_scores = tmp_path / "f1_scores.jsonl"
+    c2_results = tmp_path / "c2_results.jsonl"
+    f1_results = tmp_path / "f1_results.jsonl"
+    _write_scores(c2_scores)
+    write_jsonl(
+        f1_scores,
+        [
+            {
+                **dict(_score_record(item_id="f1_ok", failure_stage="correct")),
+                "family": "F1",
+            }
+        ],
+    )
+    write_jsonl(c2_results, [{"item_id": "item_ok", "family": "C2", "raw_response": {}}])
+    write_jsonl(f1_results, [{"item_id": "f1_ok", "family": "F1", "raw_response": {}}])
+
+    report_path = tmp_path / "pilot_v0_report.md"
+    summary_path = tmp_path / "pilot_v0_summary.json"
+    assert (
+        generate_pilot_report_main(
+            [
+                "--pilot-v0",
+                "--c2-scores",
+                str(c2_scores),
+                "--c2-results",
+                str(c2_results),
+                "--f1-scores",
+                str(f1_scores),
+                "--f1-results",
+                str(f1_results),
+                "--out",
+                str(report_path),
+                "--summary-json",
+                str(summary_path),
+                "--model",
+                "mock-model",
+            ]
+        )
+        == 0
+    )
+    captured = capsys.readouterr()
+    assert "Wrote pilot v0 report" in captured.out
+    assert report_path.exists()
+    assert summary_path.exists()
