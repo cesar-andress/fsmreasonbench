@@ -19,6 +19,10 @@ fsmreasonbench-generate-one = "fsmreasonbench.cli.generate_one:main"
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
+  "matplotlib>=3.8",
+]
+plot = [
+  "matplotlib>=3.8",
 ]
 
 [tool.setuptools.packages.find]

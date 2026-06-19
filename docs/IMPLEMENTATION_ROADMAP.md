@@ -40,6 +40,7 @@
 | P3.9 Minimal Ollama batch runner (C2 + F1) | ✅ |
 | P3.10 Failure inspection CLI for scored model runs | ✅ |
 | P3.11 Multi-model pilot runner (C2 + F1) | ✅ |
+| P3.12 Model capability-surface evaluation + plotting | ✅ |
 
 **Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 

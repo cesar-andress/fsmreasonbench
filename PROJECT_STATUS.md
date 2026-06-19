@@ -78,6 +78,8 @@ generator → oracle → certificate → verifier  ✅
 | Exploratory capability surface | `evaluator/capability_surface.py`, `cli/run_capability_surface.py` |
 | Ollama batch runner | `runners/`, `cli/run_ollama_batch.py` |
 | Multi-model pilot runner | `runners/pilot_models.py`, `cli/run_pilot_models.py` |
+| Model capability-surface runner | `evaluator/capability_surface_models.py`, `cli/run_capability_surface_models.py` |
+| Capability-surface plotting | `evaluator/capability_surface_plots.py`, `cli/plot_capability_surface.py` |
 | Failure inspection CLI | `evaluator/inspect_failures.py`, `cli/inspect_failures.py` — rates + per-stage failure samples |
 | Pilot report generator | `evaluator/pilot_report.py`, `cli/generate_pilot_report.py` |
 
@@ -213,4 +215,11 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_pilot_models \
   --f1-items runs/capability_surface_smoke2/F1/min_distinguishing_trace_length_2/items.jsonl \
   --max-items 20 \
   --out-dir runs/pilot_v1
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_capability_surface_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --levels 1,2,3,4,5 \
+  --n-per-level 20 \
+  --out-dir runs/capability_surface_models
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.plot_capability_surface \
+  --summary runs/capability_surface_models/combined_summary.json
 ```

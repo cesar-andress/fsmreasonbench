@@ -163,6 +163,24 @@ python -m fsmreasonbench.cli.run_pilot_models \
 
 Layout per model/family: `{out-dir}/{model_dir}/{family}/scores.jsonl`, `results.jsonl`, `transcripts/`. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md`. Exploratory only — not for paper claims.
 
+## Model capability-surface evaluation
+
+Sweep difficulty levels 1–5 with multiple Ollama models:
+
+```bash
+python -m fsmreasonbench.cli.run_capability_surface_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 \
+  --levels 1,2,3,4,5 \
+  --n-per-level 20 \
+  --out-dir runs/capability_surface_models
+
+python -m fsmreasonbench.cli.plot_capability_surface \
+  --summary runs/capability_surface_models/combined_summary.json
+```
+
+Requires `pip install 'fsmreasonbench[plot]'` (matplotlib) for plotting. Default output: `runs/capability_surface_models/` with per-level/per-model scores, `combined_summary.*`, `report.md`, and PNG curves.
+
 ## Exploratory batch evaluation (non-frozen)
 
 ```bash
