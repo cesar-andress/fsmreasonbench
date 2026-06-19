@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsmreasonbench.org/schema/certificate/separation.schema.json",
+  "title": "SeparationCertificate",
+  "description": "Certificate envelope for F1 DFA non-equivalence (distinguishing_trace).",
+  "type": "object",
+  "required": ["certificate_type", "version", "fsm_ids", "payload"],
+  "additionalProperties": true,
+  "properties": {
+    "certificate_type": { "const": "distinguishing_trace" },
+    "version": { "type": "string" },
+    "fsm_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "string" }
+    },
+    "verdict_supported": { "type": "boolean" },
+    "payload": {
+      "type": "object",
+      "required": ["trace", "acceptance"],
+      "properties": {
+        "trace": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "acceptance": {
+          "type": "object",
+          "required": ["A", "B"],
+          "properties": {
+            "A": { "type": "boolean" },
+            "B": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}

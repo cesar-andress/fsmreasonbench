@@ -42,6 +42,17 @@ or non-containment—not merely to answer boolean yes/no.
 | F1.b Non-containment | `w ∈ L(M₁) \ L(M₂)` | Separating trace |
 | F1.c Safety violation | `M ⊭ □P` | Counterexample trace to ¬P |
 
+#### Implementation status (artifact)
+
+| Slice | Status | Certificate | Verdict convention |
+|-------|--------|-------------|-------------------|
+| F1.a DFA non-equivalence | ✅ implemented | `distinguishing_trace` | `verdict=false` ⟺ not equivalent |
+| F1.a equivalent pairs | ⬜ not yet | TBD | `verdict=true` |
+| F1.b containment | ⬜ not yet | TBD | — |
+| F1.c safety violation | ⬜ not yet | TBD | — |
+
+**Normative question wording:** “Are DFA A and B equivalent?” Submit `verdict=false` with a `distinguishing_trace` certificate when they are not.
+
 #### Submitted answer (primary)
 
 ```json

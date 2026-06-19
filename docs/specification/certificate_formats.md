@@ -38,7 +38,33 @@ The **verifier** MUST be independent of generator and oracle.
 
 ## F1 — Separation / Witness
 
-### Type: `separation_witness`
+### Type: `distinguishing_trace` (implemented: F1.a DFA non-equivalence)
+
+```json
+{
+  "certificate_type": "distinguishing_trace",
+  "version": "1.0",
+  "fsm_ids": ["uuid-A", "uuid-B"],
+  "verdict_supported": false,
+  "payload": {
+    "trace": ["a", "b"],
+    "acceptance": { "A": true, "B": false }
+  }
+}
+```
+
+| Check | Rule |
+|-------|------|
+| Replay | Trace must be simulable on both DFAs |
+| Acceptance | Declared `A`/`B` values must match replay |
+| Separation | `acceptance.A != acceptance.B` |
+| Shortestness | Oracle metadata only in v0 slice; not enforced by verifier yet |
+
+**Verdict convention:** boolean answers the equivalence question directly — `false` means **not equivalent**. Do not invert into a separate “separable?” field.
+
+Schema: `schema/certificate/separation.schema.json`.
+
+### Type: `separation_witness` (planned general envelope)
 
 ```json
 {

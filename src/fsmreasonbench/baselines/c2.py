@@ -5,9 +5,12 @@ from __future__ import annotations
 import random
 from typing import Any
 
+from fsmreasonbench.baselines.common import run_invalid_baseline
 from fsmreasonbench.certificates.reachability import build_reachability_certificate
 from fsmreasonbench.items.assembly import BenchmarkItem
 from fsmreasonbench.oracle.reachability import is_reachable
+
+__all__ = ["run_invalid_baseline", "run_oracle_baseline", "run_random_baseline"]
 
 
 def run_oracle_baseline(item: BenchmarkItem) -> dict[str, Any]:
@@ -69,6 +72,4 @@ def run_random_baseline(item: BenchmarkItem, *, seed: int = 0) -> dict[str, Any]
     }
 
 
-def run_invalid_baseline(item: BenchmarkItem) -> str:
-    """Malformed response for extractability-gate testing."""
-    return f"NOT VALID JSON {{ item_id: {item.item_id}, verdict: maybe }}"
+# re-export shared invalid baseline

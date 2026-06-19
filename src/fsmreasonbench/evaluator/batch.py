@@ -4,11 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from fsmreasonbench.baselines.c2 import (
-    run_invalid_baseline,
-    run_oracle_baseline,
-    run_random_baseline,
-)
+from pathlib import Path
+
+from fsmreasonbench.baselines.runner import run_baseline
 from fsmreasonbench.evaluator.models import ScoringRecord
 from fsmreasonbench.evaluator.scorer import score_c2_item
 from fsmreasonbench.evaluator.summary import (
@@ -50,13 +48,7 @@ def baseline_response(
     *,
     seed: int = 0,
 ) -> Any:
-    if baseline == "oracle":
-        return run_oracle_baseline(item)
-    if baseline == "random":
-        return run_random_baseline(item, seed=seed)
-    if baseline == "invalid":
-        return run_invalid_baseline(item)
-    raise ValueError(f"unknown baseline {baseline!r}")
+    return run_baseline(baseline, item, seed=seed)
 
 
 def evaluate_baseline_on_items(
@@ -90,8 +82,6 @@ def run_c2_smoke_baselines(
     Writes item JSONL, per-baseline score JSONL, per-baseline summaries, and
     ``combined_summary.json``.
     """
-    from pathlib import Path
-
     from fsmreasonbench.evaluator.io import dump_json
     from fsmreasonbench.evaluator.jsonl import write_jsonl
 

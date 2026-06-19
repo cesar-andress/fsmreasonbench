@@ -25,8 +25,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     item = load_item(args.item)
-    if item.family != "C2":
-        print(f"ERROR: expected C2 item, got family={item.family!r}", file=sys.stderr)
+    if item.family not in {"C2", "F1"}:
+        print(f"ERROR: unsupported family={item.family!r}", file=sys.stderr)
         return 2
 
     raw_response = load_json(args.submission)

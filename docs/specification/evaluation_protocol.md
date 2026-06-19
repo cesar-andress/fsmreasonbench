@@ -276,23 +276,27 @@ Add `--score` to print the scoring record (stderr when stdout carries the raw re
 | `random` | Lower reference; deterministic under `--seed` | Parseable submission; usually fails verification |
 | `invalid` | Extractability probe | Malformed non-JSON text |
 
-Baselines live in `src/fsmreasonbench/baselines/`. They produce `raw_response` values consumed by the existing C2 parser and scorer.
+Baselines live in `src/fsmreasonbench/baselines/`. They produce `raw_response` values consumed by the family-aware parser and scorer (C2 and F1).
 
-### 12.3 C2 submission schema
+### 12.3 Submission schema (C2 and F1)
 
 Structured submissions MUST include:
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `item_id` | string | Must match the evaluatee item |
-| `verdict` | boolean | `true` = reachable, `false` = unreachable |
-| `certificate` | object | `trace_witness` or `unreachability_witness` per [`certificate_formats.md`](certificate_formats.md) |
+| `verdict` | boolean | Family-specific meaning (see below) |
+| `certificate` | object | Family-typed certificate per [`certificate_formats.md`](certificate_formats.md) |
 
-Schema: `schema/c2_submission.schema.json`.
+**C2 reachability:** `verdict=true` ⟺ target reachable; certificates `trace_witness` / `unreachability_witness`.
+
+**F1 DFA non-equivalence:** question asks whether A and B are **equivalent**; `verdict=false` ⟺ **not equivalent**; certificate `distinguishing_trace` with `payload.acceptance.A/B`.
+
+C2 schema: `schema/c2_submission.schema.json`. F1 reuses the same top-level submission envelope in this vertical slice.
 
 Raw model text MAY be stored in transcripts; the parser extracts JSON objects or fenced code blocks.
 
-### 12.4 C2 scoring record
+### 12.4 Scoring record (all families)
 
 | Field | Type | Meaning |
 |-------|------|---------|

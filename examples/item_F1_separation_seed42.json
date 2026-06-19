@@ -1,0 +1,160 @@
+{
+  "answer_key": {
+    "certificate": {
+      "certificate_type": "distinguishing_trace",
+      "fsm_ids": [
+        "3754dde6-6d48-5d7a-811a-7205b17d9bc6",
+        "aafcfe35-afe4-587c-a346-5ba65ec59136"
+      ],
+      "payload": {
+        "acceptance": {
+          "A": false,
+          "B": true
+        },
+        "trace": [
+          "c"
+        ]
+      },
+      "verdict_supported": false,
+      "version": "1.0"
+    },
+    "item_id": "67dafa6a-45b8-5b9b-8c9d-36f3eb1fe347",
+    "verdict": false
+  },
+  "contamination": {
+    "public_fingerprint": "e9d26a92c3a039e53efdef740fa7dea54253ac869f247eb77661c5d052aa3e3e"
+  },
+  "difficulty": {
+    "core": {
+      "alphabet_size": 3,
+      "distinguishing_trace_length": 1,
+      "transition_count_A": 7,
+      "transition_count_B": 5,
+      "|Q_A|": 4,
+      "|Q_B|": 4
+    },
+    "generator_seed": 42
+  },
+  "family": "F1",
+  "family_tier": "flagship",
+  "fsm_a": {
+    "accepting_states": [
+      "q0"
+    ],
+    "fsm_id": "3754dde6-6d48-5d7a-811a-7205b17d9bc6",
+    "fsm_type": "DFA",
+    "initial_state": "q0",
+    "input_alphabet": [
+      "a",
+      "b",
+      "c"
+    ],
+    "metadata": {
+      "generator_seed": 42,
+      "label": "A",
+      "state_count": 4
+    },
+    "states": [
+      "q0",
+      "q1",
+      "q2",
+      "q3"
+    ],
+    "transitions": [
+      {
+        "from": "q0",
+        "input": "b",
+        "to": "q2"
+      },
+      {
+        "from": "q0",
+        "input": "c",
+        "to": "q1"
+      },
+      {
+        "from": "q2",
+        "input": "a",
+        "to": "q3"
+      },
+      {
+        "from": "q2",
+        "input": "b",
+        "to": "q0"
+      },
+      {
+        "from": "q2",
+        "input": "c",
+        "to": "q0"
+      },
+      {
+        "from": "q3",
+        "input": "a",
+        "to": "q3"
+      },
+      {
+        "from": "q3",
+        "input": "b",
+        "to": "q2"
+      }
+    ]
+  },
+  "fsm_b": {
+    "accepting_states": [
+      "q0"
+    ],
+    "fsm_id": "aafcfe35-afe4-587c-a346-5ba65ec59136",
+    "fsm_type": "DFA",
+    "initial_state": "q0",
+    "input_alphabet": [
+      "a",
+      "b",
+      "c"
+    ],
+    "metadata": {
+      "generator_seed": 43,
+      "label": "B",
+      "state_count": 4
+    },
+    "states": [
+      "q0",
+      "q1",
+      "q2",
+      "q3"
+    ],
+    "transitions": [
+      {
+        "from": "q0",
+        "input": "a",
+        "to": "q1"
+      },
+      {
+        "from": "q0",
+        "input": "c",
+        "to": "q0"
+      },
+      {
+        "from": "q1",
+        "input": "a",
+        "to": "q3"
+      },
+      {
+        "from": "q1",
+        "input": "c",
+        "to": "q2"
+      },
+      {
+        "from": "q3",
+        "input": "b",
+        "to": "q0"
+      }
+    ]
+  },
+  "item_id": "67dafa6a-45b8-5b9b-8c9d-36f3eb1fe347",
+  "question": {
+    "family": "F1",
+    "fsm_a_id": "3754dde6-6d48-5d7a-811a-7205b17d9bc6",
+    "fsm_b_id": "aafcfe35-afe4-587c-a346-5ba65ec59136",
+    "prompt_id": "separation.non_equivalence.v1",
+    "task": "non_equivalence"
+  }
+}

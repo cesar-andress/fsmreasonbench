@@ -39,9 +39,24 @@
 
 **Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 
-## Phase 4+ — Not started
+## Phase 4 — Flagship verticals 🔄
 
-- F1 separation / witness
+| Milestone | Status |
+|-----------|--------|
+| P4.1 F1 DFA non-equivalence + distinguishing_trace | ✅ |
+| P4.2 F1 equivalent-pair certificates | ⬜ |
+| P4.3 F1 NFA / containment subtypes | ⬜ |
+| P4.4 F2 non-materialized composition | ⬜ |
+| P4.5 F3 constructive synthesis | ⬜ |
+| P4.6 F4 formalization fidelity | ⬜ |
+| Multi-track infrastructure | ⬜ |
+| Contamination / frozen cohorts / Zenodo release | ⬜ |
+
+**Success criterion (partial):** first flagship F1 item self-verifies end-to-end.
+
+## Phase 4+ — Remaining flagship work
+
+- F1 equivalent-pair proofs, NFA, containment
 - F2 non-materialized composition
 - F3 constructive synthesis
 - F4 formalization fidelity
@@ -56,10 +71,10 @@ src/fsmreasonbench/
   oracle/          # reference decision procedures
   certificates/    # oracle-side certificate builders
   verifier/        # independent verification (no oracle import)
-  generator/       # seeded instance generation
+  generator/       # C2 reachability + F1 separation generation
   items/           # benchmark item assembly + self_verify
-  evaluator/       # C2 parser, scorer, transcripts, batch, summary
-  baselines/       # C2 reference systems (oracle, random, invalid)
+  evaluator/       # family-aware parser, scorer, transcripts, batch, summary
+  baselines/       # C2/F1 reference systems (oracle, random, invalid)
   cli/             # generate_one, score_submission, rescore_transcript, run_baseline,
                    # generate_batch, evaluate_baseline_batch, summarize_scores,
                    # run_c2_smoke_baselines
@@ -71,6 +86,7 @@ src/fsmreasonbench/
 pip install -e ".[dev]"
 pytest
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --seed 42
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --family F1 --seed 42
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.score_submission \
   --item examples/item_C2_reachability_seed42.json \
   --submission examples/submission_C2_correct.json

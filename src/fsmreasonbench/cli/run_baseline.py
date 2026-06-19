@@ -1,4 +1,4 @@
-"""Run a C2 reference baseline against a benchmark item."""
+"""Run a reference baseline against a benchmark item."""
 
 from __future__ import annotations
 
@@ -7,41 +7,17 @@ import json
 import sys
 from typing import Any
 
-from fsmreasonbench.baselines.c2 import (
-    run_invalid_baseline,
-    run_oracle_baseline,
-    run_random_baseline,
-)
+from fsmreasonbench.baselines.runner import run_baseline as dispatch_baseline
 from fsmreasonbench.evaluator.io import load_item
-from fsmreasonbench.evaluator.scorer import score_c2_item
-
-_BASELINES = frozenset({"oracle", "random", "invalid"})
-
-
-def run_baseline(
-    baseline: str,
-    item_path: str,
-    *,
-    seed: int = 0,
-) -> Any:
-    item = load_item(item_path)
-    if item.family != "C2":
-        raise ValueError(f"expected C2 item, got family={item.family!r}")
-    if baseline == "oracle":
-        return run_oracle_baseline(item)
-    if baseline == "random":
-        return run_random_baseline(item, seed=seed)
-    if baseline == "invalid":
-        return run_invalid_baseline(item)
-    raise ValueError(f"unknown baseline {baseline!r}")
+from fsmreasonbench.evaluator.scorer import score_item
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run a C2 reference baseline")
+    parser = argparse.ArgumentParser(description="Run a reference baseline")
     parser.add_argument(
         "--baseline",
         required=True,
-        choices=sorted(_BASELINES),
+        choices=["oracle", "random", "invalid"],
         help="Baseline system: oracle (ceiling), random, or invalid",
     )
     parser.add_argument("--item", required=True, help="Path to full benchmark item JSON")
@@ -59,8 +35,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        raw_response = run_baseline(args.baseline, args.item, seed=args.seed)
-    except ValueError as exc:
+        item = load_item(args.item)
+        raw_response = dispatch_baseline(args.baseline, item, seed=args.seed)
+    except (ValueError, OSError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
@@ -70,8 +47,7 @@ def main(argv: list[str] | None = None) -> int:
         print(raw_response)
 
     if args.score:
-        item = load_item(args.item)
-        record = score_c2_item(item, raw_response)
+        record = score_item(item, raw_response)
         print(json.dumps(record.to_dict(), indent=2, sort_keys=True), file=sys.stderr)
         return 0 if record.fully_correct else 1
 

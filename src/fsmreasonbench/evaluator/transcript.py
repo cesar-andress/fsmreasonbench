@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 from typing import Any
 
 from fsmreasonbench.evaluator.models import SCORER_VERSION, ScoringRecord, Transcript
-from fsmreasonbench.evaluator.parser import parse_c2_response
-from fsmreasonbench.evaluator.scorer import score_c2_item, score_c2_parsed
+from fsmreasonbench.evaluator.parser import parse_submission
+from fsmreasonbench.evaluator.scorer import score_item, score_parsed_submission
 from fsmreasonbench.items.assembly import BenchmarkItem
 
 TRANSCRIPT_VERSION = "1.0"
@@ -24,8 +24,8 @@ def record_transcript(
     timestamp: str | None = None,
 ) -> Transcript:
     """Parse, score, and record a full evaluation transcript."""
-    parse_result = parse_c2_response(raw_response)
-    scoring = score_c2_item(item, raw_response)
+    parse_result = parse_submission(raw_response, item.family)
+    scoring = score_item(item, raw_response)
     parsed_dict = None
     if parse_result.extractable and parse_result.submission is not None:
         submission = parse_result.submission
@@ -61,8 +61,8 @@ def rescore_transcript(transcript: Transcript) -> ScoringRecord:
             verdict=transcript.parsed_submission["verdict"],
             certificate=transcript.parsed_submission["certificate"],
         )
-        return score_c2_parsed(item, submission)
-    return score_c2_item(item, transcript.raw_response)
+        return score_parsed_submission(item, submission)
+    return score_item(item, transcript.raw_response)
 
 
 def _item_from_transcript(transcript: Transcript) -> BenchmarkItem:

@@ -1,4 +1,4 @@
-"""Benchmark item assembly for the C2 reachability vertical slice."""
+"""Benchmark item assembly for C2 reachability and F1 separation vertical slices."""
 
 from __future__ import annotations
 
@@ -7,10 +7,13 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from fsmreasonbench.certificates.reachability import build_reachability_certificate
+from fsmreasonbench.certificates.separation import build_distinguishing_trace_certificate
 from fsmreasonbench.models.fsm import ExecutableFSM
 from fsmreasonbench.models.serialization import canonical_json, content_hash, fsm_to_dict
 from fsmreasonbench.oracle.reachability import is_reachable, shortest_reachability_witness
+from fsmreasonbench.oracle.separation import are_equivalent, shortest_distinguishing_trace
 from fsmreasonbench.verifier.reachability import verify_reachability_certificate
+from fsmreasonbench.verifier.separation import verify_distinguishing_trace_certificate
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,18 +28,30 @@ class BenchmarkItem:
     answer_key: dict[str, Any]
     difficulty: dict[str, Any]
     contamination: dict[str, Any] = field(default_factory=dict)
+    fsm_b: ExecutableFSM | None = None
+
+    @property
+    def fsm_a(self) -> ExecutableFSM:
+        return self.fsm
 
     def to_evaluatee_dict(self) -> dict[str, Any]:
         """Serialize evaluatee-visible fields (no answer key)."""
-        return {
+        data: dict[str, Any] = {
             "item_id": self.item_id,
             "family": self.family,
             "family_tier": self.family_tier,
-            "fsm": fsm_to_dict(self.fsm, include_metadata=True),
             "question": self.question,
             "difficulty": self.difficulty,
             "contamination": self.contamination,
         }
+        if self.family == "F1":
+            if self.fsm_b is None:
+                raise ValueError("F1 item requires fsm_b")
+            data["fsm_a"] = fsm_to_dict(self.fsm, include_metadata=True)
+            data["fsm_b"] = fsm_to_dict(self.fsm_b, include_metadata=True)
+        else:
+            data["fsm"] = fsm_to_dict(self.fsm, include_metadata=True)
+        return data
 
     def to_full_dict(self) -> dict[str, Any]:
         data = self.to_evaluatee_dict()
@@ -93,12 +108,89 @@ def assemble_reachability_item(
     )
 
 
+def assemble_separation_item(
+    fsm_a: ExecutableFSM,
+    fsm_b: ExecutableFSM,
+    *,
+    seed: int,
+    item_id: str | None = None,
+) -> BenchmarkItem:
+    """
+    Assemble F1 DFA non-equivalence item with oracle-produced distinguishing trace.
+
+    Verdict convention: ``verdict=false`` means the DFAs are **not equivalent**.
+    """
+    if are_equivalent(fsm_a, fsm_b):
+        raise ValueError("F1 generator requires non-equivalent DFA pair")
+
+    certificate = build_distinguishing_trace_certificate(fsm_a, fsm_b)
+    witness = shortest_distinguishing_trace(fsm_a, fsm_b)
+    if witness is None:
+        raise RuntimeError("internal error: non-equivalent pair without witness")
+
+    question = {
+        "family": "F1",
+        "prompt_id": "separation.non_equivalence.v1",
+        "task": "non_equivalence",
+        "fsm_a_id": fsm_a.fsm_id,
+        "fsm_b_id": fsm_b.fsm_id,
+    }
+    fingerprint_input = canonical_json(
+        {
+            "fsm_a": fsm_to_dict(fsm_a, include_metadata=False),
+            "fsm_b": fsm_to_dict(fsm_b, include_metadata=False),
+            "question": question,
+        }
+    )
+    public_fingerprint = content_hash({"canonical": fingerprint_input})
+
+    resolved_item_id = item_id or str(
+        uuid.uuid5(
+            uuid.NAMESPACE_URL,
+            f"fsmreasonbench:item:F1:{seed}:{fsm_a.fsm_id}:{fsm_b.fsm_id}",
+        )
+    )
+
+    return BenchmarkItem(
+        item_id=resolved_item_id,
+        family="F1",
+        family_tier="flagship",
+        fsm=fsm_a,
+        fsm_b=fsm_b,
+        question=question,
+        answer_key={
+            "item_id": resolved_item_id,
+            "verdict": False,
+            "certificate": certificate,
+        },
+        difficulty={
+            "core": {
+                "|Q_A|": fsm_a.state_count,
+                "|Q_B|": fsm_b.state_count,
+                "alphabet_size": len(fsm_a.input_alphabet),
+                "distinguishing_trace_length": len(witness.trace),
+                "transition_count_A": len(fsm_a.transitions),
+                "transition_count_B": len(fsm_b.transitions),
+            },
+            "generator_seed": seed,
+        },
+        contamination={"public_fingerprint": public_fingerprint},
+    )
+
+
 def self_verify_item(item: BenchmarkItem) -> None:
     """
     Validate item end-to-end: oracle certificate accepted by independent verifier.
 
     Raises AssertionError on failure.
     """
+    if item.family == "F1":
+        _self_verify_f1_item(item)
+        return
+    _self_verify_c2_item(item)
+
+
+def _self_verify_c2_item(item: BenchmarkItem) -> None:
     target_state = item.question["target_state"]
     certificate = item.answer_key["certificate"]
     expected_verdict = item.answer_key["verdict"]
@@ -116,3 +208,24 @@ def self_verify_item(item: BenchmarkItem) -> None:
     actual = is_reachable(item.fsm, target_state)
     if actual != expected_verdict:
         raise AssertionError(f"verdict mismatch: oracle={expected_verdict}, actual={actual}")
+
+
+def _self_verify_f1_item(item: BenchmarkItem) -> None:
+    if item.fsm_b is None:
+        raise AssertionError("F1 item missing fsm_b")
+    certificate = item.answer_key["certificate"]
+    expected_verdict = item.answer_key["verdict"]
+    if expected_verdict is not False:
+        raise AssertionError("F1 non-equivalence items must have verdict=false")
+
+    result = verify_distinguishing_trace_certificate(item.fsm_a, item.fsm_b, certificate)
+    if not result.valid:
+        raise AssertionError(f"self-verification failed: {result.errors}")
+
+    if certificate["certificate_type"] != "distinguishing_trace":
+        raise AssertionError(
+            f"expected distinguishing_trace certificate, got {certificate['certificate_type']!r}"
+        )
+
+    if are_equivalent(item.fsm_a, item.fsm_b):
+        raise AssertionError("oracle reports equivalent DFAs for non-equivalence item")

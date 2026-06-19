@@ -16,7 +16,7 @@
 | **Phase 1** — Core infrastructure | ✅ **Complete** | FSM, oracle, verifier, tests |
 | **Phase 2** — First vertical (C2 reachability) | ✅ **Complete** | Difficulty controls + negative items |
 | **Phase 3** — Evaluation infrastructure | ✅ **Complete** | C2 parser, scoring, transcripts, baselines |
-| **Phase 4+** — Full benchmark | ⬜ Not started | F1–F4, cohorts, Zenodo |
+| **Phase 4** — Flagship verticals | 🔄 **In progress** | F1 DFA non-equivalence vertical |
 
 Roadmap detail: [`docs/IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)
 
@@ -34,7 +34,27 @@ generator → oracle → certificate → verifier  ✅
 - **CLI:** `python3 -m fsmreasonbench.cli.generate_one --seed 42`
 - **Difficulty controls:** `min_witness_length=1`, `max_witness_length=12`, `allow_initial_target=false`
 - **Negative items:** unreachable targets with `unreachability_witness`
-- **Tests:** 53+ passing (`pytest`)
+- **Tests:** 66+ passing (`pytest`)
+
+---
+
+## Phase 4 deliverables (F1 separation / witness)
+
+| Component | Path |
+|-----------|------|
+| Separation oracle (shortest distinguishing trace) | `oracle/separation.py` |
+| Certificate builder | `certificates/separation.py` |
+| Independent verifier | `verifier/separation.py` |
+| Seeded F1 generator (non-equivalent DFA pairs) | `generator/separation.py` |
+| F1 item assembly + self-verify | `items/assembly.py` |
+| F1 parser / scorer | `evaluator/parser.py`, `scorer_f1.py` |
+| F1 baselines | `baselines/f1.py`, `baselines/runner.py` |
+| Schema | `schema/certificate/separation.schema.json` |
+| Example item | `examples/item_F1_separation_seed42.json` |
+
+**Verdict convention:** question asks whether A and B are **equivalent**; `verdict=false` means **not equivalent** (separable). Gold certificate type: `distinguishing_trace`.
+
+**CLI:** `python3 -m fsmreasonbench.cli.generate_one --family F1 --seed 42`
 
 ---
 
@@ -98,11 +118,12 @@ Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 
 ---
 
-## Next implementation milestone (Phase 4)
+## Next implementation milestone (Phase 4 remainder)
 
-1. **F1 separation / witness** — first flagship family vertical
+1. **F1 equivalent-pair proof certificates** (positive items)
+2. **F1 NFA / containment subtypes**
 
-**Not next:** frozen cohorts, contamination tooling, LLM runners, multi-track.
+**Not next:** frozen cohorts, contamination tooling, LLM runners, multi-track, F2 composition.
 
 ---
 
@@ -122,6 +143,9 @@ Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 pip install -e ".[dev]"
 pytest -v
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --seed 42
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --family F1 --seed 42
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline oracle --item examples/item_F1_separation_seed42.json --score
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.score_submission \
   --item examples/item_C2_reachability_seed42.json \
   --submission examples/submission_C2_correct.json

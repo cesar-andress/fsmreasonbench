@@ -26,9 +26,26 @@ def item_from_dict(data: dict[str, Any]) -> BenchmarkItem:
     """Build BenchmarkItem from full or evaluatee JSON."""
     if "answer_key" not in data:
         raise ValueError("item JSON must include answer_key for scoring")
+    family = data["family"]
+    if family == "F1":
+        if "fsm_a" not in data or "fsm_b" not in data:
+            raise ValueError("F1 item JSON must include fsm_a and fsm_b")
+        return BenchmarkItem(
+            item_id=data["item_id"],
+            family=family,
+            family_tier=data.get("family_tier", "flagship"),
+            fsm=fsm_from_dict(data["fsm_a"]),
+            fsm_b=fsm_from_dict(data["fsm_b"]),
+            question=data["question"],
+            answer_key=data["answer_key"],
+            difficulty=data.get("difficulty", {}),
+            contamination=data.get("contamination", {}),
+        )
+    if "fsm" not in data:
+        raise ValueError("item JSON must include fsm")
     return BenchmarkItem(
         item_id=data["item_id"],
-        family=data["family"],
+        family=family,
         family_tier=data.get("family_tier", "calibration"),
         fsm=fsm_from_dict(data["fsm"]),
         question=data["question"],
