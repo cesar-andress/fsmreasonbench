@@ -80,3 +80,22 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
 ```
 
 Output under `runs/` is gitignored; not a frozen cohort.
+
+## C2 smoke baseline check
+
+One command runs all three baselines on the same generated batch and writes per-baseline plus combined summaries:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_c2_smoke_baselines \
+  --n 100 --seed 1 --out-dir runs/c2_smoke
+```
+
+Expected separation:
+
+| Baseline | Typical `fully_correct_rate` | Typical `extractability_rate` |
+|----------|---------------------------|------------------------------|
+| `oracle` | 1.0 | 1.0 |
+| `random` | ≪ 1.0 (deterministic under seed) | 1.0 |
+| `invalid` | 0.0 | 0.0 |
+
+Artifacts in `runs/c2_smoke/`: `c2_items.jsonl`, `{oracle,random,invalid}_scores.jsonl`, `{oracle,random,invalid}_summary.json`, `combined_summary.json`.

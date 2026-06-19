@@ -35,6 +35,7 @@
 | P3.4 CLI `score_submission` / `rescore_transcript` | ✅ |
 | P3.5 Baselines: random, oracle ceiling, invalid | ✅ |
 | P3.6 C2 batch generation + baseline batch evaluation + summaries | ✅ |
+| P3.7 C2 smoke baseline batch runner (oracle / random / invalid) | ✅ |
 
 **Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 
@@ -60,7 +61,8 @@ src/fsmreasonbench/
   evaluator/       # C2 parser, scorer, transcripts, batch, summary
   baselines/       # C2 reference systems (oracle, random, invalid)
   cli/             # generate_one, score_submission, rescore_transcript, run_baseline,
-                   # generate_batch, evaluate_baseline_batch, summarize_scores
+                   # generate_batch, evaluate_baseline_batch, summarize_scores,
+                   # run_c2_smoke_baselines
 ```
 
 ## Run
@@ -82,4 +84,6 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.evaluate_baseline_batch \
   --baseline oracle --items runs/c2_items.jsonl --out runs/oracle_scores.jsonl
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
   --scores runs/oracle_scores.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_c2_smoke_baselines \
+  --n 100 --seed 1 --out-dir runs/c2_smoke
 ```

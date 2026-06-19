@@ -47,3 +47,16 @@ def summarize_scoring_records(records: list[ScoringRecord]) -> dict[str, Any]:
             for stage in FailureStage
         },
     }
+
+
+def summarize_with_baseline(
+    baseline: str,
+    records: list[ScoringRecord],
+) -> dict[str, Any]:
+    """Attach baseline name to an aggregate summary."""
+    return {"baseline": baseline, **summarize_scoring_records(records)}
+
+
+def combine_baseline_summaries(summaries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return one summary object per baseline for combined reporting."""
+    return list(summaries)

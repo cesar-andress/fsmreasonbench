@@ -11,6 +11,10 @@ from fsmreasonbench.baselines.c2 import (
 )
 from fsmreasonbench.evaluator.models import ScoringRecord
 from fsmreasonbench.evaluator.scorer import score_c2_item
+from fsmreasonbench.evaluator.summary import (
+    combine_baseline_summaries,
+    summarize_with_baseline,
+)
 from fsmreasonbench.generator.reachability import (
     ReachabilityGeneratorConfig,
     generate_reachability_item,
@@ -18,6 +22,7 @@ from fsmreasonbench.generator.reachability import (
 from fsmreasonbench.items.assembly import BenchmarkItem, self_verify_item
 
 _BASELINES = frozenset({"oracle", "random", "invalid"})
+_SMOKE_BASELINES = ("oracle", "random", "invalid")
 
 
 def generate_c2_batch(
@@ -69,3 +74,43 @@ def evaluate_baseline_on_items(
         raw_response = baseline_response(baseline, item, seed=item_seed)
         records.append(score_c2_item(item, raw_response))
     return records
+
+
+def run_c2_smoke_baselines(
+    n: int,
+    seed: int,
+    out_dir: str | Path,
+    *,
+    config: ReachabilityGeneratorConfig | None = None,
+    baseline_seed: int = 0,
+) -> list[dict[str, Any]]:
+    """
+    Generate one C2 batch and evaluate oracle, random, and invalid baselines.
+
+    Writes item JSONL, per-baseline score JSONL, per-baseline summaries, and
+    ``combined_summary.json``.
+    """
+    from pathlib import Path
+
+    from fsmreasonbench.evaluator.io import dump_json
+    from fsmreasonbench.evaluator.jsonl import write_jsonl
+
+    if n < 1:
+        raise ValueError("n must be >= 1")
+
+    root = Path(out_dir)
+    root.mkdir(parents=True, exist_ok=True)
+
+    items = generate_c2_batch(n, seed, config=config)
+    write_jsonl(root / "c2_items.jsonl", (item.to_full_dict() for item in items))
+
+    combined: list[dict[str, Any]] = []
+    for baseline in _SMOKE_BASELINES:
+        records = evaluate_baseline_on_items(baseline, items, seed=baseline_seed)
+        write_jsonl(root / f"{baseline}_scores.jsonl", (record.to_dict() for record in records))
+        summary = summarize_with_baseline(baseline, records)
+        dump_json(root / f"{baseline}_summary.json", summary)
+        combined.append(summary)
+
+    dump_json(root / "combined_summary.json", combine_baseline_summaries(combined))
+    return combined

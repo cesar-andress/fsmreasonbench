@@ -34,7 +34,7 @@ generator → oracle → certificate → verifier  ✅
 - **CLI:** `python3 -m fsmreasonbench.cli.generate_one --seed 42`
 - **Difficulty controls:** `min_witness_length=1`, `max_witness_length=12`, `allow_initial_target=false`
 - **Negative items:** unreachable targets with `unreachability_witness`
-- **Tests:** 48+ passing (`pytest`)
+- **Tests:** 53+ passing (`pytest`)
 
 ---
 
@@ -52,6 +52,7 @@ generator → oracle → certificate → verifier  ✅
 | CLI run baseline | `cli/run_baseline.py` |
 | C2 batch generation + evaluation | `evaluator/batch.py`, `evaluator/summary.py` |
 | CLI batch tools | `cli/generate_batch.py`, `evaluate_baseline_batch.py`, `summarize_scores.py` |
+| C2 smoke baseline runner | `cli/run_c2_smoke_baselines.py` |
 
 **End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
 
@@ -134,4 +135,6 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.evaluate_baseline_batch \
   --baseline oracle --items runs/c2_items.jsonl --out runs/oracle_scores.jsonl
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
   --scores runs/oracle_scores.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_c2_smoke_baselines \
+  --n 100 --seed 1 --out-dir runs/c2_smoke
 ```
