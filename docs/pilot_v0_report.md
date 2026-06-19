@@ -84,6 +84,36 @@
         {
 `
   - parsed_submission: `{"certificate": {"certificate_type": "trace_witness", "payload": {"state_sequence": ["q0", "q1"], "trace": [{"input": "a", "state": "q0"}, {"input": null, "state": "q1"}]}, "version": "1.0"}, "item_id`
+- `50c54614-4655-55ba-a09a-a3c49f84fa0a`
+  - verdict_correct: False
+  - certificate_valid: False
+  - certificate_errors: ['trace symbols must be strings']
+  - raw_response excerpt: `{
+  "item_id": "50c54614-4655-55ba-a09a-a3c49f84fa0a",
+  "verdict": true,
+  "certificate": {
+    "certificate_type": "trace_witness",
+    "version": "1.0",
+    "payload": {
+      "trace": [
+        {
+`
+  - parsed_submission: `{"certificate": {"certificate_type": "trace_witness", "payload": {"state_sequence": ["q0", "q1", "q2", "q3"], "trace": [{"input": "a", "state": "q0"}, {"input": "b", "state": "q1"}, {"input": "c", "st`
+- `76eab108-3226-5814-bd32-f910a86db134`
+  - verdict_correct: False
+  - certificate_valid: False
+  - certificate_errors: ['trace symbols must be strings']
+  - raw_response excerpt: `{
+  "item_id": "76eab108-3226-5814-bd32-f910a86db134",
+  "verdict": true,
+  "certificate": {
+    "certificate_type": "trace_witness",
+    "version": "1.0",
+    "payload": {
+      "trace": [
+        {
+`
+  - parsed_submission: `{"certificate": {"certificate_type": "trace_witness", "payload": {"state_sequence": ["q0", "q2", "q4"], "trace": [{"input": "c", "state": "q0"}, {"input": "a", "state": "q2"}, {"input": "c", "state": `
 
 #### certificate_invalid
 
@@ -130,6 +160,34 @@
         {
 `
   - parsed_submission: `{"certificate": {"certificate_type": "trace_witness", "payload": {"state_sequence": ["q0", "q3"], "trace": [{"input": "c", "state": "q0"}, {"input": "b", "state": "q3"}]}, "version": "1.0"}, "item_id"`
+- `716ba5ba-81cd-5097-b8df-17488c62ff0f`
+  - verdict_correct: True
+  - certificate_valid: False
+  - certificate_errors: ["missing reachable states: ['q2', 'q3', 'q4']"]
+  - raw_response excerpt: `{
+  "item_id": "716ba5ba-81cd-5097-b8df-17488c62ff0f",
+  "verdict": false,
+  "certificate": {
+    "certificate_type": "unreachability_witness",
+    "version": "1.0",
+    "payload": {
+      "reachable_`
+  - parsed_submission: `{"certificate": {"certificate_type": "unreachability_witness", "payload": {"reachable_states": ["q0"], "target_state": "q1"}, "version": "1.0"}, "item_id": "716ba5ba-81cd-5097-b8df-17488c62ff0f", "ver`
+- `2fbc4c9c-454b-5828-b08d-0eb7432a31fe`
+  - verdict_correct: True
+  - certificate_valid: False
+  - certificate_errors: ['trace symbols must be strings']
+  - raw_response excerpt: `{
+  "item_id": "2fbc4c9c-454b-5828-b08d-0eb7432a31fe",
+  "verdict": true,
+  "certificate": {
+    "certificate_type": "trace_witness",
+    "version": "1.0",
+    "payload": {
+      "trace": [
+        {
+`
+  - parsed_submission: `{"certificate": {"certificate_type": "trace_witness", "payload": {"state_sequence": ["q0", "q3"], "trace": [{"input": "b", "state": "q0"}, {"input": "a", "state": "q3"}]}, "version": "1.0"}, "item_id"`
 
 ## F1 summary
 
@@ -206,6 +264,32 @@
     "version": "1.0",
     "fsm_ids": ["b9088544-1f`
   - parsed_submission: `{"certificate": {"certificate_type": "distinguishing_trace", "fsm_ids": ["b9088544-1f84-5997-af39-b08c3ffee88f", "c348da51-2d0b-5eef-82a4-d61594945c0d"], "payload": {"acceptance": {"A": false, "B": tr`
+- `0ebd4577-8958-5041-bd45-4e76a4e3a9f9`
+  - verdict_correct: True
+  - certificate_valid: False
+  - certificate_errors: ["trace replay failed: no transition from 'q2' on 'b'"]
+  - raw_response excerpt: ````json
+{
+  "item_id": "0ebd4577-8958-5041-bd45-4e76a4e3a9f9",
+  "verdict": false,
+  "certificate": {
+    "certificate_type": "distinguishing_trace",
+    "version": "1.0",
+    "fsm_ids": ["6e3d1949-d0`
+  - parsed_submission: `{"certificate": {"certificate_type": "distinguishing_trace", "fsm_ids": ["6e3d1949-d0b9-5a28-bc15-fbe08de04abd", "41b90ab6-bab6-50d0-833b-68f41606c97d"], "payload": {"acceptance": {"A": false, "B": tr`
+- `ac50ad35-8941-5eb3-9f73-cdf57e318c34`
+  - verdict_correct: True
+  - certificate_valid: False
+  - certificate_errors: ["trace replay failed: no transition from 'q3' on 'b'"]
+  - raw_response excerpt: ````json
+{
+  "item_id": "ac50ad35-8941-5eb3-9f73-cdf57e318c34",
+  "verdict": false,
+  "certificate": {
+    "certificate_type": "distinguishing_trace",
+    "version": "1.0",
+    "fsm_ids": ["b1ef6cc7-48`
+  - parsed_submission: `{"certificate": {"certificate_type": "distinguishing_trace", "fsm_ids": ["b1ef6cc7-48c7-5580-a773-9e141c3b516b", "7a6b4dce-a07d-56d1-98ed-6504a9d375ec"], "payload": {"acceptance": {"A": false, "B": tr`
 
 ## Interpretation
 

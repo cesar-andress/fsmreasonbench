@@ -114,6 +114,66 @@
             },
             "raw_response_excerpt": "{\n  \"item_id\": \"96ba0e25-c1b9-5ab2-8e1f-8b81205ba6ac\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"c\"\n        },\n        {\n          \"state\": \"q3\",\n          \"input\": \"b\"\n        }\n      ],\n      \"state_sequence\": [\"q0\", \"q3\"]\n    }\n  }\n}",
             "verdict_correct": true
+          },
+          {
+            "certificate_errors": [
+              "missing reachable states: ['q2', 'q3', 'q4']"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "C2",
+            "item_id": "716ba5ba-81cd-5097-b8df-17488c62ff0f",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "unreachability_witness",
+                "payload": {
+                  "reachable_states": [
+                    "q0"
+                  ],
+                  "target_state": "q1"
+                },
+                "version": "1.0"
+              },
+              "item_id": "716ba5ba-81cd-5097-b8df-17488c62ff0f",
+              "verdict": false
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"716ba5ba-81cd-5097-b8df-17488c62ff0f\",\n  \"verdict\": false,\n  \"certificate\": {\n    \"certificate_type\": \"unreachability_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"reachable_states\": [\"q0\"],\n      \"target_state\": \"q1\"\n    }\n  }\n}",
+            "verdict_correct": true
+          },
+          {
+            "certificate_errors": [
+              "trace symbols must be strings"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "C2",
+            "item_id": "2fbc4c9c-454b-5828-b08d-0eb7432a31fe",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "trace_witness",
+                "payload": {
+                  "state_sequence": [
+                    "q0",
+                    "q3"
+                  ],
+                  "trace": [
+                    {
+                      "input": "b",
+                      "state": "q0"
+                    },
+                    {
+                      "input": "a",
+                      "state": "q3"
+                    }
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "2fbc4c9c-454b-5828-b08d-0eb7432a31fe",
+              "verdict": true
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"2fbc4c9c-454b-5828-b08d-0eb7432a31fe\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"b\"\n        },\n        {\n          \"state\": \"q3\",\n          \"input\": \"a\"\n        }\n      ],\n      \"state_sequence\": [\"q0\", \"q3\"]\n    }\n  }\n}",
+            "verdict_correct": true
           }
         ],
         "verdict_wrong": [
@@ -220,6 +280,87 @@
               "verdict": true
             },
             "raw_response_excerpt": "{\n  \"item_id\": \"e03698a4-1816-51c7-a275-7dea05584b95\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"a\"\n        },\n        {\n          \"state\": \"q1\",\n          \"input\": null\n        }\n      ],\n      \"state_sequence\": [\"q0\", \"q1\"]\n    }\n  }\n}",
+            "verdict_correct": false
+          },
+          {
+            "certificate_errors": [
+              "trace symbols must be strings"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "verdict_wrong",
+            "family": "C2",
+            "item_id": "50c54614-4655-55ba-a09a-a3c49f84fa0a",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "trace_witness",
+                "payload": {
+                  "state_sequence": [
+                    "q0",
+                    "q1",
+                    "q2",
+                    "q3"
+                  ],
+                  "trace": [
+                    {
+                      "input": "a",
+                      "state": "q0"
+                    },
+                    {
+                      "input": "b",
+                      "state": "q1"
+                    },
+                    {
+                      "input": "c",
+                      "state": "q2"
+                    }
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "50c54614-4655-55ba-a09a-a3c49f84fa0a",
+              "verdict": true
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"50c54614-4655-55ba-a09a-a3c49f84fa0a\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"a\"\n        },\n        {\n          \"state\": \"q1\",\n          \"input\": \"b\"\n        },\n        {\n          \"state\": \"q2\",\n          \"input\": \"c\"\n        }\n      ],\n      \"state_sequence\": [\n        \"q0\",\n        \"q1\",\n        \"q2\",\n        \"q3\"\n      ]\n    }\n...",
+            "verdict_correct": false
+          },
+          {
+            "certificate_errors": [
+              "trace symbols must be strings"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "verdict_wrong",
+            "family": "C2",
+            "item_id": "76eab108-3226-5814-bd32-f910a86db134",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "trace_witness",
+                "payload": {
+                  "state_sequence": [
+                    "q0",
+                    "q2",
+                    "q4"
+                  ],
+                  "trace": [
+                    {
+                      "input": "c",
+                      "state": "q0"
+                    },
+                    {
+                      "input": "a",
+                      "state": "q2"
+                    },
+                    {
+                      "input": "c",
+                      "state": "q4"
+                    }
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "76eab108-3226-5814-bd32-f910a86db134",
+              "verdict": true
+            },
+            "raw_response_excerpt": "{\n  \"item_id\": \"76eab108-3226-5814-bd32-f910a86db134\",\n  \"verdict\": true,\n  \"certificate\": {\n    \"certificate_type\": \"trace_witness\",\n    \"version\": \"1.0\",\n    \"payload\": {\n      \"trace\": [\n        {\n          \"state\": \"q0\",\n          \"input\": \"c\"\n        },\n        {\n          \"state\": \"q2\",\n          \"input\": \"a\"\n        },\n        {\n          \"state\": \"q4\",\n          \"input\": \"c\"\n        }\n      ],\n      \"state_sequence\": [\n        \"q0\",\n        \"q2\",\n        \"q4\"\n      ]\n    }\n  }\n}",
             "verdict_correct": false
           }
         ]
@@ -361,6 +502,72 @@
               "verdict": false
             },
             "raw_response_excerpt": "```json\n{\n  \"item_id\": \"a3553aa3-1550-5e9a-9046-6515a569d4bd\",\n  \"verdict\": false,\n  \"certificate\": {\n    \"certificate_type\": \"distinguishing_trace\",\n    \"version\": \"1.0\",\n    \"fsm_ids\": [\"b9088544-1f84-5997-af39-b08c3ffee88f\", \"c348da51-2d0b-5eef-82a4-d61594945c0d\"],\n    \"payload\": {\n      \"trace\": [\"a\", \"b\"],\n      \"acceptance\": { \"A\": false, \"B\": true }\n    }\n  }\n}\n```",
+            "verdict_correct": true
+          },
+          {
+            "certificate_errors": [
+              "trace replay failed: no transition from 'q2' on 'b'"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "F1",
+            "item_id": "0ebd4577-8958-5041-bd45-4e76a4e3a9f9",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "distinguishing_trace",
+                "fsm_ids": [
+                  "6e3d1949-d0b9-5a28-bc15-fbe08de04abd",
+                  "41b90ab6-bab6-50d0-833b-68f41606c97d"
+                ],
+                "payload": {
+                  "acceptance": {
+                    "A": false,
+                    "B": true
+                  },
+                  "trace": [
+                    "a",
+                    "b"
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "0ebd4577-8958-5041-bd45-4e76a4e3a9f9",
+              "verdict": false
+            },
+            "raw_response_excerpt": "```json\n{\n  \"item_id\": \"0ebd4577-8958-5041-bd45-4e76a4e3a9f9\",\n  \"verdict\": false,\n  \"certificate\": {\n    \"certificate_type\": \"distinguishing_trace\",\n    \"version\": \"1.0\",\n    \"fsm_ids\": [\"6e3d1949-d0b9-5a28-bc15-fbe08de04abd\", \"41b90ab6-bab6-50d0-833b-68f41606c97d\"],\n    \"payload\": {\n      \"trace\": [\"a\", \"b\"],\n      \"acceptance\": { \"A\": false, \"B\": true }\n    }\n  }\n}\n```",
+            "verdict_correct": true
+          },
+          {
+            "certificate_errors": [
+              "trace replay failed: no transition from 'q3' on 'b'"
+            ],
+            "certificate_valid": false,
+            "failure_stage": "certificate_invalid",
+            "family": "F1",
+            "item_id": "ac50ad35-8941-5eb3-9f73-cdf57e318c34",
+            "parsed_submission": {
+              "certificate": {
+                "certificate_type": "distinguishing_trace",
+                "fsm_ids": [
+                  "b1ef6cc7-48c7-5580-a773-9e141c3b516b",
+                  "7a6b4dce-a07d-56d1-98ed-6504a9d375ec"
+                ],
+                "payload": {
+                  "acceptance": {
+                    "A": false,
+                    "B": true
+                  },
+                  "trace": [
+                    "a",
+                    "b"
+                  ]
+                },
+                "version": "1.0"
+              },
+              "item_id": "ac50ad35-8941-5eb3-9f73-cdf57e318c34",
+              "verdict": false
+            },
+            "raw_response_excerpt": "```json\n{\n  \"item_id\": \"ac50ad35-8941-5eb3-9f73-cdf57e318c34\",\n  \"verdict\": false,\n  \"certificate\": {\n    \"certificate_type\": \"distinguishing_trace\",\n    \"version\": \"1.0\",\n    \"fsm_ids\": [\"b1ef6cc7-48c7-5580-a773-9e141c3b516b\", \"7a6b4dce-a07d-56d1-98ed-6504a9d375ec\"],\n    \"payload\": {\n      \"trace\": [\"a\", \"b\"],\n      \"acceptance\": { \"A\": false, \"B\": true }\n    }\n  }\n}\n```",
             "verdict_correct": true
           }
         ]
