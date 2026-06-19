@@ -47,6 +47,7 @@
 |-----------|--------|
 | P4.1 F1 DFA non-equivalence + distinguishing_trace | ✅ |
 | P4.2 F1 difficulty controls + batch/smoke evaluation | ✅ |
+| P4.2b F1 constructive generator for controlled ℓ_dist | ✅ |
 | P4.3 F1 equivalent-pair certificates | ⬜ |
 | P4.4 F1 NFA / containment subtypes | ⬜ |
 | P4.5 F2 non-materialized composition | ⬜ |

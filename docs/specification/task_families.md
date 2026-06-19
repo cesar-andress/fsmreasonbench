@@ -51,7 +51,7 @@ or non-containment—not merely to answer boolean yes/no.
 | F1.b containment | ⬜ not yet | TBD | — |
 | F1.c safety violation | ⬜ not yet | TBD | — |
 
-**Generator controls (artifact):** `min_distinguishing_trace_length` (default 2), `max_distinguishing_trace_length`, `state_count_a`, `state_count_b`, `alphabet_size`, `max_retries`. Smoke examples may set `min_distinguishing_trace_length=1`.
+**Generator controls (artifact):** `mode` (`constructive` | `random`, auto-select constructive when `min_distinguishing_trace_length ≥ 3`), `target_distinguishing_trace_length`, `min_distinguishing_trace_length` (default 2), `max_distinguishing_trace_length`, `state_count_a`, `state_count_b`, `alphabet_size`, `max_retries`. Constructive mode builds paired chain DFAs with a seeded witness sequence and shared sink; random mode uses rejection sampling. Smoke examples may set `min_distinguishing_trace_length=1`.
 
 **Batch / smoke:** `generate_batch --family F1`, `evaluate_baseline_batch`, `run_f1_smoke_baselines`.
 

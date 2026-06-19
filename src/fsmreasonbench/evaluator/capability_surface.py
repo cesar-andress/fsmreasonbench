@@ -17,7 +17,7 @@ from fsmreasonbench.evaluator.io import dump_json
 from fsmreasonbench.evaluator.jsonl import write_jsonl
 from fsmreasonbench.evaluator.summary import summarize_scoring_records
 from fsmreasonbench.generator.reachability import ReachabilityGeneratorConfig
-from fsmreasonbench.generator.separation import SeparationGeneratorConfig
+from fsmreasonbench.generator.separation import separation_config_for_level
 
 C2_DIFFICULTY_AXIS = "min_witness_length"
 F1_DIFFICULTY_AXIS = "min_distinguishing_trace_length"
@@ -146,10 +146,7 @@ def _run_family_level(
             c2_config=batch_config,
         )
     else:
-        batch_config = SeparationGeneratorConfig(
-            min_distinguishing_trace_length=level,
-            max_distinguishing_trace_length=12,
-        )
+        batch_config = separation_config_for_level(level)
         items = generate_batch(
             "F1",
             n,

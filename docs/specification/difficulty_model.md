@@ -46,9 +46,13 @@ d_F1 = (|Q_A|, |Q_B|, |Σ|, ℓ_dist, transition_count_A, transition_count_B)
 
 | Control | Default | Notes |
 |---------|---------|-------|
+| `mode` | auto | `constructive` when `min_distinguishing_trace_length ≥ 3`, else `random`; explicit override supported |
+| `target_distinguishing_trace_length` | — | Exact shortest distinguishing length for constructive mode |
 | `min_distinguishing_trace_length` | 2 | Use 1 only for smoke / regression items |
-| `max_distinguishing_trace_length` | 12 | Items outside bounds retry; explicit error after `max_retries` |
-| `max_retries` | 64 | Per-item generation attempts |
+| `max_distinguishing_trace_length` | 12 | Items outside bounds retry (random) or fail validation (constructive) |
+| `max_retries` | 64 | Per-item generation attempts (random mode only) |
+
+Constructive generation builds two chain-like DFAs that agree on all prefixes shorter than `ℓ_dist` and diverge on a witness trace of length exactly `ℓ_dist`. Capability-surface sweeps use constructive mode for F1 levels ≥ 3.
 
 Legacy spec parameters (`sep_kind`, `min_witness_gap`) apply to future F1 subtypes.
 

@@ -2,8 +2,13 @@
 
 import pytest
 
-from fsmreasonbench.generator.separation import SeparationGeneratorConfig, generate_separation_item
+from fsmreasonbench.generator.separation import (
+    SeparationGeneratorConfig,
+    generate_separation_item,
+    resolve_separation_mode,
+)
 from fsmreasonbench.items.assembly import self_verify_item
+from fsmreasonbench.oracle.separation import shortest_distinguishing_trace
 from fsmreasonbench.verifier.separation import verify_distinguishing_trace_certificate
 
 
@@ -28,6 +33,7 @@ def test_generation_fails_explicitly_when_bounds_unsatisfiable() -> None:
         min_distinguishing_trace_length=99,
         max_distinguishing_trace_length=99,
         max_retries=3,
+        mode="random",
     )
     with pytest.raises(RuntimeError, match="after 3 retries"):
         generate_separation_item(1, config)
@@ -82,4 +88,44 @@ def test_smoke_min_length_one_allowed() -> None:
         42,
         SeparationGeneratorConfig(min_distinguishing_trace_length=1),
     )
+    self_verify_item(item)
+
+
+@pytest.mark.parametrize("target_k", range(1, 9))
+def test_constructive_mode_produces_exact_distinguishing_length(target_k: int) -> None:
+    config = SeparationGeneratorConfig(
+        mode="constructive",
+        target_distinguishing_trace_length=target_k,
+        min_distinguishing_trace_length=target_k,
+        max_distinguishing_trace_length=target_k,
+    )
+    item = generate_separation_item(100 + target_k, config)
+    witness = shortest_distinguishing_trace(item.fsm_a, item.fsm_b)
+    assert witness is not None
+    assert len(witness.trace) == target_k
+    assert item.difficulty["core"]["distinguishing_trace_length"] == target_k
+    self_verify_item(item)
+    result = verify_distinguishing_trace_certificate(
+        item.fsm_a,
+        item.fsm_b,
+        item.answer_key["certificate"],
+    )
+    assert result.valid
+
+
+def test_constructive_mode_default_when_min_length_at_least_three() -> None:
+    config = SeparationGeneratorConfig(min_distinguishing_trace_length=4)
+    assert resolve_separation_mode(config) == "constructive"
+
+
+def test_random_mode_still_respects_bounds() -> None:
+    config = SeparationGeneratorConfig(
+        mode="random",
+        min_distinguishing_trace_length=1,
+        max_distinguishing_trace_length=3,
+        max_retries=128,
+    )
+    item = generate_separation_item(55, config)
+    length = item.difficulty["core"]["distinguishing_trace_length"]
+    assert 1 <= length <= 3
     self_verify_item(item)

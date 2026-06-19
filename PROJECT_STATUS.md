@@ -45,7 +45,7 @@ generator → oracle → certificate → verifier  ✅
 | Separation oracle (shortest distinguishing trace) | `oracle/separation.py` |
 | Certificate builder | `certificates/separation.py` |
 | Independent verifier | `verifier/separation.py` |
-| Seeded F1 generator (non-equivalent DFA pairs) | `generator/separation.py` |
+| Seeded F1 generator (non-equivalent DFA pairs) | `generator/separation.py`, `generator/separation_constructive.py` |
 | F1 item assembly + self-verify | `items/assembly.py` |
 | F1 parser / scorer | `evaluator/parser.py`, `scorer_f1.py` |
 | F1 baselines | `baselines/f1.py`, `baselines/runner.py` |
@@ -54,7 +54,7 @@ generator → oracle → certificate → verifier  ✅
 | Hard example (`ℓ_dist≥3`) | `examples/item_F1_separation_seed6_hard.json` |
 | F1 batch + smoke | `cli/generate_batch --family F1`, `run_f1_smoke_baselines.py` |
 
-**Generator defaults:** `min_distinguishing_trace_length=2`, `max_distinguishing_trace_length=12`, `max_retries=64`. Smoke item seed 42 uses `--min-distinguishing-trace-length 1`.
+**Generator defaults:** `min_distinguishing_trace_length=2`, `max_distinguishing_trace_length=12`, `max_retries=64`. Auto mode uses **constructive** generation when `min_distinguishing_trace_length ≥ 3` (chain+sink topology with exact witness length); lower levels use random rejection sampling unless `mode=constructive` is set explicitly. Smoke item seed 42 uses `--min-distinguishing-trace-length 1`.
 
 **CLI:** `python3 -m fsmreasonbench.cli.generate_one --family F1 --seed 42`
 

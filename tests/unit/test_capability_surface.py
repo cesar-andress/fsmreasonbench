@@ -138,14 +138,33 @@ def test_cli_produces_combined_summary(tmp_path: Path, capsys: pytest.CaptureFix
 
 
 def test_explicit_failure_without_skip_failed_levels(tmp_path: Path) -> None:
-    with pytest.raises(RuntimeError, match="failed to generate"):
-        run_capability_surface(
-            tmp_path / "fail",
-            CapabilitySurfaceConfig(
-                families=("F1",),
-                n_per_level=10,
-                seed=1,
-                f1_levels=(4,),
-                c2_levels=(),
+    from fsmreasonbench.generator.separation import (
+        SeparationGeneratorConfig,
+        generate_separation_item,
+    )
+
+    with pytest.raises(RuntimeError, match="after 2 retries"):
+        generate_separation_item(
+            1,
+            SeparationGeneratorConfig(
+                mode="random",
+                min_distinguishing_trace_length=99,
+                max_distinguishing_trace_length=99,
+                max_retries=2,
             ),
         )
+
+
+def test_f1_capability_surface_levels_one_to_five_without_skips(tmp_path: Path) -> None:
+    payload = run_capability_surface(
+        tmp_path / "f1_levels",
+        CapabilitySurfaceConfig(
+            families=("F1",),
+            n_per_level=20,
+            seed=1,
+            f1_levels=(1, 2, 3, 4, 5),
+            c2_levels=(),
+        ),
+    )
+    assert payload["skipped_levels"] == []
+    assert len(payload["rows"]) == 5 * 3

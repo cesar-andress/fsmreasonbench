@@ -5,10 +5,52 @@ from __future__ import annotations
 import random
 import uuid
 from dataclasses import dataclass
+from typing import Literal
 
+from fsmreasonbench.generator.separation_constructive import construct_separation_dfa_pair
 from fsmreasonbench.items.assembly import BenchmarkItem, assemble_separation_item, self_verify_item
 from fsmreasonbench.models.fsm import ExecutableFSM, FSMType, Transition
 from fsmreasonbench.oracle.separation import are_equivalent, shortest_distinguishing_trace
+
+SeparationGeneratorMode = Literal["constructive", "random"]
+
+
+def resolve_separation_mode(config: SeparationGeneratorConfig) -> SeparationGeneratorMode:
+    """Return effective generator mode (constructive default when min length >= 3)."""
+    if config.mode in ("constructive", "random"):
+        return config.mode
+    if config.min_distinguishing_trace_length >= 3:
+        return "constructive"
+    return "random"
+
+
+def resolve_target_distinguishing_length(
+    seed: int,
+    config: SeparationGeneratorConfig,
+) -> int:
+    """Pick the target distinguishing trace length for constructive generation."""
+    if config.target_distinguishing_trace_length is not None:
+        target = config.target_distinguishing_trace_length
+    elif config.min_distinguishing_trace_length == config.max_distinguishing_trace_length:
+        target = config.min_distinguishing_trace_length
+    else:
+        rng = random.Random(seed)
+        target = rng.randint(
+            config.min_distinguishing_trace_length,
+            config.max_distinguishing_trace_length,
+        )
+
+    if not (
+        config.min_distinguishing_trace_length
+        <= target
+        <= config.max_distinguishing_trace_length
+    ):
+        raise ValueError(
+            "target distinguishing trace length "
+            f"{target} outside [{config.min_distinguishing_trace_length}, "
+            f"{config.max_distinguishing_trace_length}]"
+        )
+    return target
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,6 +61,8 @@ class SeparationGeneratorConfig:
     state_count_b: int = 4
     alphabet_size: int = 3
     transition_density: float = 0.6
+    mode: SeparationGeneratorMode | None = None
+    target_distinguishing_trace_length: int | None = None
     min_distinguishing_trace_length: int = 2
     max_distinguishing_trace_length: int = 12
     max_retries: int = 64
@@ -30,14 +74,35 @@ class SeparationGeneratorConfig:
             raise ValueError("alphabet_size must be >= 1")
         if not 0.0 <= self.transition_density <= 1.0:
             raise ValueError("transition_density must be in [0, 1]")
+        if self.mode is not None and self.mode not in ("constructive", "random"):
+            raise ValueError("mode must be 'constructive', 'random', or None for auto")
         if self.min_distinguishing_trace_length < 0:
             raise ValueError("min_distinguishing_trace_length must be >= 0")
         if self.max_distinguishing_trace_length < self.min_distinguishing_trace_length:
             raise ValueError(
                 "max_distinguishing_trace_length must be >= min_distinguishing_trace_length"
             )
+        if self.target_distinguishing_trace_length is not None and not (
+            self.min_distinguishing_trace_length
+            <= self.target_distinguishing_trace_length
+            <= self.max_distinguishing_trace_length
+        ):
+            raise ValueError(
+                "target_distinguishing_trace_length must lie within "
+                "[min_distinguishing_trace_length, max_distinguishing_trace_length]"
+            )
         if self.max_retries < 1:
             raise ValueError("max_retries must be >= 1")
+
+
+def separation_config_for_level(level: int) -> SeparationGeneratorConfig:
+    """Capability-surface F1 config with constructive mode for higher levels."""
+    return SeparationGeneratorConfig(
+        min_distinguishing_trace_length=level,
+        max_distinguishing_trace_length=level,
+        target_distinguishing_trace_length=level,
+        mode="constructive" if level >= 3 else None,
+    )
 
 
 def generate_separation_dfa(
@@ -96,7 +161,31 @@ def generate_separation_item(
 ) -> BenchmarkItem:
     """Generate a self-verifying F1 non-equivalence item."""
     config = config or SeparationGeneratorConfig()
+    if resolve_separation_mode(config) == "constructive":
+        return _generate_constructive_separation_item(seed, config)
+    return _generate_random_separation_item(seed, config)
 
+
+def _generate_constructive_separation_item(
+    seed: int,
+    config: SeparationGeneratorConfig,
+) -> BenchmarkItem:
+    target_k = resolve_target_distinguishing_length(seed, config)
+    fsm_a, fsm_b = construct_separation_dfa_pair(
+        seed,
+        target_k,
+        alphabet_size=config.alphabet_size,
+    )
+    item = assemble_separation_item(fsm_a, fsm_b, seed=seed)
+    self_verify_item(item)
+    _validate_generated_constraints(item, config)
+    return item
+
+
+def _generate_random_separation_item(
+    seed: int,
+    config: SeparationGeneratorConfig,
+) -> BenchmarkItem:
     for attempt in range(config.max_retries):
         attempt_seed = seed if attempt == 0 else seed + attempt * 9973
         fsm_a = generate_separation_dfa(
@@ -145,6 +234,12 @@ def _validate_generated_constraints(
         raise AssertionError(
             f"distinguishing_trace_length metadata mismatch: {recorded} vs {trace_length}"
         )
+    if config.target_distinguishing_trace_length is not None:
+        if trace_length != config.target_distinguishing_trace_length:
+            raise AssertionError(
+                "distinguishing trace length does not match target: "
+                f"{trace_length} != {config.target_distinguishing_trace_length}"
+            )
     if trace_length < config.min_distinguishing_trace_length:
         raise AssertionError(
             f"distinguishing trace shorter than min_distinguishing_trace_length: "
