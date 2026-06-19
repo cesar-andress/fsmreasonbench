@@ -77,6 +77,7 @@ generator → oracle → certificate → verifier  ✅
 | C2 smoke baseline runner | `cli/run_c2_smoke_baselines.py` |
 | Exploratory capability surface | `evaluator/capability_surface.py`, `cli/run_capability_surface.py` |
 | Ollama batch runner | `runners/`, `cli/run_ollama_batch.py` |
+| Failure inspection CLI | `evaluator/inspect_failures.py`, `cli/inspect_failures.py` |
 
 **End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
 
@@ -176,4 +177,8 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_ollama_batch \
   --temperature 0
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
   --scores runs/ollama_c2_qwen7b/scores.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.inspect_failures \
+  --scores runs/ollama_c2_qwen7b/scores.jsonl \
+  --results runs/ollama_c2_qwen7b.jsonl \
+  --limit 5
 ```
