@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsmreasonbench.org/schema/answer.schema.json",
+  "title": "BenchmarkAnswer",
+  "description": "Submission and answer-key payload for a single FSMReasonBench item.",
+  "type": "object",
+  "required": ["item_id", "verdict"],
+  "additionalProperties": false,
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Must match the benchmark item id."
+    },
+    "verdict": {
+      "description": "Family-dependent verdict: boolean or structured diagnosis.",
+      "oneOf": [
+        { "type": "boolean" },
+        { "$ref": "#/$defs/DiagnosisResult" }
+      ]
+    },
+    "certificate": {
+      "type": "object",
+      "description": "Certificate envelope; see certificate_formats.md.",
+      "required": ["certificate_type", "version", "payload"],
+      "properties": {
+        "certificate_type": {
+          "type": "string",
+          "enum": [
+            "trace_witness",
+            "unreachability_witness",
+            "counterexample",
+            "invariant_witness",
+            "distinguishing_sequence",
+            "equivalence_witness",
+            "containment_witness",
+            "diagnosis_witness",
+            "composition_witness",
+            "null"
+          ]
+        },
+        "version": { "type": "string" },
+        "fsm_id": { "type": "string", "format": "uuid" },
+        "verdict_supported": { "type": "boolean" },
+        "payload": {
+          "type": "object",
+          "description": "Type-specific certificate body."
+        }
+      }
+    },
+    "explanation": {
+      "type": "string",
+      "description": "Optional narrative; required for T6 in R0/R1 tracks."
+    },
+    "latency_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional wall-clock latency for analysis."
+    },
+    "oracle_meta": {
+      "type": "object",
+      "description": "Present in answer keys only.",
+      "properties": {
+        "procedure": { "type": "string" },
+        "tool": { "type": "string" },
+        "tool_version": { "type": "string" },
+        "proof_hash": { "type": "string" },
+        "wall_time_ms": { "type": "integer" }
+      }
+    }
+  },
+  "$defs": {
+    "DiagnosisResult": {
+      "type": "object",
+      "required": ["failure_kind"],
+      "additionalProperties": false,
+      "properties": {
+        "failure_index": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Zero-based step index of first failure; null if none."
+        },
+        "failure_kind": {
+          "type": "string",
+          "enum": ["none", "undefined_transition", "wrong_state", "wrong_output", "rejected"]
+        },
+        "state_at_failure": { "type": ["string", "null"] },
+        "symbol_at_failure": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

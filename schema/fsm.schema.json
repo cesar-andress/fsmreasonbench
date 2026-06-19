@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsmreasonbench.org/schema/fsm.schema.json",
+  "title": "ExecutableFSM",
+  "description": "Canonical representation of an executable finite-state machine for FSMReasonBench v1.",
+  "type": "object",
+  "required": ["fsm_id", "fsm_type", "states", "initial_state", "input_alphabet", "transitions"],
+  "additionalProperties": false,
+  "properties": {
+    "fsm_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Stable identifier for this FSM within the benchmark item."
+    },
+    "fsm_type": {
+      "type": "string",
+      "enum": ["DFA", "NFA", "MEALY"],
+      "description": "Automaton type; determines transition semantics and acceptance."
+    },
+    "states": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Finite set of state identifiers Q."
+    },
+    "initial_state": {
+      "type": "string",
+      "description": "Initial state q0; must be an element of states."
+    },
+    "input_alphabet": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Finite input alphabet Sigma."
+    },
+    "accepting_states": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Accepting states F (DFA/NFA). Optional for Mealy if acceptance is property-specific."
+    },
+    "transitions": {
+      "type": "array",
+      "description": "Transition relation delta. Multiple entries per (state, symbol) allowed for NFA.",
+      "items": { "$ref": "#/$defs/Transition" },
+      "minItems": 0
+    },
+    "output_alphabet": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "description": "Output alphabet for MEALY machines."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional generator metadata; not required for verification.",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "Transition": {
+      "type": "object",
+      "required": ["from", "input", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "Source state."
+        },
+        "input": {
+          "type": "string",
+          "description": "Input symbol from input_alphabet."
+        },
+        "to": {
+          "type": "string",
+          "description": "Target state (NFA: one of possibly many successors)."
+        },
+        "output": {
+          "type": "string",
+          "description": "Mealy output emitted on this transition."
+        }
+      }
+    }
+  }
+}

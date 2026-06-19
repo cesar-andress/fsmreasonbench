@@ -1,0 +1,108 @@
+{
+  "answer_key": {
+    "certificate": {
+      "certificate_type": "trace_witness",
+      "fsm_id": "4b3aacee-8d63-5c07-a401-f241fb421215",
+      "payload": {
+        "accepting": true,
+        "state_sequence": [
+          "q0"
+        ],
+        "trace": []
+      },
+      "verdict_supported": true,
+      "version": "1.0"
+    },
+    "item_id": "16c1896b-62da-57db-8b7b-9f4fba484503",
+    "verdict": true
+  },
+  "contamination": {
+    "public_fingerprint": "925fddd913f1b5cc6d47e9bf79f206bf516f1a7501f21a994a88d6aaaef771b4"
+  },
+  "difficulty": {
+    "core": {
+      "witness_length": 0,
+      "|Q|": 5
+    },
+    "generator_seed": 42
+  },
+  "family": "C2",
+  "family_tier": "calibration",
+  "fsm": {
+    "accepting_states": [
+      "q2"
+    ],
+    "fsm_id": "4b3aacee-8d63-5c07-a401-f241fb421215",
+    "fsm_type": "DFA",
+    "initial_state": "q0",
+    "input_alphabet": [
+      "a",
+      "b",
+      "c"
+    ],
+    "metadata": {
+      "generator_seed": 42,
+      "state_count": 5
+    },
+    "states": [
+      "q0",
+      "q1",
+      "q2",
+      "q3",
+      "q4"
+    ],
+    "transitions": [
+      {
+        "from": "q0",
+        "input": "b",
+        "to": "q2"
+      },
+      {
+        "from": "q0",
+        "input": "c",
+        "to": "q1"
+      },
+      {
+        "from": "q2",
+        "input": "a",
+        "to": "q3"
+      },
+      {
+        "from": "q2",
+        "input": "b",
+        "to": "q0"
+      },
+      {
+        "from": "q2",
+        "input": "c",
+        "to": "q4"
+      },
+      {
+        "from": "q3",
+        "input": "b",
+        "to": "q4"
+      },
+      {
+        "from": "q3",
+        "input": "c",
+        "to": "q3"
+      },
+      {
+        "from": "q4",
+        "input": "a",
+        "to": "q0"
+      },
+      {
+        "from": "q4",
+        "input": "c",
+        "to": "q3"
+      }
+    ]
+  },
+  "item_id": "16c1896b-62da-57db-8b7b-9f4fba484503",
+  "question": {
+    "family": "C2",
+    "prompt_id": "reachability.v1",
+    "target_state": "q0"
+  }
+}

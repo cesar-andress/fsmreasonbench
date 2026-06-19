@@ -1,0 +1,78 @@
+"""Reachability certificate JSON Schema (trace_witness / unreachability_witness)."""
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsmreasonbench.org/schema/certificate/reachability.schema.json",
+  "title": "ReachabilityCertificate",
+  "description": "Certificate envelope for C2 reachability (Phase 1 vertical slice).",
+  "oneOf": [
+    { "$ref": "#/$defs/TraceWitnessCertificate" },
+    { "$ref": "#/$defs/UnreachabilityCertificate" }
+  ],
+  "$defs": {
+    "CertificateEnvelope": {
+      "type": "object",
+      "required": ["certificate_type", "version", "fsm_id", "verdict_supported", "payload"],
+      "additionalProperties": false,
+      "properties": {
+        "certificate_type": { "type": "string" },
+        "version": { "type": "string" },
+        "fsm_id": { "type": "string", "format": "uuid" },
+        "verdict_supported": { "type": "boolean" },
+        "payload": { "type": "object" }
+      }
+    },
+    "TraceWitnessCertificate": {
+      "allOf": [
+        { "$ref": "#/$defs/CertificateEnvelope" },
+        {
+          "properties": {
+            "certificate_type": { "const": "trace_witness" },
+            "payload": {
+              "type": "object",
+              "required": ["trace", "state_sequence"],
+              "properties": {
+                "trace": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "state_sequence": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "minItems": 1
+                },
+                "branching_choices": {
+                  "type": "array",
+                  "items": { "type": "integer", "minimum": 0 }
+                },
+                "accepting": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "UnreachabilityCertificate": {
+      "allOf": [
+        { "$ref": "#/$defs/CertificateEnvelope" },
+        {
+          "properties": {
+            "certificate_type": { "const": "unreachability_witness" },
+            "payload": {
+              "type": "object",
+              "required": ["reachable_states", "target_state"],
+              "properties": {
+                "reachable_states": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "uniqueItems": true
+                },
+                "target_state": { "type": "string" }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

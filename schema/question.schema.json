@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsmreasonbench.org/schema/question.schema.json",
+  "title": "BenchmarkQuestion",
+  "description": "Typed question payload for FSMReasonBench task families T1-T7.",
+  "type": "object",
+  "required": ["family", "prompt_id"],
+  "additionalProperties": false,
+  "properties": {
+    "family": {
+      "type": "string",
+      "enum": ["F1", "F2", "F3", "F4", "C1", "C2"],
+      "description": "Task family identifier."
+    },
+    "prompt_id": {
+      "type": "string",
+      "description": "Stable template identifier for the question shape."
+    },
+    "trace": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Input trace w in Sigma* (T1, T6)."
+    },
+    "target_state": {
+      "type": "string",
+      "description": "Reachability target state (T2)."
+    },
+    "invariant": {
+      "$ref": "#/$defs/StatePredicate",
+      "description": "State predicate P for safety checking (T3)."
+    },
+    "secondary_fsm_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to companion FSM embedded in item (T4, T5, T7)."
+    },
+    "expected_behavior": {
+      "$ref": "#/$defs/ExpectedBehavior",
+      "description": "Expected run behavior for diagnosis (T6)."
+    },
+    "composition_spec": {
+      "$ref": "#/$defs/CompositionSpec",
+      "description": "Composition operator definition (T7)."
+    },
+    "property": {
+      "$ref": "#/$defs/PropertySpec",
+      "description": "Property phi on composed or primary machine (T3, T7)."
+    },
+    "natural_language_hint": {
+      "type": "string",
+      "description": "Optional human-readable restatement; not normative for scoring."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "family": { "const": "T1" } }, "required": ["family"] },
+      "then": { "required": ["trace"] }
+    },
+    {
+      "if": { "properties": { "family": { "const": "C2" } }, "required": ["family"] },
+      "then": { "required": ["target_state"] }
+    }
+    {
+      "if": { "properties": { "family": { "const": "T3" } }, "required": ["family"] },
+      "then": { "required": ["invariant"] }
+    },
+    {
+      "if": { "properties": { "family": { "enum": ["T4", "T5"] } }, "required": ["family"] },
+      "then": { "required": ["secondary_fsm_id"] }
+    },
+    {
+      "if": { "properties": { "family": { "const": "T6" } }, "required": ["family"] },
+      "then": { "required": ["trace", "expected_behavior"] }
+    },
+    {
+      "if": { "properties": { "family": { "const": "T7" } }, "required": ["family"] },
+      "then": { "required": ["secondary_fsm_id", "composition_spec", "property"] }
+    }
+  ],
+  "$defs": {
+    "StatePredicate": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["state_set", "expression"],
+          "description": "Lookup table or simple expression over state ids."
+        },
+        "satisfying_states": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "States where P holds (type=state_set)."
+        },
+        "expression": {
+          "type": "string",
+          "description": "Reserved for future structured expressions."
+        }
+      }
+    },
+    "ExpectedBehavior": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["accept", "reject", "final_state", "output_sequence"]
+        },
+        "final_state": { "type": "string" },
+        "output_sequence": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "CompositionSpec": {
+      "type": "object",
+      "required": ["operator", "version"],
+      "properties": {
+        "operator": {
+          "type": "string",
+          "enum": ["synchronous_product"],
+          "description": "v1 default: synchronous product over labeled alphabet."
+        },
+        "version": {
+          "type": "string",
+          "description": "Normative operator definition version in spec/."
+        },
+        "synchronized_alphabet": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Symbols shared between components; others may stutter."
+        }
+      }
+    },
+    "PropertySpec": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["safety", "reachability", "nonblocking"]
+        },
+        "invariant": { "$ref": "#/$defs/StatePredicate" },
+        "target_state": { "type": "string" }
+      }
+    }
+  }
+}

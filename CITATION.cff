@@ -1,0 +1,24 @@
+# NOTE: DOI field must be updated immediately after Zenodo minting.
+
+cff-version: 1.2.0
+message: "If you use FSMReasonBench, please cite it as below."
+title: "FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines"
+version: "1.0.0"
+date-released: null
+license: TBD
+authors:
+  - family-names: Andrés
+    given-names: César
+    orcid: "https://orcid.org/0009-0001-8968-3404"
+    affiliation: "Universidad Camilo José Cela"
+repository-code: "https://github.com/TBD/fsmreasonbench"
+url: "https://zenodo.org/record/TBD"
+preferred-citation:
+  type: dataset
+  title: "FSMReasonBench v1.0.0"
+  authors:
+    - family-names: Andrés
+      given-names: César
+  year: null
+  doi: "10.5281/zenodo.TBD"
+  notes: "Cite benchmark_version, cohort_version, schema_version, and verifier_version from release_manifest.json"

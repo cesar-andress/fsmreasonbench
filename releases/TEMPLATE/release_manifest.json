@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsmreasonbench.org/schema/release_manifest.schema.json",
+  "title": "FSMReasonBenchReleaseManifest",
+  "description": "Version pins and file inventory for a Zenodo release. TEMPLATE — fill at release time.",
+  "type": "object",
+  "required": [
+    "manifest_kind",
+    "benchmark_version",
+    "cohort_version",
+    "schema_version",
+    "verifier_version",
+    "released_at",
+    "zenodo"
+  ],
+  "properties": {
+    "manifest_kind": {
+      "const": "fsmreasonbench_release_manifest",
+      "description": "Discriminator for release manifest files."
+    },
+    "benchmark_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "SemVer of normative benchmark specification."
+    },
+    "cohort_version": {
+      "type": "string",
+      "description": "Frozen cohort identifier, e.g. 1.0-public."
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Pinned JSON Schema contract version."
+    },
+    "verifier_version": {
+      "type": "string",
+      "description": "Pinned independent verifier implementation version."
+    },
+    "generator_version": {
+      "type": "string",
+      "description": "Pinned generator version for regeneration claims."
+    },
+    "python_version": {
+      "type": "string",
+      "description": "Python interpreter used at release, e.g. 3.12.3."
+    },
+    "released_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "seed_embargo_until": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO date when generation seeds become public."
+    },
+    "zenodo": {
+      "type": "object",
+      "required": ["primary_doi"],
+      "properties": {
+        "primary_doi": { "type": "string", "description": "TBD until minted" },
+        "evaluator_supplement_doi": { "type": "string" },
+        "paper_reproduction_doi": { "type": "string" }
+      }
+    },
+    "compatible": {
+      "type": "object",
+      "description": "Accepted version ranges for verification tools."
+    },
+    "files": {
+      "type": "array",
+      "description": "Inventory of files in Zenodo tarball with sha256.",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["spec", "schema", "cohort", "evaluator", "verifier", "script", "doc"]
+          }
+        }
+      }
+    },
+    "reproduction": {
+      "type": "object",
+      "properties": {
+        "validate_cohort": "scripts/validate_cohort_integrity.sh",
+        "verify_submission": "scripts/verify_submission.py",
+        "reproduce_tables": "scripts/reproduce_table.sh"
+      }
+    }
+  }
+}
