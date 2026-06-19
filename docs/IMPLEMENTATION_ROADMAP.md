@@ -34,8 +34,9 @@
 | P3.3 Transcript recording + deterministic rescore | ✅ |
 | P3.4 CLI `score_submission` / `rescore_transcript` | ✅ |
 | P3.5 Baselines: random, oracle ceiling, invalid | ✅ |
+| P3.6 C2 batch generation + baseline batch evaluation + summaries | ✅ |
 
-**Success criterion met:** C2 evaluation path with interpretable reference baselines.
+**Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 
 ## Phase 4+ — Not started
 
@@ -56,9 +57,10 @@ src/fsmreasonbench/
   verifier/        # independent verification (no oracle import)
   generator/       # seeded instance generation
   items/           # benchmark item assembly + self_verify
-  evaluator/       # C2 parser, scorer, transcripts
+  evaluator/       # C2 parser, scorer, transcripts, batch, summary
   baselines/       # C2 reference systems (oracle, random, invalid)
-  cli/             # generate_one, score_submission, rescore_transcript, run_baseline
+  cli/             # generate_one, score_submission, rescore_transcript, run_baseline,
+                   # generate_batch, evaluate_baseline_batch, summarize_scores
 ```
 
 ## Run
@@ -74,4 +76,10 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
   --transcript examples/transcript_C2_correct.json
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
   --baseline oracle --item examples/item_C2_reachability_seed42.json --score
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_batch \
+  --n 100 --seed 1 --out runs/c2_items.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.evaluate_baseline_batch \
+  --baseline oracle --items runs/c2_items.jsonl --out runs/oracle_scores.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
+  --scores runs/oracle_scores.jsonl
 ```

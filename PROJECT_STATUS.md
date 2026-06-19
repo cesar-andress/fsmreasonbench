@@ -34,7 +34,7 @@ generator → oracle → certificate → verifier  ✅
 - **CLI:** `python3 -m fsmreasonbench.cli.generate_one --seed 42`
 - **Difficulty controls:** `min_witness_length=1`, `max_witness_length=12`, `allow_initial_target=false`
 - **Negative items:** unreachable targets with `unreachability_witness`
-- **Tests:** 42+ passing (`pytest`)
+- **Tests:** 48+ passing (`pytest`)
 
 ---
 
@@ -50,10 +50,14 @@ generator → oracle → certificate → verifier  ✅
 | Example submissions + transcript | `examples/submission_C2_*.json`, `transcript_C2_correct.json` |
 | C2 baselines | `src/fsmreasonbench/baselines/` |
 | CLI run baseline | `cli/run_baseline.py` |
+| C2 batch generation + evaluation | `evaluator/batch.py`, `evaluator/summary.py` |
+| CLI batch tools | `cli/generate_batch.py`, `evaluate_baseline_batch.py`, `summarize_scores.py` |
 
 **End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
 
 **Reference baselines:** `oracle` (symbolic ceiling), `random` (seeded, usually wrong), `invalid` (extractability probe)
+
+**Exploratory batch (non-frozen):** generate JSONL cohort → evaluate baseline → aggregate summary
 
 ---
 
@@ -124,4 +128,10 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
   --transcript examples/transcript_C2_correct.json
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
   --baseline oracle --item examples/item_C2_reachability_seed42.json --score
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_batch \
+  --n 100 --seed 1 --out runs/c2_items.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.evaluate_baseline_batch \
+  --baseline oracle --items runs/c2_items.jsonl --out runs/oracle_scores.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
+  --scores runs/oracle_scores.jsonl
 ```

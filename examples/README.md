@@ -67,3 +67,16 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
 | `oracle` | `failure_stage=correct` |
 | `random` | Usually `verdict_wrong` or `certificate_invalid` |
 | `invalid` | `failure_stage=not_extractable` |
+
+## Exploratory batch evaluation (non-frozen)
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_batch \
+  --n 100 --seed 1 --out runs/c2_items.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.evaluate_baseline_batch \
+  --baseline oracle --items runs/c2_items.jsonl --out runs/oracle_scores.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
+  --scores runs/oracle_scores.jsonl
+```
+
+Output under `runs/` is gitignored; not a frozen cohort.
