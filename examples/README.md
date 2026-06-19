@@ -113,6 +113,25 @@ Writes per family/level items, baseline scores, summaries, plus `combined_summar
 
 Not a frozen cohort and not for paper claims.
 
+## Ollama exploratory evaluation
+
+Requires a running [Ollama](https://ollama.com) server. Use the venv Python (`python`, not system `python3.11`) or `PYTHONPATH=src`:
+
+```bash
+python -m fsmreasonbench.cli.run_ollama_batch \
+  --model qwen2.5-coder:7b \
+  --items runs/capability_surface/C2/min_witness_length_2/items.jsonl \
+  --out runs/ollama_c2_qwen7b.jsonl \
+  --out-dir runs/ollama_c2_qwen7b \
+  --temperature 0 \
+  --max-items 10
+
+python -m fsmreasonbench.cli.summarize_scores \
+  --scores runs/ollama_c2_qwen7b/scores.jsonl
+```
+
+Writes per-item transcripts under `{out-dir}/transcripts/`, scoring JSONL at `{out-dir}/scores.jsonl`, and `summary.json`. Exploratory only — not for paper claims.
+
 ## Exploratory batch evaluation (non-frozen)
 
 ```bash

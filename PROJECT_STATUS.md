@@ -34,7 +34,7 @@ generator → oracle → certificate → verifier  ✅
 - **CLI:** `python3 -m fsmreasonbench.cli.generate_one --seed 42`
 - **Difficulty controls:** `min_witness_length=1`, `max_witness_length=12`, `allow_initial_target=false`
 - **Negative items:** unreachable targets with `unreachability_witness`
-- **Tests:** 84+ passing (`pytest`)
+- **Tests:** 91+ passing (`pytest`)
 
 ---
 
@@ -76,6 +76,7 @@ generator → oracle → certificate → verifier  ✅
 | CLI batch tools | `cli/generate_batch.py`, `evaluate_baseline_batch.py`, `summarize_scores.py` |
 | C2 smoke baseline runner | `cli/run_c2_smoke_baselines.py` |
 | Exploratory capability surface | `evaluator/capability_surface.py`, `cli/run_capability_surface.py` |
+| Ollama batch runner | `runners/`, `cli/run_ollama_batch.py` |
 
 **End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
 
@@ -168,4 +169,11 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
   --n 100 --seed 1 --out-dir runs/f1_smoke
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_capability_surface \
   --families C2,F1 --n-per-level 50 --seed 1 --out-dir runs/capability_surface
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_ollama_batch \
+  --model qwen2.5-coder:7b \
+  --items runs/c2_items.jsonl \
+  --out runs/ollama_c2_qwen7b.jsonl \
+  --temperature 0
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
+  --scores runs/ollama_c2_qwen7b/scores.jsonl
 ```

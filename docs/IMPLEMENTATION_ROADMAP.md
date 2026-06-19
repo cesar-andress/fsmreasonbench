@@ -37,6 +37,7 @@
 | P3.6 C2 batch generation + baseline batch evaluation + summaries | ✅ |
 | P3.7 C2 smoke baseline batch runner (oracle / random / invalid) | ✅ |
 | P3.8 Exploratory capability-surface runner (C2 + F1) | ✅ |
+| P3.9 Minimal Ollama batch runner (C2 + F1) | ✅ |
 
 **Success criterion met:** C2 evaluation path with interpretable reference baselines and exploratory batch runs.
 
@@ -78,10 +79,11 @@ src/fsmreasonbench/
   evaluator/       # family-aware parser, scorer, transcripts, batch, summary,
                    # capability_surface
   baselines/       # C2/F1 reference systems (oracle, random, invalid)
+  runners/         # prompt rendering, Ollama batch evaluation
   cli/             # generate_one, score_submission, rescore_transcript, run_baseline,
                    # generate_batch, evaluate_baseline_batch, summarize_scores,
                    # run_c2_smoke_baselines, run_f1_smoke_baselines,
-                   # run_capability_surface
+                   # run_capability_surface, run_ollama_batch
 ```
 
 ## Run
@@ -110,4 +112,9 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
   --n 100 --seed 1 --out-dir runs/f1_smoke
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_capability_surface \
   --families C2,F1 --n-per-level 50 --seed 1 --out-dir runs/capability_surface
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_ollama_batch \
+  --model qwen2.5-coder:7b \
+  --items runs/c2_items.jsonl \
+  --out runs/ollama_c2_qwen7b.jsonl \
+  --temperature 0
 ```

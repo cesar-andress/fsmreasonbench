@@ -349,7 +349,23 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
   --n 100 --seed 1 --out-dir runs/f1_smoke
 ```
 
-### 12.7 Planned (full benchmark)
+### 12.7 Ollama batch runner (exploratory)
+
+Run a local Ollama model on a C2 or F1 items JSONL (must include `answer_key` for offline scoring):
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_ollama_batch \
+  --model qwen2.5-coder:7b \
+  --items runs/c2_items.jsonl \
+  --out runs/ollama_c2_qwen7b.jsonl \
+  --temperature 0
+```
+
+Outputs: run records JSONL (`--out`), `{out-dir}/transcripts/*.json`, `{out-dir}/scores.jsonl`, `{out-dir}/summary.json`. Model text is passed through JSON/fence extraction before the existing parser/scorer.
+
+Summarize with `summarize_scores --scores {out-dir}/scores.jsonl`. Exploratory only; not for paper claims.
+
+### 12.8 Planned (full benchmark)
 
 ```
 evaluate_submission.py \
