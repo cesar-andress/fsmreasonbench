@@ -1,4 +1,4 @@
-"""Evaluate a baseline on a JSONL batch of C2 items."""
+"""Evaluate a baseline on a JSONL batch of benchmark items."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from fsmreasonbench.evaluator.jsonl import load_items_jsonl, write_jsonl
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Evaluate a baseline on C2 item JSONL")
+    parser = argparse.ArgumentParser(description="Evaluate a baseline on item JSONL")
     parser.add_argument(
         "--baseline",
         required=True,
@@ -38,17 +38,26 @@ def main(argv: list[str] | None = None) -> int:
         print("ERROR: items JSONL is empty", file=sys.stderr)
         return 2
 
-    for item in items:
-        if item.family != "C2":
-            print(f"ERROR: expected C2 items, got family={item.family!r}", file=sys.stderr)
-            return 2
+    family = items[0].family
+    if family not in {"C2", "F1"}:
+        print(f"ERROR: unsupported family={family!r}", file=sys.stderr)
+        return 2
+    if any(item.family != family for item in items):
+        print("ERROR: mixed families in items JSONL", file=sys.stderr)
+        return 2
 
-    records = evaluate_baseline_on_items(args.baseline, items, seed=args.seed)
+    try:
+        records = evaluate_baseline_on_items(args.baseline, items, seed=args.seed)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
     write_jsonl(args.out, (record.to_dict() for record in records))
     print(
         json.dumps(
             {
                 "baseline": args.baseline,
+                "family": family,
                 "n": len(records),
                 "out": args.out,
             },

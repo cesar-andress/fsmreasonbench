@@ -1,14 +1,13 @@
-"""C2 batch generation and baseline evaluation."""
+"""Batch generation, baseline evaluation, and smoke runners."""
 
 from __future__ import annotations
 
-from typing import Any
-
 from pathlib import Path
+from typing import Any
 
 from fsmreasonbench.baselines.runner import run_baseline
 from fsmreasonbench.evaluator.models import ScoringRecord
-from fsmreasonbench.evaluator.scorer import score_c2_item
+from fsmreasonbench.evaluator.scorer import score_item
 from fsmreasonbench.evaluator.summary import (
     combine_baseline_summaries,
     summarize_with_baseline,
@@ -16,6 +15,10 @@ from fsmreasonbench.evaluator.summary import (
 from fsmreasonbench.generator.reachability import (
     ReachabilityGeneratorConfig,
     generate_reachability_item,
+)
+from fsmreasonbench.generator.separation import (
+    SeparationGeneratorConfig,
+    generate_separation_item,
 )
 from fsmreasonbench.items.assembly import BenchmarkItem, self_verify_item
 
@@ -42,6 +45,39 @@ def generate_c2_batch(
     return items
 
 
+def generate_f1_batch(
+    n: int,
+    seed: int,
+    *,
+    config: SeparationGeneratorConfig | None = None,
+) -> list[BenchmarkItem]:
+    """Generate ``n`` self-verifying F1 items with deterministic per-item seeds."""
+    if n < 1:
+        raise ValueError("n must be >= 1")
+
+    items: list[BenchmarkItem] = []
+    for index in range(n):
+        item_seed = seed + index
+        item = generate_separation_item(item_seed, config)
+        items.append(item)
+    return items
+
+
+def generate_batch(
+    family: str,
+    n: int,
+    seed: int,
+    *,
+    c2_config: ReachabilityGeneratorConfig | None = None,
+    f1_config: SeparationGeneratorConfig | None = None,
+) -> list[BenchmarkItem]:
+    if family == "C2":
+        return generate_c2_batch(n, seed, config=c2_config)
+    if family == "F1":
+        return generate_f1_batch(n, seed, config=f1_config)
+    raise ValueError(f"unsupported batch family: {family!r}")
+
+
 def baseline_response(
     baseline: str,
     item: BenchmarkItem,
@@ -59,13 +95,55 @@ def evaluate_baseline_on_items(
 ) -> list[ScoringRecord]:
     if baseline not in _BASELINES:
         raise ValueError(f"unknown baseline {baseline!r}")
+    if not items:
+        return []
+
+    family = items[0].family
+    if any(item.family != family for item in items):
+        raise ValueError("batch items must share the same family")
 
     records: list[ScoringRecord] = []
     for index, item in enumerate(items):
         item_seed = seed + index
         raw_response = baseline_response(baseline, item, seed=item_seed)
-        records.append(score_c2_item(item, raw_response))
+        records.append(score_item(item, raw_response))
     return records
+
+
+def _run_smoke_baselines(
+    family: str,
+    n: int,
+    seed: int,
+    out_dir: str | Path,
+    *,
+    items: list[BenchmarkItem],
+    items_filename: str,
+    baseline_seed: int = 0,
+) -> list[dict[str, Any]]:
+    from fsmreasonbench.evaluator.io import dump_json
+    from fsmreasonbench.evaluator.jsonl import write_jsonl
+
+    if n < 1:
+        raise ValueError("n must be >= 1")
+
+    root = Path(out_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    write_jsonl(root / items_filename, (item.to_full_dict() for item in items))
+
+    combined: list[dict[str, Any]] = []
+    for baseline in _SMOKE_BASELINES:
+        records = evaluate_baseline_on_items(baseline, items, seed=baseline_seed)
+        write_jsonl(root / f"{baseline}_scores.jsonl", (record.to_dict() for record in records))
+        summary = summarize_with_baseline(baseline, records)
+        dump_json(root / f"{baseline}_summary.json", summary)
+        combined.append(summary)
+
+    dump_json(
+        root / "combined_summary.json",
+        combine_baseline_summaries(combined),
+    )
+    _ = family
+    return combined
 
 
 def run_c2_smoke_baselines(
@@ -76,31 +154,35 @@ def run_c2_smoke_baselines(
     config: ReachabilityGeneratorConfig | None = None,
     baseline_seed: int = 0,
 ) -> list[dict[str, Any]]:
-    """
-    Generate one C2 batch and evaluate oracle, random, and invalid baselines.
-
-    Writes item JSONL, per-baseline score JSONL, per-baseline summaries, and
-    ``combined_summary.json``.
-    """
-    from fsmreasonbench.evaluator.io import dump_json
-    from fsmreasonbench.evaluator.jsonl import write_jsonl
-
-    if n < 1:
-        raise ValueError("n must be >= 1")
-
-    root = Path(out_dir)
-    root.mkdir(parents=True, exist_ok=True)
-
+    """Generate one C2 batch and evaluate oracle, random, and invalid baselines."""
     items = generate_c2_batch(n, seed, config=config)
-    write_jsonl(root / "c2_items.jsonl", (item.to_full_dict() for item in items))
+    return _run_smoke_baselines(
+        "C2",
+        n,
+        seed,
+        out_dir,
+        items=items,
+        items_filename="c2_items.jsonl",
+        baseline_seed=baseline_seed,
+    )
 
-    combined: list[dict[str, Any]] = []
-    for baseline in _SMOKE_BASELINES:
-        records = evaluate_baseline_on_items(baseline, items, seed=baseline_seed)
-        write_jsonl(root / f"{baseline}_scores.jsonl", (record.to_dict() for record in records))
-        summary = summarize_with_baseline(baseline, records)
-        dump_json(root / f"{baseline}_summary.json", summary)
-        combined.append(summary)
 
-    dump_json(root / "combined_summary.json", combine_baseline_summaries(combined))
-    return combined
+def run_f1_smoke_baselines(
+    n: int,
+    seed: int,
+    out_dir: str | Path,
+    *,
+    config: SeparationGeneratorConfig | None = None,
+    baseline_seed: int = 0,
+) -> list[dict[str, Any]]:
+    """Generate one F1 batch and evaluate oracle, random, and invalid baselines."""
+    items = generate_f1_batch(n, seed, config=config)
+    return _run_smoke_baselines(
+        "F1",
+        n,
+        seed,
+        out_dir,
+        items=items,
+        items_filename="f1_items.jsonl",
+        baseline_seed=baseline_seed,
+    )

@@ -8,7 +8,8 @@ Hand-generated and tool-generated **illustrative items** (not full cohorts).
 |------|-------------|
 | `item_C2_reachability_seed42.json` | Positive C2 reachability item (`seed=42`, `\|Q\|=5`) |
 | `item_C2_reachability_seed43_negative.json` | Negative C2 reachability item (`seed=43`, unreachable target) |
-| `item_F1_separation_seed42.json` | F1 DFA non-equivalence item (`seed=42`) |
+| `item_F1_separation_seed42.json` | F1 smoke item (`seed=42`, `min_distinguishing_trace_length=1`) |
+| `item_F1_separation_seed6_hard.json` | F1 hard item (`seed=6`, `ℓ_dist=4`, `min=3`) |
 
 Regenerate:
 
@@ -16,7 +17,11 @@ Regenerate:
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --seed 42 \
   --output examples/item_C2_reachability_seed42.json
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --family F1 --seed 42 \
+  --min-distinguishing-trace-length 1 \
   --output examples/item_F1_separation_seed42.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --family F1 --seed 6 \
+  --min-distinguishing-trace-length 3 \
+  --output examples/item_F1_separation_seed6_hard.json
 ```
 
 Each item passes `self_verify_item`: generator → oracle → certificate → verifier.
@@ -80,6 +85,15 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
 ```
 
 **Verdict:** `false` = DFAs are **not equivalent**. Certificate: `distinguishing_trace`.
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_batch \
+  --family F1 --n 100 --seed 1 --out runs/f1_items.jsonl
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
+  --n 100 --seed 1 --out-dir runs/f1_smoke
+```
+
+Default benchmark generation uses `min_distinguishing_trace_length=2`.
 
 ## Exploratory batch evaluation (non-frozen)
 

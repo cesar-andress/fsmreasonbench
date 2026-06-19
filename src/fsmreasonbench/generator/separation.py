@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from fsmreasonbench.items.assembly import BenchmarkItem, assemble_separation_item, self_verify_item
 from fsmreasonbench.models.fsm import ExecutableFSM, FSMType, Transition
-from fsmreasonbench.oracle.separation import are_equivalent
+from fsmreasonbench.oracle.separation import are_equivalent, shortest_distinguishing_trace
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,7 +19,9 @@ class SeparationGeneratorConfig:
     state_count_b: int = 4
     alphabet_size: int = 3
     transition_density: float = 0.6
-    max_generation_attempts: int = 64
+    min_distinguishing_trace_length: int = 2
+    max_distinguishing_trace_length: int = 12
+    max_retries: int = 64
 
     def __post_init__(self) -> None:
         if self.state_count_a < 2 or self.state_count_b < 2:
@@ -28,8 +30,14 @@ class SeparationGeneratorConfig:
             raise ValueError("alphabet_size must be >= 1")
         if not 0.0 <= self.transition_density <= 1.0:
             raise ValueError("transition_density must be in [0, 1]")
-        if self.max_generation_attempts < 1:
-            raise ValueError("max_generation_attempts must be >= 1")
+        if self.min_distinguishing_trace_length < 0:
+            raise ValueError("min_distinguishing_trace_length must be >= 0")
+        if self.max_distinguishing_trace_length < self.min_distinguishing_trace_length:
+            raise ValueError(
+                "max_distinguishing_trace_length must be >= min_distinguishing_trace_length"
+            )
+        if self.max_retries < 1:
+            raise ValueError("max_retries must be >= 1")
 
 
 def generate_separation_dfa(
@@ -89,7 +97,7 @@ def generate_separation_item(
     """Generate a self-verifying F1 non-equivalence item."""
     config = config or SeparationGeneratorConfig()
 
-    for attempt in range(config.max_generation_attempts):
+    for attempt in range(config.max_retries):
         attempt_seed = seed if attempt == 0 else seed + attempt * 9973
         fsm_a = generate_separation_dfa(
             attempt_seed,
@@ -109,10 +117,41 @@ def generate_separation_item(
         item = assemble_separation_item(fsm_a, fsm_b, seed=attempt_seed)
         try:
             self_verify_item(item)
+            _validate_generated_constraints(item, config)
         except AssertionError:
             continue
         return item
 
     raise RuntimeError(
-        f"failed to generate F1 item for seed={seed} after {config.max_generation_attempts} attempts"
+        "failed to generate F1 item for "
+        f"seed={seed} with distinguishing_trace_length in "
+        f"[{config.min_distinguishing_trace_length}, {config.max_distinguishing_trace_length}] "
+        f"after {config.max_retries} retries"
     )
+
+
+def _validate_generated_constraints(
+    item: BenchmarkItem,
+    config: SeparationGeneratorConfig,
+) -> None:
+    """Assert generator policy on assembled F1 item."""
+    witness = shortest_distinguishing_trace(item.fsm_a, item.fsm_b)
+    if witness is None:
+        raise AssertionError("non-equivalent pair must have a distinguishing trace")
+
+    trace_length = len(witness.trace)
+    recorded = item.difficulty["core"]["distinguishing_trace_length"]
+    if trace_length != recorded:
+        raise AssertionError(
+            f"distinguishing_trace_length metadata mismatch: {recorded} vs {trace_length}"
+        )
+    if trace_length < config.min_distinguishing_trace_length:
+        raise AssertionError(
+            f"distinguishing trace shorter than min_distinguishing_trace_length: "
+            f"{trace_length} < {config.min_distinguishing_trace_length}"
+        )
+    if trace_length > config.max_distinguishing_trace_length:
+        raise AssertionError(
+            f"distinguishing trace longer than max_distinguishing_trace_length: "
+            f"{trace_length} > {config.max_distinguishing_trace_length}"
+        )

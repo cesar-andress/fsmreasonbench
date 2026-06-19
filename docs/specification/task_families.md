@@ -51,6 +51,10 @@ or non-containment—not merely to answer boolean yes/no.
 | F1.b containment | ⬜ not yet | TBD | — |
 | F1.c safety violation | ⬜ not yet | TBD | — |
 
+**Generator controls (artifact):** `min_distinguishing_trace_length` (default 2), `max_distinguishing_trace_length`, `state_count_a`, `state_count_b`, `alphabet_size`, `max_retries`. Smoke examples may set `min_distinguishing_trace_length=1`.
+
+**Batch / smoke:** `generate_batch --family F1`, `evaluate_baseline_batch`, `run_f1_smoke_baselines`.
+
 **Normative question wording:** “Are DFA A and B equivalent?” Submit `verdict=false` with a `distinguishing_trace` certificate when they are not.
 
 #### Submitted answer (primary)

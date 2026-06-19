@@ -44,11 +44,12 @@
 | Milestone | Status |
 |-----------|--------|
 | P4.1 F1 DFA non-equivalence + distinguishing_trace | ✅ |
-| P4.2 F1 equivalent-pair certificates | ⬜ |
-| P4.3 F1 NFA / containment subtypes | ⬜ |
-| P4.4 F2 non-materialized composition | ⬜ |
-| P4.5 F3 constructive synthesis | ⬜ |
-| P4.6 F4 formalization fidelity | ⬜ |
+| P4.2 F1 difficulty controls + batch/smoke evaluation | ✅ |
+| P4.3 F1 equivalent-pair certificates | ⬜ |
+| P4.4 F1 NFA / containment subtypes | ⬜ |
+| P4.5 F2 non-materialized composition | ⬜ |
+| P4.6 F3 constructive synthesis | ⬜ |
+| P4.7 F4 formalization fidelity | ⬜ |
 | Multi-track infrastructure | ⬜ |
 | Contamination / frozen cohorts / Zenodo release | ⬜ |
 
@@ -77,7 +78,7 @@ src/fsmreasonbench/
   baselines/       # C2/F1 reference systems (oracle, random, invalid)
   cli/             # generate_one, score_submission, rescore_transcript, run_baseline,
                    # generate_batch, evaluate_baseline_batch, summarize_scores,
-                   # run_c2_smoke_baselines
+                   # run_c2_smoke_baselines, run_f1_smoke_baselines
 ```
 
 ## Run
@@ -102,4 +103,6 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
   --scores runs/oracle_scores.jsonl
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_c2_smoke_baselines \
   --n 100 --seed 1 --out-dir runs/c2_smoke
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
+  --n 100 --seed 1 --out-dir runs/f1_smoke
 ```

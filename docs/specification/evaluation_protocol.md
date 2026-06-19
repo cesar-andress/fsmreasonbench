@@ -319,7 +319,37 @@ Each evaluation transcript stores:
 
 Rescore recomputes `scoring_record` from `item` + `raw_response` (or parsed submission if present); fields MUST match the original score when inputs are unchanged.
 
-### 12.6 Planned (full benchmark)
+### 12.6 Batch evaluation (C2 and F1)
+
+Generate a non-frozen JSONL cohort:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_batch \
+  --family F1 --n 100 --seed 1 --out runs/f1_items.jsonl
+```
+
+Evaluate a baseline batch (family inferred from items):
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.evaluate_baseline_batch \
+  --baseline oracle --items runs/f1_items.jsonl --out runs/f1_oracle_scores.jsonl
+```
+
+Summarize (family-agnostic):
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
+  --scores runs/f1_oracle_scores.jsonl
+```
+
+F1 smoke runner (generate + oracle/random/invalid + combined summary):
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
+  --n 100 --seed 1 --out-dir runs/f1_smoke
+```
+
+### 12.7 Planned (full benchmark)
 
 ```
 evaluate_submission.py \

@@ -32,6 +32,27 @@ d_core = (|Q|, |Σ|, ℓ*, ndeg, struct_amb, present_len)
 ### F1 — Separation / Witness
 
 ```
+d_F1 = (|Q_A|, |Q_B|, |Σ|, ℓ_dist, transition_count_A, transition_count_B)
+```
+
+| Parameter | Symbol | Definition |
+|-----------|--------|------------|
+| Component state counts | `\|Q_A\|`, `\|Q_B\|` | States in each DFA |
+| Alphabet size | `\|Σ\|` | Shared input alphabet |
+| Distinguishing trace length | `ℓ_dist` | Shortest oracle distinguishing trace length |
+| Transition counts | — | `\|δ_A\|`, `\|δ_B\|` for density reporting |
+
+**Generator policy (artifact v0 slice):**
+
+| Control | Default | Notes |
+|---------|---------|-------|
+| `min_distinguishing_trace_length` | 2 | Use 1 only for smoke / regression items |
+| `max_distinguishing_trace_length` | 12 | Items outside bounds retry; explicit error after `max_retries` |
+| `max_retries` | 64 | Per-item generation attempts |
+
+Legacy spec parameters (`sep_kind`, `min_witness_gap`) apply to future F1 subtypes.
+
+```
 d_F1 = (d_core, sep_kind, min_witness_gap)
 ```
 

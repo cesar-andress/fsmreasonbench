@@ -23,8 +23,27 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--state-count", type=int, default=5)
     parser.add_argument("--state-count-a", type=int, default=4)
     parser.add_argument("--state-count-b", type=int, default=4)
+    parser.add_argument("--alphabet-size", type=int, default=3)
     parser.add_argument("--min-witness-length", type=int, default=1)
     parser.add_argument("--max-witness-length", type=int, default=12)
+    parser.add_argument(
+        "--min-distinguishing-trace-length",
+        type=int,
+        default=2,
+        help="F1 minimum distinguishing trace length (default: 2; use 1 for smoke items)",
+    )
+    parser.add_argument(
+        "--max-distinguishing-trace-length",
+        type=int,
+        default=12,
+        help="F1 maximum distinguishing trace length (default: 12)",
+    )
+    parser.add_argument(
+        "--max-retries",
+        type=int,
+        default=64,
+        help="F1 generation retries (default: 64)",
+    )
     parser.add_argument(
         "--allow-initial-target",
         action="store_true",
@@ -59,8 +78,16 @@ def main(argv: list[str] | None = None) -> int:
         config = SeparationGeneratorConfig(
             state_count_a=args.state_count_a,
             state_count_b=args.state_count_b,
+            alphabet_size=args.alphabet_size,
+            min_distinguishing_trace_length=args.min_distinguishing_trace_length,
+            max_distinguishing_trace_length=args.max_distinguishing_trace_length,
+            max_retries=args.max_retries,
         )
-        item = generate_separation_item(args.seed, config)
+        try:
+            item = generate_separation_item(args.seed, config)
+        except RuntimeError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 2
 
     payload = item.to_full_dict()
     text = json.dumps(payload, indent=2, sort_keys=True)

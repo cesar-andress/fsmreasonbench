@@ -34,7 +34,7 @@ generator → oracle → certificate → verifier  ✅
 - **CLI:** `python3 -m fsmreasonbench.cli.generate_one --seed 42`
 - **Difficulty controls:** `min_witness_length=1`, `max_witness_length=12`, `allow_initial_target=false`
 - **Negative items:** unreachable targets with `unreachability_witness`
-- **Tests:** 66+ passing (`pytest`)
+- **Tests:** 76+ passing (`pytest`)
 
 ---
 
@@ -51,8 +51,10 @@ generator → oracle → certificate → verifier  ✅
 | F1 baselines | `baselines/f1.py`, `baselines/runner.py` |
 | Schema | `schema/certificate/separation.schema.json` |
 | Example item | `examples/item_F1_separation_seed42.json` |
+| Hard example (`ℓ_dist≥3`) | `examples/item_F1_separation_seed6_hard.json` |
+| F1 batch + smoke | `cli/generate_batch --family F1`, `run_f1_smoke_baselines.py` |
 
-**Verdict convention:** question asks whether A and B are **equivalent**; `verdict=false` means **not equivalent** (separable). Gold certificate type: `distinguishing_trace`.
+**Generator defaults:** `min_distinguishing_trace_length=2`, `max_distinguishing_trace_length=12`, `max_retries=64`. Smoke item seed 42 uses `--min-distinguishing-trace-length 1`.
 
 **CLI:** `python3 -m fsmreasonbench.cli.generate_one --family F1 --seed 42`
 
@@ -161,4 +163,6 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.summarize_scores \
   --scores runs/oracle_scores.jsonl
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_c2_smoke_baselines \
   --n 100 --seed 1 --out-dir runs/c2_smoke
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
+  --n 100 --seed 1 --out-dir runs/f1_smoke
 ```
