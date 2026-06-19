@@ -15,7 +15,7 @@
 |-------|--------|-------|
 | **Phase 1** — Core infrastructure | ✅ **Complete** | FSM, oracle, verifier, tests |
 | **Phase 2** — First vertical (C2 reachability) | ✅ **Complete** | Difficulty controls + negative items |
-| **Phase 3** — Evaluation infrastructure | 🔄 **In progress** | C2 parser, scoring, transcripts, rescore |
+| **Phase 3** — Evaluation infrastructure | ✅ **Complete** | C2 parser, scoring, transcripts, baselines |
 | **Phase 4+** — Full benchmark | ⬜ Not started | F1–F4, cohorts, Zenodo |
 
 Roadmap detail: [`docs/IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)
@@ -34,7 +34,7 @@ generator → oracle → certificate → verifier  ✅
 - **CLI:** `python3 -m fsmreasonbench.cli.generate_one --seed 42`
 - **Difficulty controls:** `min_witness_length=1`, `max_witness_length=12`, `allow_initial_target=false`
 - **Negative items:** unreachable targets with `unreachability_witness`
-- **Tests:** 35+ passing (`pytest`)
+- **Tests:** 42+ passing (`pytest`)
 
 ---
 
@@ -48,8 +48,12 @@ generator → oracle → certificate → verifier  ✅
 | Transcript + rescore | `src/fsmreasonbench/evaluator/transcript.py` |
 | CLI score / rescore | `cli/score_submission.py`, `cli/rescore_transcript.py` |
 | Example submissions + transcript | `examples/submission_C2_*.json`, `transcript_C2_correct.json` |
+| C2 baselines | `src/fsmreasonbench/baselines/` |
+| CLI run baseline | `cli/run_baseline.py` |
 
 **End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
+
+**Reference baselines:** `oracle` (symbolic ceiling), `random` (seeded, usually wrong), `invalid` (extractability probe)
 
 ---
 
@@ -89,11 +93,11 @@ Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 
 ---
 
-## Next implementation milestone (Phase 3 remainder)
+## Next implementation milestone (Phase 4)
 
-1. **Baselines** — random witness, symbolic oracle ceiling on C2 slice
+1. **F1 separation / witness** — first flagship family vertical
 
-**Not next:** F2 composition, F4 probes, frozen cohorts, contamination tooling, LLM runners, multi-track.
+**Not next:** frozen cohorts, contamination tooling, LLM runners, multi-track.
 
 ---
 
@@ -118,4 +122,6 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.score_submission \
   --submission examples/submission_C2_correct.json
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
   --transcript examples/transcript_C2_correct.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline oracle --item examples/item_C2_reachability_seed42.json --score
 ```

@@ -255,7 +255,30 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
   --transcript examples/transcript_C2_correct.json
 ```
 
-### 12.2 C2 submission schema
+Run a reference baseline (outputs `raw_response` for the evaluator):
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline oracle --item examples/item_C2_reachability_seed42.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline random --item examples/item_C2_reachability_seed42.json --seed 123
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline invalid --item examples/item_C2_reachability_seed42.json
+```
+
+Add `--score` to print the scoring record (stderr when stdout carries the raw response).
+
+### 12.2 C2 reference baselines
+
+| Baseline | Role | Output |
+|----------|------|--------|
+| `oracle` | Symbolic upper bound (not a competing model) | Correct verdict + verifier-valid certificate |
+| `random` | Lower reference; deterministic under `--seed` | Parseable submission; usually fails verification |
+| `invalid` | Extractability probe | Malformed non-JSON text |
+
+Baselines live in `src/fsmreasonbench/baselines/`. They produce `raw_response` values consumed by the existing C2 parser and scorer.
+
+### 12.3 C2 submission schema
 
 Structured submissions MUST include:
 
@@ -269,7 +292,7 @@ Schema: `schema/c2_submission.schema.json`.
 
 Raw model text MAY be stored in transcripts; the parser extracts JSON objects or fenced code blocks.
 
-### 12.3 C2 scoring record
+### 12.4 C2 scoring record
 
 | Field | Type | Meaning |
 |-------|------|---------|
@@ -279,7 +302,7 @@ Raw model text MAY be stored in transcripts; the parser extracts JSON objects or
 | `fully_correct` | bool | Verdict and certificate both correct |
 | `failure_stage` | enum | `not_extractable`, `verdict_wrong`, `certificate_invalid`, `correct` |
 
-### 12.4 Transcript envelope
+### 12.5 Transcript envelope
 
 Each evaluation transcript stores:
 
@@ -292,7 +315,7 @@ Each evaluation transcript stores:
 
 Rescore recomputes `scoring_record` from `item` + `raw_response` (or parsed submission if present); fields MUST match the original score when inputs are unchanged.
 
-### 12.5 Planned (full benchmark)
+### 12.6 Planned (full benchmark)
 
 ```
 evaluate_submission.py \

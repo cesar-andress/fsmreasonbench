@@ -48,3 +48,22 @@ Rescore:
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
   --transcript examples/transcript_C2_correct.json
 ```
+
+## C2 baselines
+
+Reference systems (no LLM required):
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline oracle --item examples/item_C2_reachability_seed42.json --score
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline random --item examples/item_C2_reachability_seed42.json --seed 123
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline invalid --item examples/item_C2_reachability_seed42.json
+```
+
+| Baseline | Expected scoring |
+|----------|------------------|
+| `oracle` | `failure_stage=correct` |
+| `random` | Usually `verdict_wrong` or `certificate_invalid` |
+| `invalid` | `failure_stage=not_extractable` |

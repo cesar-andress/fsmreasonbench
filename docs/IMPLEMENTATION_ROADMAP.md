@@ -25,7 +25,7 @@
 
 **Success criterion met:** first self-verifying benchmark item.
 
-## Phase 3 — Evaluation infrastructure 🔄
+## Phase 3 — Evaluation infrastructure ✅
 
 | Milestone | Status |
 |-----------|--------|
@@ -33,7 +33,9 @@
 | P3.2 C2 scoring (extractability vs correctness) | ✅ |
 | P3.3 Transcript recording + deterministic rescore | ✅ |
 | P3.4 CLI `score_submission` / `rescore_transcript` | ✅ |
-| P3.5 Baselines: random, symbolic oracle ceiling | ⬜ |
+| P3.5 Baselines: random, oracle ceiling, invalid | ✅ |
+
+**Success criterion met:** C2 evaluation path with interpretable reference baselines.
 
 ## Phase 4+ — Not started
 
@@ -55,7 +57,8 @@ src/fsmreasonbench/
   generator/       # seeded instance generation
   items/           # benchmark item assembly + self_verify
   evaluator/       # C2 parser, scorer, transcripts
-  cli/             # generate_one, score_submission, rescore_transcript
+  baselines/       # C2 reference systems (oracle, random, invalid)
+  cli/             # generate_one, score_submission, rescore_transcript, run_baseline
 ```
 
 ## Run
@@ -69,4 +72,6 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.score_submission \
   --submission examples/submission_C2_correct.json
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.rescore_transcript \
   --transcript examples/transcript_C2_correct.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline oracle --item examples/item_C2_reachability_seed42.json --score
 ```
