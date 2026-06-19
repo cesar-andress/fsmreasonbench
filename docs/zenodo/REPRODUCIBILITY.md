@@ -179,7 +179,7 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --family C2 --seed 
 PYTHONPATH=src python3.11 -m pytest -v
 
 # Baseline batch (symbolic, no LLM)
-PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline_batch --help
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.evaluate_baseline_batch --help
 ```
 
 Exploratory outputs under `runs/` are gitignored and must not be treated as release artifacts.
