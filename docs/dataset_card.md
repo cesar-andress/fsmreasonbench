@@ -86,8 +86,26 @@ open-ended NL-only specifications. See BENCHMARK_SPEC §2.2.
 | Tier | Description | Status |
 |------|-------------|--------|
 | **On-demand / exploratory** | Seeded generation under `runs/`; pilot and capability-surface batches | Active in development; not citable as final results |
-| **Exploratory freeze** | Sealed snapshots via `freeze_cohort` (manifest `0.1-exploratory`) | Supported; reproducible within a study, not a public release |
+| **Exploratory freeze** | Sealed snapshots via `freeze_cohort` (manifest `0.1-exploratory`) | **Two valid cohorts committed** (see below); reproducible for smoke testing, not a public release |
 | **Frozen public cohort** | Content-addressed manifest; evaluatee/evaluator bundle split | Planned; not yet published |
+
+### Valid exploratory frozen cohorts (non-public)
+
+These directories pass `validate_cohort`. They are **exploratory** snapshots for reproducibility smoke testing and artifact validation — **not** final public `v1.0-public` cohorts and not citable as benchmark results.
+
+| `cohort_id` | Path | Items | `cohort_fingerprint` |
+|-------------|------|-------|----------------------|
+| `c2-reachability-level3-v0.1-exploratory` | `cohorts/v0.1-exploratory/c2-reachability-level3/` | 20 C2 (witness length level 3) | `77d3bfa104266396d016415527c2cc74eea545bec2bf1295bf0d2ee1c1086230` |
+| `f1-mixed-level3-v0.1-exploratory` | `cohorts/v0.1-exploratory/f1-mixed-level3/` | 20 F1 mixed (equivalent + non-equivalent; $\ell_{\mathrm{dist}}=3$) | `4e1e662307456c871ed8c424a4ba493ab041b3d32530feecdef7c19ffe634a67` |
+
+Validate integrity:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
+  --cohort-dir cohorts/v0.1-exploratory/c2-reachability-level3
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
+  --cohort-dir cohorts/v0.1-exploratory/f1-mixed-level3
+```
 
 Exploratory cohorts must not be treated as the final benchmark dataset. See
 [`docs/zenodo/REPRODUCIBILITY.md`](zenodo/REPRODUCIBILITY.md) and
@@ -313,7 +331,7 @@ Future public release requirements (manifest, bundle split, pinned environment) 
 ## Known Limitations
 
 - **Partial implementation:** only C2 and F1 are end-to-end; full F1–F4 + C1–C2 specification exceeds current code.
-- **Exploratory cohorts:** on-demand and `0.1-exploratory` freezes are not the final public dataset; metrics may change when a public cohort is published.
+- **Exploratory cohorts:** on-demand batches and `0.1-exploratory` freezes are not the final public dataset; two valid exploratory snapshots exist for smoke testing (`cohorts/v0.1-exploratory/`), but metrics may change when a public cohort is published.
 - **Generator bias:** constructive generators may introduce structural regularities; F1 audits and generator revisions mitigate but do not eliminate this risk.
 - **Certificate contract:** scores bound success to supported certificate formats, not informal proof styles.
 - **Model coverage:** early exploratory runs use a small local open-weight model set; results do not generalize broadly.
@@ -344,8 +362,8 @@ Threats and design principles are discussed in the companion paper draft (`paper
 | F2–F4 flagship families | Specified, not implemented |
 | C1 calibration | Specified, not implemented |
 | Frozen public cohort | **Not yet published** |
-| Exploratory cohort freeze (`0.1-exploratory`) | Implemented |
-| Final benchmark scores / paper claims | **Not available** — awaiting frozen public cohort |
+| Exploratory cohort freeze (`0.1-exploratory`) | Implemented; two valid cohorts in `cohorts/v0.1-exploratory/` |
+| Final benchmark scores / paper claims | **Not available** — awaiting frozen **public** cohort (`1.0-public`) |
 
 Release planning: [`docs/zenodo/RELEASE_CHECKLIST.md`](zenodo/RELEASE_CHECKLIST.md),
 [`docs/IMPLEMENTATION_ROADMAP.md`](IMPLEMENTATION_ROADMAP.md),

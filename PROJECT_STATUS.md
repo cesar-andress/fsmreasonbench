@@ -1,7 +1,7 @@
 # FSMReasonBench — Project Status
 
 **Repository:** artifact (`fsmreasonbench`)  
-**Last updated:** 2025-06-20  
+**Last updated:** 2026-06-20  
 **Package version:** `0.2.0-dev`  
 **Branch:** `main`
 
@@ -53,7 +53,14 @@ Reported rates: `extractability_rate`, `verdict_accuracy`, `certificate_valid_ra
 | **Invalid baseline** | Non-extractable output probe |
 | **Local Ollama (no tools)** | Exploratory model evaluation; temperature=0; not frozen |
 
-Exploratory runs (pilots, capability-surface sweeps) use **non-frozen** JSONL cohorts under `runs/` (gitignored). Committed summaries in `docs/pilot_v0_*` and `docs/pilot_v1_*` are illustrative only — not paper claims or final benchmark results.
+Exploratory runs (pilots, capability-surface sweeps) may use on-demand JSONL under `runs/` (gitignored) or **sealed exploratory cohorts** under `cohorts/v0.1-exploratory/`. Committed summaries in `docs/pilot_v0_*` and `docs/pilot_v1_*` are illustrative only — not paper claims or final benchmark results.
+
+**Exploratory frozen cohorts (valid, non-public):** two snapshots pass `validate_cohort` and are intended for reproducibility smoke testing and artifact validation — **not** final public `v1.0-public` cohorts and not citable as benchmark results.
+
+| `cohort_id` | Path | Fingerprint |
+|-------------|------|-------------|
+| `c2-reachability-level3-v0.1-exploratory` | [`cohorts/v0.1-exploratory/c2-reachability-level3/`](cohorts/v0.1-exploratory/c2-reachability-level3/) | `77d3bfa104266396d016415527c2cc74eea545bec2bf1295bf0d2ee1c1086230` |
+| `f1-mixed-level3-v0.1-exploratory` | [`cohorts/v0.1-exploratory/f1-mixed-level3/`](cohorts/v0.1-exploratory/f1-mixed-level3/) | `4e1e662307456c871ed8c424a4ba493ab041b3d32530feecdef7c19ffe634a67` |
 
 **Dataset card:** [`docs/dataset_card.md`](docs/dataset_card.md) — draft overview for downstream publication (e.g. Hugging Face); references normative docs and distinguishes exploratory from future frozen public cohorts.
 
@@ -131,7 +138,9 @@ generator → oracle → certificate → verifier  ✅
 
 **Reference baselines:** `oracle` (symbolic ceiling), `random` (seeded, usually wrong), `invalid` (extractability probe)
 
-**Exploratory batch (non-frozen):** generate JSONL cohort → evaluate baseline → aggregate summary
+**Exploratory batch (on-demand):** generate JSONL cohort → evaluate baseline → aggregate summary
+
+**Exploratory cohort freeze (sealed):** `freeze_cohort` / `validate_cohort` — manifest `0.1-exploratory`; see [`cohorts/v0.1-exploratory/`](cohorts/v0.1-exploratory/)
 
 ---
 
@@ -182,7 +191,7 @@ Items: C2 `min_witness_length=2`, F1 `min_distinguishing_trace_length=2` from `c
 
 ## Zenodo-first architecture (unchanged)
 
-Development code on `main` is **not citable**. First Zenodo target remains **v1.0.0** after Phase 3+ and cohort freeze.
+Development code on `main` is **not citable**. First Zenodo target remains **v1.0.0** after a **public** cohort freeze (`1.0-public`). Exploratory snapshots under `cohorts/v0.1-exploratory/` are sealed for smoke testing but are not that release.
 
 Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 
@@ -193,7 +202,7 @@ Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 1. **F1 equivalent-pair proof certificates** (positive items)
 2. **F1 NFA / containment subtypes**
 
-**Not next:** frozen cohorts, contamination tooling, F2 composition.
+**Not next:** public `1.0-public` cohort, contamination tooling, F2 composition.
 
 ---
 
@@ -253,10 +262,8 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.failure_taxonomy \
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.failure_taxonomy_batch \
   --root runs/capability_surface_models_f1_mixed \
   --out docs/f1_mixed_failure_taxonomy.json
-PYTHONPATH=src python3.11 -m fsmreasonbench.cli.freeze_cohort \
-  --items runs/capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/items.jsonl \
-  --cohort-id f1-mixed-level3-v0.1-exploratory \
-  --out-dir cohorts/v0.1-exploratory/f1-mixed-level3
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
+  --cohort-dir cohorts/v0.1-exploratory/c2-reachability-level3
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
   --cohort-dir cohorts/v0.1-exploratory/f1-mixed-level3
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_pilot_models \

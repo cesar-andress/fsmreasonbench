@@ -177,20 +177,43 @@ content-addressed directory without minting a DOI or assigning `v1.0-public`:
 ```bash
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.freeze_cohort \
   --items runs/.../items.jsonl \
-  --cohort-id f1-mixed-level3-v0.1-exploratory \
-  --out-dir cohorts/v0.1-exploratory/f1-mixed-level3
+  --cohort-id <cohort-id>-v0.1-exploratory \
+  --out-dir cohorts/v0.1-exploratory/<name>
 
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
-  --cohort-dir cohorts/v0.1-exploratory/f1-mixed-level3
+  --cohort-dir cohorts/v0.1-exploratory/<name>
 ```
 
 Each freeze writes `items.jsonl`, `manifest.json`, `sha256sums.txt`, and `README.md`.
 The manifest records `cohort_id`, timestamps, family counts, difficulty summary, per-item
 SHA-256 digests, and an aggregate `cohort_fingerprint`. Every item is checked with
-`self_verify_item()` before sealing.
+`self_verify_item()` before sealing. Duplicate `item_id` values in the source JSONL cause
+`freeze_cohort` to fail before any output is written.
 
 This workflow uses manifest version **`0.1-exploratory`**. It is explicitly **not** a Zenodo
 release and must not be cited as a final benchmark result.
+
+### Valid exploratory cohorts in the repository
+
+Two sealed snapshots are committed under `cohorts/v0.1-exploratory/`. They pass
+`validate_cohort` and are intended for **reproducibility smoke testing** and **artifact
+validation** — not as final public `v1.0-public` cohorts.
+
+| `cohort_id` | Directory | `cohort_fingerprint` |
+|-------------|-----------|----------------------|
+| `c2-reachability-level3-v0.1-exploratory` | `cohorts/v0.1-exploratory/c2-reachability-level3/` | `77d3bfa104266396d016415527c2cc74eea545bec2bf1295bf0d2ee1c1086230` |
+| `f1-mixed-level3-v0.1-exploratory` | `cohorts/v0.1-exploratory/f1-mixed-level3/` | `4e1e662307456c871ed8c424a4ba493ab041b3d32530feecdef7c19ffe634a67` |
+
+Smoke validation:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
+  --cohort-dir cohorts/v0.1-exploratory/c2-reachability-level3
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
+  --cohort-dir cohorts/v0.1-exploratory/f1-mixed-level3
+```
+
+On-demand JSONL under `runs/` remains gitignored and is not a substitute for these sealed snapshots when checking cohort tooling end-to-end.
 
 ---
 
