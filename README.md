@@ -11,6 +11,10 @@ Git `main` is for development. **Cite the Zenodo DOI**, not the git URL.
 
 Companion paper (separate): `../paper/`
 
+**Development milestone:** [`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md) —
+C2 + F1 implemented, exploratory cohort freeze, evaluation pipeline. **Not** a Zenodo release or
+final public benchmark.
+
 ---
 
 ## Artifact philosophy
@@ -96,6 +100,7 @@ Layout detail: [`docs/artifact/repository_layout.md`](docs/artifact/repository_l
 | [`docs/versioning_policy.md`](docs/versioning_policy.md) | Four-axis version rules |
 | [`docs/artifact/github_vs_zenodo.md`](docs/artifact/github_vs_zenodo.md) | Design review |
 | [`docs/artifact/zenodo_checklist.md`](docs/artifact/zenodo_checklist.md) | Pre-upload gate |
+| [`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md) | **v0.1 exploratory milestone** (not Zenodo / not public v1.0) |
 
 ---
 
@@ -113,14 +118,17 @@ Results = **capability surfaces**, not a single leaderboard score.
 
 ## Current status
 
+**Development artifact on `main`:** see [`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md).
+
 | Component | Status |
 |-----------|--------|
 | Zenodo-first architecture docs | ✅ |
 | v2 spec (F1–F4, C1–C2) | ✅ draft |
-| Release manifest template | ✅ |
-| Verifier | ⬜ **blocks v1.0.0 DOI** |
-| Generator | ⬜ not started |
-| Cohort 1.0-public | ⬜ not frozen |
+| C2 + F1 end-to-end (generator → verifier → scorer) | ✅ |
+| Exploratory cohort freeze (`0.1-exploratory`) | ✅ (2 committed snapshots) |
+| Evaluation pipeline + baselines + capability surface | ✅ |
+| **Public Zenodo release `v1.0.0` / cohort `1.0-public`** | ⬜ **not published** |
+| Families F2–F4, C1 | ⬜ specified only |
 | LICENSE / DOI in CITATION.cff | ⬜ placeholder |
 
 See [`PROJECT_STATUS.md`](PROJECT_STATUS.md).

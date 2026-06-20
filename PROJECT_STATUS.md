@@ -3,7 +3,12 @@
 **Repository:** artifact (`fsmreasonbench`)  
 **Last updated:** 2026-06-20  
 **Package version:** `0.2.0-dev`  
-**Branch:** `main`
+**Branch:** `main`  
+**Release notes:** [`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md)
+
+> **Not a Zenodo release.** `v0.1-exploratory` documents the current development milestone (C2 + F1,
+> evaluation pipeline, two exploratory frozen cohorts). It is **not** public cohort `1.0-public`
+> and **not** a final benchmark release.
 
 ---
 
@@ -61,6 +66,9 @@ Exploratory runs (pilots, capability-surface sweeps) may use on-demand JSONL und
 |-------------|------|-------------|
 | `c2-reachability-level3-v0.1-exploratory` | [`cohorts/v0.1-exploratory/c2-reachability-level3/`](cohorts/v0.1-exploratory/c2-reachability-level3/) | `77d3bfa104266396d016415527c2cc74eea545bec2bf1295bf0d2ee1c1086230` |
 | `f1-mixed-level3-v0.1-exploratory` | [`cohorts/v0.1-exploratory/f1-mixed-level3/`](cohorts/v0.1-exploratory/f1-mixed-level3/) | `4e1e662307456c871ed8c424a4ba493ab041b3d32530feecdef7c19ffe634a67` |
+
+Full milestone summary (CLIs, evaluation pipeline, capability-surface reproduction, limitations):
+[`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md).
 
 **Dataset card:** [`docs/dataset_card.md`](docs/dataset_card.md) — draft overview for downstream publication (e.g. Hugging Face); references normative docs and distinguishes exploratory from future frozen public cohorts.
 
