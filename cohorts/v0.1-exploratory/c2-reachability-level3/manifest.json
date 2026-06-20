@@ -1,0 +1,134 @@
+{
+  "cohort_fingerprint": "3f0fe5763c99b28a34597e707156daddc50ad55297943fc1edeb6be5479805b3",
+  "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+  "created_at": "2026-06-20T07:35:32Z",
+  "difficulty_summary": {
+    "C2": {
+      "generator_seed_range": {
+        "max": 3020,
+        "min": 3002
+      },
+      "item_count": 20,
+      "state_count": {
+        "max": 5,
+        "mean": 5.0,
+        "min": 5
+      },
+      "witness_length": {
+        "max": 4,
+        "mean": 0.5,
+        "min": 0
+      }
+    }
+  },
+  "family_counts": {
+    "C2": 20
+  },
+  "generator_notes": "Exploratory C2 reachability cohort, witness length level 3, mixed reachable/unreachable targets.",
+  "item_count": 20,
+  "items": [
+    {
+      "family": "C2",
+      "item_id": "3cec6c0d-3f67-5fc0-bc4e-b0fe0c6a0122",
+      "sha256": "feba0596180d2c52d200ff30dc0a4edc51f4fe3471b0e8fe4af2a94b05f516a9"
+    },
+    {
+      "family": "C2",
+      "item_id": "3cec6c0d-3f67-5fc0-bc4e-b0fe0c6a0122",
+      "sha256": "14d210c5d55743d4192e28e387b94dad5f13489f28d0096bdf2c8838bc620a2e"
+    },
+    {
+      "family": "C2",
+      "item_id": "a5251f21-02de-567c-bd01-633f905e0c51",
+      "sha256": "6a28f5268e3fec16fc0371729477721f7e8f37b90ff26a00413bc9e3d29ce0cf"
+    },
+    {
+      "family": "C2",
+      "item_id": "144a31e3-d2b5-541a-bc0b-fc8d95d9f8c7",
+      "sha256": "17f4accdb9286299b22531c1cd48a3de7c2691c4b23d3f2d066eed3e760c9731"
+    },
+    {
+      "family": "C2",
+      "item_id": "fc54058d-ad91-537b-bdcf-de0b2ebfbae6",
+      "sha256": "0460092b2e5c1a0e9ed46b90a1fd11537a73388479db55ca2fec3b32e7e47a3b"
+    },
+    {
+      "family": "C2",
+      "item_id": "c3c1795d-8ca7-5ee5-91dd-19eacd7547d6",
+      "sha256": "aabe0b84c1e079d1e2c34017c1a267b34346463d0f786b9b66d7d320fb3c6d1a"
+    },
+    {
+      "family": "C2",
+      "item_id": "033acdbe-0b1b-57d0-ad2e-d426163a2ca6",
+      "sha256": "25cd5fd35d9b6530a369839a8063b483337d57f69cf4afcb3cd8ad2e7f18daef"
+    },
+    {
+      "family": "C2",
+      "item_id": "809d48ce-3ea6-5f99-8729-1628b83cd3ba",
+      "sha256": "8907ab7b026ff04dfac7f025609281d281ec4fd2a12241cc6b5683f5e519241c"
+    },
+    {
+      "family": "C2",
+      "item_id": "df09b7c5-bc1d-5427-82c6-1e9dec4ce1a8",
+      "sha256": "1f0005a88e8789cce8896e7af5d194cc0a582b369fe34b26cbdba70f62baec78"
+    },
+    {
+      "family": "C2",
+      "item_id": "36055b84-1bc3-5f31-bccb-eab31e7a0eb3",
+      "sha256": "a1e91c4e7252dfab3058cbbe291926fe4fe21ce711c3e07e1b3c6338ebf3e97a"
+    },
+    {
+      "family": "C2",
+      "item_id": "82491015-e5d4-5a1d-9892-88226f2ce7bc",
+      "sha256": "877d00457f1795409c7e4206c5f53a4d19ed0539696dbbc3083bfb09cb9a5deb"
+    },
+    {
+      "family": "C2",
+      "item_id": "d461208c-3009-5a82-8c11-5da3415c5647",
+      "sha256": "14684b39968d8de3289698c299e50a896202eb66f3f863e164978d9fb731a009"
+    },
+    {
+      "family": "C2",
+      "item_id": "7920e7b7-6780-52bb-bd32-2cce9c614515",
+      "sha256": "170970dec65037627fba7b7b1ccb06404395c48c241bf4b54ad78aaf51c4ac13"
+    },
+    {
+      "family": "C2",
+      "item_id": "1b4737e4-555d-56c6-93ba-19c32aff278d",
+      "sha256": "e67a00213c25baa7f4d7dcd301ba79e420db4ab295fa3294914a6f637d9c6fb0"
+    },
+    {
+      "family": "C2",
+      "item_id": "9e7a638d-65b9-5481-a6fd-819f6f1577fa",
+      "sha256": "bc09b7a4c52cb92ea7e7aa9d6992e1a189025a83bfaddf66f61a9ad9690d1b16"
+    },
+    {
+      "family": "C2",
+      "item_id": "85d85ef5-ac17-57d9-a49b-79c21b621bce",
+      "sha256": "d054197a12949d798fde50aacc9431b25de14cf47e420aa2863d1b93b3c43939"
+    },
+    {
+      "family": "C2",
+      "item_id": "c38e4a59-f32d-51aa-af29-587609dd7545",
+      "sha256": "3b7fdece5c39f0b6c4c7b9b2d1dd2e0a301ad330819366e5ced250183a98377a"
+    },
+    {
+      "family": "C2",
+      "item_id": "0c268645-f31f-5346-9318-c802ae04ef44",
+      "sha256": "3664e6294413eabdb988730273dff05415bf4a19e5cffed51c5c0a198f07b884"
+    },
+    {
+      "family": "C2",
+      "item_id": "216881a7-6b68-50a6-bd30-443f4cc2d4a0",
+      "sha256": "7165fefd7bfea70d2be03aa31b6d812e3ad5c439a185cc34b901fa370e2f4674"
+    },
+    {
+      "family": "C2",
+      "item_id": "704a4f52-5645-53e3-8b59-777e0c0abdc6",
+      "sha256": "2a5bb188e4809992a67adb7e97afbdd48d405c1ef71e7fe0b2a84cf590b776c7"
+    }
+  ],
+  "manifest_version": "0.1-exploratory",
+  "release_tier": "exploratory",
+  "source_items_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/capability_surface_models/C2/min_witness_length_3/items.jsonl"
+}
