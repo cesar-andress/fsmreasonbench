@@ -58,6 +58,7 @@ Reported rates: `extractability_rate`, `verdict_accuracy`, `certificate_valid_ra
 | **Invalid baseline** | Non-extractable output probe |
 | **Local Ollama (no tools)** | Exploratory model evaluation; temperature=0; not frozen |
 | **R0/R1/R2 track pilot** | Multi-model delegation experiment on frozen exploratory cohorts (`run_track_pilot_models`) |
+| **Local track-temperature matrix** | `run_track_pilot_models --temperatures` + `plot_local_matrix`; see `docs/local_model_matrix_experiment.md` |
 
 Exploratory runs (pilots, capability-surface sweeps, **track pilot v1**) may use on-demand JSONL under `runs/` (gitignored) or **sealed exploratory cohorts** under `cohorts/v0.1-exploratory/`. Committed summaries in `docs/pilot_v0_*`, `docs/pilot_v1_*`, and locally generated `runs/track_pilot_v1/` are illustrative only — not paper claims or final benchmark results.
 
@@ -292,6 +293,17 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_track_pilot_models \
   --max-items 20 \
   --temperature 0 \
   --out-dir runs/track_pilot_v1
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b \
+  --families C2,F1 \
+  --tracks R0,R1,R2 \
+  --temperatures 0,0.2,0.7 \
+  --max-items 20 \
+  --timeout 300 \
+  --out-dir runs/local_matrix_v1
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.plot_local_matrix \
+  --summary runs/local_matrix_v1/combined_summary.json \
+  --out-dir runs/local_matrix_v1/plots
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_capability_surface_models \
   --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
   --levels 1,2,3,4,5 \

@@ -13,6 +13,7 @@ from fsmreasonbench.runners.track_pilot_models import (
     DEFAULT_C2_ITEMS,
     DEFAULT_F1_ITEMS,
     TrackPilotModelsConfig,
+    parse_temperatures,
     run_track_pilot_models,
 )
 from fsmreasonbench.tracks.models import TrackId
@@ -61,7 +62,16 @@ def main(argv: list[str] | None = None) -> int:
         default=20,
         help="Max items per cell (default: 20)",
     )
-    parser.add_argument("--temperature", type=float, default=0.0)
+    parser.add_argument(
+        "--temperatures",
+        help="Comma-separated sampling temperatures (e.g. 0,0.2,0.7)",
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.0,
+        help="Single temperature when --temperatures is not set (default: 0.0)",
+    )
     parser.add_argument("--timeout", type=float, default=120.0)
     parser.add_argument(
         "--out-dir",
@@ -87,6 +97,11 @@ def main(argv: list[str] | None = None) -> int:
         models = _parse_csv(args.models)
         families = _parse_csv(args.families)
         tracks = _parse_csv(args.tracks)
+        temperatures = (
+            parse_temperatures(args.temperatures)
+            if args.temperatures
+            else (args.temperature,)
+        )
         for family in families:
             if family not in {"C2", "F1"}:
                 raise ValueError(f"unsupported family: {family!r}")
@@ -103,17 +118,17 @@ def main(argv: list[str] | None = None) -> int:
         f1_items_path=Path(args.f1_items),
         out_dir=args.out_dir,
         max_items=args.max_items,
-        temperature=args.temperature,
+        temperatures=temperatures,
         timeout=args.timeout,
         skip_completed=not args.force,
     )
 
-    def generate_factory(model: str):
+    def generate_factory(model: str, temperature: float):
         client = HttpOllamaClient(
             OllamaConfig(
                 base_url=args.ollama_url,
                 model=model,
-                temperature=args.temperature,
+                temperature=temperature,
                 timeout=args.timeout,
             )
         )
@@ -133,6 +148,7 @@ def main(argv: list[str] | None = None) -> int:
                 "models": list(models),
                 "families": list(families),
                 "tracks": list(tracks),
+                "temperatures": list(temperatures),
                 "cells_completed": completed,
                 "cells_failed": len(result.failed_cells),
                 "combined_summary": str(result.out_dir / "combined_summary.json"),

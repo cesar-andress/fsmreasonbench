@@ -202,3 +202,21 @@ python -m fsmreasonbench.cli.run_track_pilot_models \
 ```
 
 `track_pilot_v1` is the first experiment layout capable of measuring **Δ_R1−R0** and **Δ_R2−R0** on actual LLM outputs across a model panel. Each cell writes `results.jsonl`, `scores.jsonl`, `transcripts/`, and `summary.json` under `{out_dir}/{model_dir}/{family}/{track}/`. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md` (with per-family metrics, delegation gaps, and failure-movement tables). Use `--force` to re-run completed cells; failures are recorded per cell without aborting the sweep.
+
+### Local model track-temperature matrix
+
+```bash
+python -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 \
+  --tracks R0,R1,R2 \
+  --temperatures 0,0.2,0.7 \
+  --max-items 20 \
+  --out-dir runs/local_matrix_v1
+
+python -m fsmreasonbench.cli.plot_local_matrix \
+  --summary runs/local_matrix_v1/combined_summary.json \
+  --out-dir runs/local_matrix_v1/plots
+```
+
+When `--temperatures` lists more than one value, cells are written under `{out_dir}/{model_dir}/{family}/temp_{temperature}/{track}/`. The combined report adds per-temperature delegation gaps, temperature sensitivity (Δ_T0.2−T0.0, Δ_T0.7−T0.0), and RQ-L1–RQ-L4 framing. See [`docs/local_model_matrix_experiment.md`](local_model_matrix_experiment.md). Intended to test track and temperature effects on reproducible local models (RTX 4090, no paid APIs) before any frontier or public-cohort study.

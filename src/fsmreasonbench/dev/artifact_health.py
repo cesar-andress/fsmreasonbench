@@ -36,6 +36,7 @@ REQUIRED_CLI_MODULES: tuple[str, ...] = (
     "fsmreasonbench.cli.run_ollama_track_batch",
     "fsmreasonbench.cli.run_pilot_models",
     "fsmreasonbench.cli.run_track_pilot_models",
+    "fsmreasonbench.cli.plot_local_matrix",
     "fsmreasonbench.cli.run_capability_surface_models",
     "fsmreasonbench.cli.plot_capability_surface",
     "fsmreasonbench.cli.export_capability_surface_report",

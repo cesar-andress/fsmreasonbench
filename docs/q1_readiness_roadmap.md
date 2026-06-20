@@ -19,7 +19,7 @@ This roadmap maps seven publication blockers (E1–E7) to executable milestones 
 | Ceilings | **oracle, reference_submitter, competent_submitter** | Reports under `docs/*_summary.*` |
 | Statistical reporting | **Bootstrap CIs from existing runs** | `docs/rate_ci_*` |
 | F2–F4, C1 | **Specified, not implemented** | `docs/specification/task_families.md` |
-| Frontier panel | **Exploratory pilots only** | `docs/pilot_v*`, capability-surface docs |
+| Frontier panel | **Exploratory pilots only** | `docs/pilot_v*`, capability-surface docs, `local_matrix_v1` |
 | Powered cohorts | **No** | 20 items/family is smoke-test scale |
 | Non-obvious finding | **Not established** | Exploratory separation layers exist; no frozen public claim |
 
@@ -87,6 +87,8 @@ This roadmap maps seven publication blockers (E1–E7) to executable milestones 
 
 **Effort:** 2–3 weeks  
 **Acceptance impact:** Unblocks track claims in paper; prerequisite for E5 comparisons by track.
+
+**Local matrix extension (2026-06):** `run_track_pilot_models --temperatures` + `plot_local_matrix` + [`docs/local_model_matrix_experiment.md`](local_model_matrix_experiment.md). Runs `local_matrix_v1` on RTX 4090 local models (no paid APIs) to test RQ-L1–RQ-L4 before scaling n or migrating to public cohort.
 
 ---
 

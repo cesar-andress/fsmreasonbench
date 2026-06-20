@@ -222,6 +222,26 @@ Default item sources: `cohorts/v0.1-exploratory/c2-reachability-level3/items.jso
 
 Layout per model/family/track: `{out-dir}/{model_dir}/{family}/{track}/results.jsonl`, `scores.jsonl`, `transcripts/`, `summary.json`. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md` (metrics, delegation gaps, failure movement). Skip completed cells unless `--force`. Exploratory only — not for paper claims.
 
+## Local model track-temperature matrix
+
+Test track (R0/R1/R2) and temperature effects on reproducible local Ollama models before any frontier or public-cohort study. Design: [`docs/local_model_matrix_experiment.md`](../docs/local_model_matrix_experiment.md).
+
+```bash
+python -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 \
+  --tracks R0,R1,R2 \
+  --temperatures 0,0.2,0.7 \
+  --max-items 20 \
+  --out-dir runs/local_matrix_v1
+
+python -m fsmreasonbench.cli.plot_local_matrix \
+  --summary runs/local_matrix_v1/combined_summary.json \
+  --out-dir runs/local_matrix_v1/plots
+```
+
+Layout with multiple temperatures: `{out-dir}/{model_dir}/{family}/temp_{temperature}/{track}/`. n=20 initial pilot; scale to 100–200 items/cell only after smoke validation. Local models only, no paid APIs.
+
 ## Model capability-surface evaluation
 
 Sweep difficulty levels 1–5 with multiple Ollama models:

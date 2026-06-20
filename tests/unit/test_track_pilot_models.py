@@ -106,8 +106,8 @@ def _make_fake_generate(c2_item, f1_item, track: TrackId):
 
 
 def _make_factory(c2_item, f1_item):
-    def generate_factory(model: str):
-        _ = model
+    def generate_factory(model: str, temperature: float):
+        _ = (model, temperature)
 
         def fake_generate(
             prompt: str,
@@ -177,7 +177,7 @@ def test_runner_creates_expected_directory_layout(tmp_path: Path, pilot_items) -
     assert len(result.track_rows) == 4
     for family in ("C2", "F1"):
         for track in ("R0", "R1"):
-            run_dir = cell_dir(out_dir, "mock-a", family, track)
+            run_dir = cell_dir(out_dir, "mock-a", family, track, temperature=0.0)
             assert (run_dir / "results.jsonl").exists()
             assert (run_dir / "scores.jsonl").exists()
             assert (run_dir / "summary.json").exists()
@@ -192,8 +192,8 @@ def test_skip_completed_cells(tmp_path: Path, pilot_items) -> None:
     c2_items_path, f1_items_path, c2_item, f1_item = pilot_items
     invocations = {"count": 0}
 
-    def generate_factory(model: str):
-        _ = model
+    def generate_factory(model: str, temperature: float):
+        _ = temperature
         base = _make_fake_generate(c2_item, f1_item, TrackId.R0)
 
         def counting_generate(
@@ -229,8 +229,8 @@ def test_force_reruns_completed_cells(tmp_path: Path, pilot_items) -> None:
     c2_items_path, f1_items_path, c2_item, f1_item = pilot_items
     invocations = {"count": 0}
 
-    def generate_factory(model: str):
-        _ = model
+    def generate_factory(model: str, temperature: float):
+        _ = temperature
         base = _make_fake_generate(c2_item, f1_item, TrackId.R0)
 
         def counting_generate(
@@ -274,7 +274,8 @@ def test_force_reruns_completed_cells(tmp_path: Path, pilot_items) -> None:
 def test_failed_cell_recorded_not_fatal(tmp_path: Path, pilot_items) -> None:
     c2_items_path, f1_items_path, c2_item, f1_item = pilot_items
 
-    def generate_factory(model: str):
+    def generate_factory(model: str, temperature: float):
+        _ = temperature
         def fake_generate(
             prompt: str,
             *,
@@ -368,6 +369,7 @@ def test_delegation_gaps_computed_correctly() -> None:
             model="mock",
             family="C2",
             track="R0",
+            temperature=0.0,
             cohort_id="test",
             run_dir=Path("."),
         ),
@@ -384,6 +386,7 @@ def test_delegation_gaps_computed_correctly() -> None:
             model="mock",
             family="C2",
             track="R1",
+            temperature=0.0,
             cohort_id="test",
             run_dir=Path("."),
         ),
@@ -400,6 +403,7 @@ def test_delegation_gaps_computed_correctly() -> None:
             model="mock",
             family="C2",
             track="R2",
+            temperature=0.0,
             cohort_id="test",
             run_dir=Path("."),
         ),
@@ -429,7 +433,7 @@ def test_report_includes_track_comparison_tables(tmp_path: Path, pilot_items) ->
     report = (out_dir / "report.md").read_text(encoding="utf-8")
     assert "## Overview" in report
     assert "## C2 — per-track metrics" in report
-    assert "## C2 — delegation gaps" in report
+    assert "## C2 — delegation gaps by temperature" in report
     assert "## C2 — failure movement" in report
     assert "## Interpretation" in report
     assert "exploratory" in report.lower()

@@ -18,7 +18,7 @@ from fsmreasonbench.runners.pilot_models import model_dir_name
 from fsmreasonbench.tracks.delegation import DELEGATION_GAP_METRICS, compute_delegation_gap
 from fsmreasonbench.tracks.models import TrackId
 
-GenerateFactory = Callable[[str], GenerateFn]
+GenerateFactory = Callable[[str, float], GenerateFn]
 
 DEFAULT_C2_ITEMS = "cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl"
 DEFAULT_F1_ITEMS = "cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl"
@@ -30,6 +30,7 @@ _TRACK_ROW_FIELDS = (
     "model_dir",
     "family",
     "track",
+    "temperature",
     "cohort_id",
     "n",
     "extractability_rate",
@@ -60,6 +61,16 @@ _SUBMISSION_FAILURE_CLASSES = (
     "correct",
 )
 
+_RESEARCH_QUESTIONS = (
+    ("RQ-L1", "Does tool access improve verdict accuracy, certificate validity, or both?"),
+    ("RQ-L2", "Does temperature improve exploration or degrade certificate compliance?"),
+    (
+        "RQ-L3",
+        "Do larger/local-coder models improve contract-verified success more than verdict accuracy?",
+    ),
+    ("RQ-L4", "Are delegation gaps family-specific?"),
+)
+
 
 @dataclass(frozen=True, slots=True)
 class TrackPilotModelsConfig:
@@ -70,23 +81,55 @@ class TrackPilotModelsConfig:
     f1_items_path: str | Path
     out_dir: str | Path
     max_items: int = 20
-    temperature: float = 0.0
+    temperatures: tuple[float, ...] = (0.0,)
     timeout: float = 120.0
     skip_completed: bool = True
     c2_cohort_id: str = DEFAULT_C2_COHORT_ID
     f1_cohort_id: str = DEFAULT_F1_COHORT_ID
+
+    @property
+    def use_temperature_dirs(self) -> bool:
+        return len(self.temperatures) > 1
 
 
 @dataclass(frozen=True, slots=True)
 class TrackPilotModelsResult:
     track_rows: list[dict[str, Any]]
     delegation_rows: list[dict[str, Any]]
+    temperature_delta_rows: list[dict[str, Any]]
     failed_cells: list[dict[str, Any]]
     out_dir: Path
 
 
-def cell_dir(out_dir: Path, model: str, family: str, track: str) -> Path:
-    return out_dir / model_dir_name(model) / family / track
+def parse_temperatures(raw: str) -> tuple[float, ...]:
+    values: list[float] = []
+    for part in raw.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        values.append(float(part))
+    if not values:
+        raise ValueError("expected at least one temperature")
+    return tuple(values)
+
+
+def temperature_dir_name(temperature: float) -> str:
+    return f"temp_{temperature:g}"
+
+
+def cell_dir(
+    out_dir: Path,
+    model: str,
+    family: str,
+    track: str,
+    *,
+    temperature: float = 0.0,
+    use_temperature_dirs: bool = False,
+) -> Path:
+    base = out_dir / model_dir_name(model) / family
+    if use_temperature_dirs:
+        base = base / temperature_dir_name(temperature)
+    return base / track
 
 
 def is_cell_complete(run_dir: Path) -> bool:
@@ -110,6 +153,7 @@ def build_track_row(
     model: str,
     family: str,
     track: str,
+    temperature: float,
     cohort_id: str,
     run_dir: Path,
     status: str = "completed",
@@ -119,6 +163,7 @@ def build_track_row(
         "model_dir": model_dir_name(model),
         "family": family,
         "track": track,
+        "temperature": temperature,
         "cohort_id": cohort_id,
         "n": summary.get("n"),
         "extractability_rate": summary.get("extractability_rate"),
@@ -134,46 +179,96 @@ def build_track_row(
     }
 
 
+def _row_index_key(row: dict[str, Any]) -> tuple[str, str, float, str]:
+    return (row["model"], row["family"], float(row["temperature"]), row["track"])
+
+
 def build_delegation_rows(track_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Compute R1−R0, R2−R0, and R2−R1 delegation gaps per model × family."""
-    indexed: dict[tuple[str, str, str], dict[str, Any]] = {}
+    """Compute R1−R0, R2−R0, and R2−R1 delegation gaps per model × family × temperature."""
+    indexed: dict[tuple[str, str, float, str], dict[str, Any]] = {}
     for row in track_rows:
         if row.get("status") != "completed":
             continue
-        indexed[(row["model"], row["family"], row["track"])] = row
+        indexed[_row_index_key(row)] = row
 
     delegation_rows: list[dict[str, Any]] = []
-    models = list(dict.fromkeys(row["model"] for row in track_rows))
-    families = list(dict.fromkeys(row["family"] for row in track_rows))
+    keys = sorted(
+        {
+            (row["model"], row["family"], float(row["temperature"]))
+            for row in track_rows
+            if row.get("status") == "completed"
+        }
+    )
 
-    for model in models:
-        for family in families:
-            r0 = indexed.get((model, family, "R0"))
-            r1 = indexed.get((model, family, "R1"))
-            r2 = indexed.get((model, family, "R2"))
-            if r0 is None:
-                continue
+    for model, family, temperature in keys:
+        r0 = indexed.get((model, family, temperature, "R0"))
+        r1 = indexed.get((model, family, temperature, "R1"))
+        r2 = indexed.get((model, family, temperature, "R2"))
+        if r0 is None:
+            continue
 
-            row: dict[str, Any] = {
-                "model": model,
-                "family": family,
-                "cohort_id": r0.get("cohort_id"),
-                "n": r0.get("n"),
-            }
-            if r1 is not None:
-                gap = compute_delegation_gap(_summary_from_row(r0), _summary_from_row(r1))
-                for metric, value in gap["delegation_gap"].items():
-                    row[f"delta_R1_minus_R0_{metric}"] = value
-            if r2 is not None:
-                gap = compute_delegation_gap(_summary_from_row(r0), _summary_from_row(r2))
-                for metric, value in gap["delegation_gap"].items():
-                    row[f"delta_R2_minus_R0_{metric}"] = value
-            if r1 is not None and r2 is not None:
-                gap = compute_delegation_gap(_summary_from_row(r1), _summary_from_row(r2))
-                for metric, value in gap["delegation_gap"].items():
-                    row[f"delta_R2_minus_R1_{metric}"] = value
-            delegation_rows.append(row)
+        row: dict[str, Any] = {
+            "model": model,
+            "family": family,
+            "temperature": temperature,
+            "cohort_id": r0.get("cohort_id"),
+            "n": r0.get("n"),
+        }
+        if r1 is not None:
+            gap = compute_delegation_gap(_summary_from_row(r0), _summary_from_row(r1))
+            for metric, value in gap["delegation_gap"].items():
+                row[f"delta_R1_minus_R0_{metric}"] = value
+        if r2 is not None:
+            gap = compute_delegation_gap(_summary_from_row(r0), _summary_from_row(r2))
+            for metric, value in gap["delegation_gap"].items():
+                row[f"delta_R2_minus_R0_{metric}"] = value
+        if r1 is not None and r2 is not None:
+            gap = compute_delegation_gap(_summary_from_row(r1), _summary_from_row(r2))
+            for metric, value in gap["delegation_gap"].items():
+                row[f"delta_R2_minus_R1_{metric}"] = value
+        delegation_rows.append(row)
     return delegation_rows
+
+
+def build_temperature_delta_rows(track_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Compute metric deltas between temperatures per model × family × track."""
+    indexed: dict[tuple[str, str, float, str], dict[str, Any]] = {}
+    for row in track_rows:
+        if row.get("status") != "completed":
+            continue
+        indexed[_row_index_key(row)] = row
+
+    delta_rows: list[dict[str, Any]] = []
+    keys = sorted(
+        {
+            (row["model"], row["family"], row["track"])
+            for row in track_rows
+            if row.get("status") == "completed"
+        }
+    )
+    baseline = 0.0
+    comparisons = ((0.2, "delta_temp_0.2_minus_0.0"), (0.7, "delta_temp_0.7_minus_0.0"))
+
+    for model, family, track in keys:
+        base_row = indexed.get((model, family, baseline, track))
+        if base_row is None:
+            continue
+        row: dict[str, Any] = {
+            "model": model,
+            "family": family,
+            "track": track,
+            "baseline_temperature": baseline,
+            "n": base_row.get("n"),
+        }
+        for target_temp, prefix in comparisons:
+            target_row = indexed.get((model, family, target_temp, track))
+            if target_row is None:
+                continue
+            for metric in DELEGATION_GAP_METRICS:
+                row[f"{prefix}_{metric}"] = target_row[metric] - base_row[metric]
+        if any(key.startswith("delta_temp_") for key in row):
+            delta_rows.append(row)
+    return delta_rows
 
 
 def _summary_from_row(row: dict[str, Any]) -> dict[str, Any]:
@@ -191,17 +286,15 @@ def run_track_pilot_models(
     generate_factory: GenerateFactory,
 ) -> TrackPilotModelsResult:
     """
-    Run R0/R1/R2 track batches for each model × family cell.
+    Run R0/R1/R2 track batches for each model × family × temperature cell.
 
-    Layout::
+    Single-temperature layout::
 
-        {out_dir}/{model_dir}/{family}/{track}/results.jsonl
-        {out_dir}/{model_dir}/{family}/{track}/scores.jsonl
-        {out_dir}/{model_dir}/{family}/{track}/transcripts/
-        {out_dir}/{model_dir}/{family}/{track}/summary.json
-        {out_dir}/combined_summary.json
-        {out_dir}/combined_summary.csv
-        {out_dir}/report.md
+        {out_dir}/{model_dir}/{family}/{track}/
+
+    Multi-temperature layout::
+
+        {out_dir}/{model_dir}/{family}/temp_{temperature}/{track}/
     """
     if not config.models:
         raise ValueError("at least one model is required")
@@ -209,6 +302,8 @@ def run_track_pilot_models(
         raise ValueError("at least one family is required")
     if not config.tracks:
         raise ValueError("at least one track is required")
+    if not config.temperatures:
+        raise ValueError("at least one temperature is required")
     if config.max_items < 1:
         raise ValueError("max_items must be >= 1")
 
@@ -225,90 +320,110 @@ def run_track_pilot_models(
     failed_cells: list[dict[str, Any]] = []
 
     for model in config.models:
-        generate = generate_factory(model)
-        for family in config.families:
-            items = family_items[family]
-            cohort_id = cohort_ids[family]
-            for track in config.tracks:
-                run_dir = cell_dir(root, model, family, track)
-                run_dir.mkdir(parents=True, exist_ok=True)
+        for temperature in config.temperatures:
+            generate = generate_factory(model, temperature)
+            for family in config.families:
+                items = family_items[family]
+                cohort_id = cohort_ids[family]
+                for track in config.tracks:
+                    run_dir = cell_dir(
+                        root,
+                        model,
+                        family,
+                        track,
+                        temperature=temperature,
+                        use_temperature_dirs=config.use_temperature_dirs,
+                    )
+                    run_dir.mkdir(parents=True, exist_ok=True)
 
-                if config.skip_completed and is_cell_complete(run_dir):
-                    summary = load_cell_summary(run_dir)
-                    track_rows.append(
-                        build_track_row(
-                            summary,
-                            model=model,
-                            family=family,
-                            track=track,
-                            cohort_id=cohort_id,
-                            run_dir=run_dir,
+                    if config.skip_completed and is_cell_complete(run_dir):
+                        summary = load_cell_summary(run_dir)
+                        track_rows.append(
+                            build_track_row(
+                                summary,
+                                model=model,
+                                family=family,
+                                track=track,
+                                temperature=temperature,
+                                cohort_id=cohort_id,
+                                run_dir=run_dir,
+                            )
                         )
-                    )
-                    continue
+                        continue
 
-                try:
-                    batch_result = run_ollama_track_batch(
-                        items,
-                        generate,
-                        run_dir / "results.jsonl",
-                        OllamaBatchConfig(
-                            model=model,
-                            temperature=config.temperature,
-                            timeout=config.timeout,
-                            max_items=config.max_items,
-                        ),
-                        track=track,
-                        out_dir=run_dir,
-                    )
-                    track_rows.append(
-                        build_track_row(
-                            batch_result.summary,
-                            model=model,
-                            family=family,
+                    try:
+                        batch_result = run_ollama_track_batch(
+                            items,
+                            generate,
+                            run_dir / "results.jsonl",
+                            OllamaBatchConfig(
+                                model=model,
+                                temperature=temperature,
+                                timeout=config.timeout,
+                                max_items=config.max_items,
+                            ),
                             track=track,
-                            cohort_id=cohort_id,
-                            run_dir=run_dir,
+                            out_dir=run_dir,
                         )
-                    )
-                except Exception as exc:  # noqa: BLE001 — pilot continues after cell failure
-                    failed_cells.append(
-                        {
-                            "model": model,
-                            "family": family,
-                            "track": track,
-                            "run_dir": str(run_dir),
-                            "error": str(exc),
-                        }
-                    )
-                    track_rows.append(
-                        {
-                            "model": model,
-                            "model_dir": model_dir_name(model),
-                            "family": family,
-                            "track": track,
-                            "cohort_id": cohort_id,
-                            "run_dir": str(run_dir),
-                            "status": "failed",
-                            "error": str(exc),
-                        }
-                    )
+                        track_rows.append(
+                            build_track_row(
+                                batch_result.summary,
+                                model=model,
+                                family=family,
+                                track=track,
+                                temperature=temperature,
+                                cohort_id=cohort_id,
+                                run_dir=run_dir,
+                            )
+                        )
+                    except Exception as exc:  # noqa: BLE001 — pilot continues after cell failure
+                        failed_cells.append(
+                            {
+                                "model": model,
+                                "family": family,
+                                "track": track,
+                                "temperature": temperature,
+                                "run_dir": str(run_dir),
+                                "error": str(exc),
+                            }
+                        )
+                        track_rows.append(
+                            {
+                                "model": model,
+                                "model_dir": model_dir_name(model),
+                                "family": family,
+                                "track": track,
+                                "temperature": temperature,
+                                "cohort_id": cohort_id,
+                                "run_dir": str(run_dir),
+                                "status": "failed",
+                                "error": str(exc),
+                            }
+                        )
 
     delegation_rows = build_delegation_rows(track_rows)
+    temperature_delta_rows = build_temperature_delta_rows(track_rows)
     payload = {
+        "experiment": "local_matrix" if config.use_temperature_dirs else "track_pilot",
         "models": list(config.models),
         "families": list(config.families),
         "tracks": list(config.tracks),
+        "temperatures": list(config.temperatures),
         "max_items": config.max_items,
-        "temperature": config.temperature,
         "timeout": config.timeout,
         "cohort_ids": cohort_ids,
         "track_rows": track_rows,
         "delegation_rows": delegation_rows,
+        "temperature_delta_rows": temperature_delta_rows,
         "failed_cells": failed_cells,
     }
     dump_json(root / "combined_summary.json", payload)
-    write_track_pilot_csv(root / "combined_summary.csv", track_rows, delegation_rows)
+    write_track_pilot_csv(
+        root / "combined_summary.csv",
+        track_rows,
+        delegation_rows,
+        temperature_delta_rows,
+    )
     (root / "report.md").write_text(
         render_track_pilot_report(payload),
         encoding="utf-8",
@@ -316,6 +431,7 @@ def run_track_pilot_models(
     return TrackPilotModelsResult(
         track_rows=track_rows,
         delegation_rows=delegation_rows,
+        temperature_delta_rows=temperature_delta_rows,
         failed_cells=failed_cells,
         out_dir=root,
     )
@@ -325,6 +441,7 @@ def write_track_pilot_csv(
     path: str | Path,
     track_rows: list[dict[str, Any]],
     delegation_rows: list[dict[str, Any]],
+    temperature_delta_rows: list[dict[str, Any]] | None = None,
 ) -> None:
     out_path = Path(path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -355,7 +472,14 @@ def write_track_pilot_csv(
 
         if delegation_rows:
             handle.write("\n")
-            delegation_fieldnames = ["row_type", "model", "family", "cohort_id", "n"]
+            delegation_fieldnames = [
+                "row_type",
+                "model",
+                "family",
+                "temperature",
+                "cohort_id",
+                "n",
+            ]
             for prefix in ("delta_R1_minus_R0", "delta_R2_minus_R0", "delta_R2_minus_R1"):
                 for metric in DELEGATION_GAP_METRICS:
                     delegation_fieldnames.append(f"{prefix}_{metric}")
@@ -368,26 +492,52 @@ def write_track_pilot_csv(
             for row in delegation_rows:
                 delegation_writer.writerow({"row_type": "delegation", **row})
 
+        if temperature_delta_rows:
+            handle.write("\n")
+            temp_fieldnames = [
+                "row_type",
+                "model",
+                "family",
+                "track",
+                "baseline_temperature",
+                "n",
+            ]
+            for prefix in ("delta_temp_0.2_minus_0.0", "delta_temp_0.7_minus_0.0"):
+                for metric in DELEGATION_GAP_METRICS:
+                    temp_fieldnames.append(f"{prefix}_{metric}")
+            temp_writer = csv.DictWriter(
+                handle,
+                fieldnames=temp_fieldnames,
+                extrasaction="ignore",
+            )
+            temp_writer.writeheader()
+            for row in temperature_delta_rows:
+                temp_writer.writerow({"row_type": "temperature_delta", **row})
+
 
 def render_track_pilot_report(payload: dict[str, Any]) -> str:
     models = payload["models"]
     families = payload["families"]
     tracks = payload["tracks"]
+    temperatures = payload.get("temperatures", [0.0])
     cohort_ids = payload["cohort_ids"]
     track_rows = [row for row in payload["track_rows"] if row.get("status") == "completed"]
     delegation_rows = payload["delegation_rows"]
+    temperature_delta_rows = payload.get("temperature_delta_rows", [])
     failed_cells = payload.get("failed_cells", [])
+    is_matrix = payload.get("experiment") == "local_matrix" or len(temperatures) > 1
 
+    title = "Local Model Track-Temperature Matrix Report" if is_matrix else "Track Pilot Report"
     lines = [
-        "# Track Pilot Report",
+        f"# {title}",
         "",
-        "## Overview",
+        "## Matrix overview" if is_matrix else "## Overview",
         "",
         f"- **Models:** {', '.join(f'`{model}`' for model in models)}",
         f"- **Families:** {', '.join(families)}",
         f"- **Tracks:** {', '.join(tracks)}",
+        f"- **Temperatures:** {', '.join(str(t) for t in temperatures)}",
         f"- **Items per cell:** n={payload['max_items']}",
-        f"- **Temperature:** {payload['temperature']}",
         f"- **Timeout (s):** {payload.get('timeout', 120.0)}",
         "",
         "### Cohort IDs",
@@ -399,95 +549,143 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
     if failed_cells:
         lines.extend(["", "### Failed cells", ""])
         for cell in failed_cells:
+            temp_label = f" T={cell.get('temperature', 0)}" if "temperature" in cell else ""
             lines.append(
-                f"- `{cell['model']}` / {cell['family']} / {cell['track']}: {cell['error']}"
+                f"- `{cell['model']}` / {cell['family']} / {cell['track']}{temp_label}: {cell['error']}"
             )
 
-    metric_headers = (
-        "extract",
-        "verdict",
-        "cert",
-        "full",
-        "tool_rate",
-        "avg_tools",
-    )
-    indexed = {(row["model"], row["family"], row["track"]): row for row in track_rows}
+    indexed = {_row_index_key(row): row for row in track_rows}
+    metric_headers = ("extract", "verdict", "cert", "full", "tool_rate", "avg_tools")
 
     for family in families:
         family_models = [
             model
             for model in models
-            if any((model, family, track) in indexed for track in tracks)
+            if any(
+                (model, family, float(temp), track) in indexed
+                for temp in temperatures
+                for track in tracks
+            )
         ]
         lines.extend(["", f"## {family} — per-track metrics", ""])
-        header = "| Model | Track | n | " + " | ".join(metric_headers) + " |"
+        header = "| Model | Temp | Track | n | " + " | ".join(metric_headers) + " |"
         lines.append(header)
-        lines.append("|-------|-------|--:|" + "|".join(["------:"] * len(metric_headers)) + "|")
-        for model in family_models:
-            for track in tracks:
-                row = indexed.get((model, family, track))
-                if row is None:
-                    continue
-                lines.append(
-                    "| `{model}` | {track} | {n} | "
-                    "{extract:.3f} | {verdict:.3f} | {cert:.3f} | {full:.3f} | "
-                    "{tool_rate:.3f} | {avg_tools:.1f} |".format(
-                        model=model,
-                        track=track,
-                        n=row.get("n", 0),
-                        extract=row.get("extractability_rate", 0.0),
-                        verdict=row.get("verdict_accuracy", 0.0),
-                        cert=row.get("certificate_valid_rate", 0.0),
-                        full=row.get("fully_correct_rate", 0.0),
-                        tool_rate=row.get("tool_invocation_rate", 0.0),
-                        avg_tools=row.get("average_tool_calls_per_item", 0.0),
-                    )
-                )
-
-        lines.extend(["", f"## {family} — delegation gaps", ""])
         lines.append(
-            "| Model | Δ_R1−R0 verdict | Δ_R1−R0 cert | Δ_R1−R0 full | "
-            "Δ_R2−R0 verdict | Δ_R2−R0 cert | Δ_R2−R0 full | "
-            "Δ_R2−R1 verdict | Δ_R2−R1 cert | Δ_R2−R1 full |"
+            "|-------|-----:|-------|--:|" + "|".join(["------:"] * len(metric_headers)) + "|"
+        )
+        for model in family_models:
+            for temperature in temperatures:
+                for track in tracks:
+                    row = indexed.get((model, family, float(temperature), track))
+                    if row is None:
+                        continue
+                    lines.append(
+                        "| `{model}` | {temp:g} | {track} | {n} | "
+                        "{extract:.3f} | {verdict:.3f} | {cert:.3f} | {full:.3f} | "
+                        "{tool_rate:.3f} | {avg_tools:.1f} |".format(
+                            model=model,
+                            temp=float(temperature),
+                            track=track,
+                            n=row.get("n", 0),
+                            extract=row.get("extractability_rate", 0.0),
+                            verdict=row.get("verdict_accuracy", 0.0),
+                            cert=row.get("certificate_valid_rate", 0.0),
+                            full=row.get("fully_correct_rate", 0.0),
+                            tool_rate=row.get("tool_invocation_rate", 0.0),
+                            avg_tools=row.get("average_tool_calls_per_item", 0.0),
+                        )
+                    )
+
+        if is_matrix:
+            lines.extend(["", f"## {family} — per-temperature summary (R2 fully correct)", ""])
+            lines.append("| Model | Temp | full (R2) | cert (R2) | verdict (R2) |")
+            lines.append("|-------|-----:|----------:|----------:|-------------:|")
+            for model in family_models:
+                for temperature in temperatures:
+                    row = indexed.get((model, family, float(temperature), "R2"))
+                    if row is None:
+                        continue
+                    lines.append(
+                        "| `{model}` | {temp:g} | {full:.3f} | {cert:.3f} | {verdict:.3f} |".format(
+                            model=model,
+                            temp=float(temperature),
+                            full=row.get("fully_correct_rate", 0.0),
+                            cert=row.get("certificate_valid_rate", 0.0),
+                            verdict=row.get("verdict_accuracy", 0.0),
+                        )
+                    )
+
+        lines.extend(["", f"## {family} — delegation gaps by temperature", ""])
+        lines.append(
+            "| Model | Temp | Δ_R1−R0 full | Δ_R2−R0 full | Δ_R2−R1 full | "
+            "Δ_R2−R0 cert | Δ_R2−R0 verdict |"
         )
         lines.append(
-            "|-------|----------------:|-------------:|-----------:|"
-            "----------------:|-------------:|-----------:|"
-            "----------------:|-------------:|-----------:|"
+            "|-------|-----:|-------------:|-------------:|-------------:|"
+            "-------------:|----------------:|"
         )
         for row in delegation_rows:
             if row["family"] != family:
                 continue
             lines.append(
-                "| `{model}` | "
-                "{d11:+.3f} | {d12:+.3f} | {d13:+.3f} | "
-                "{d21:+.3f} | {d22:+.3f} | {d23:+.3f} | "
-                "{d31:+.3f} | {d32:+.3f} | {d33:+.3f} |".format(
+                "| `{model}` | {temp:g} | "
+                "{d13:+.3f} | {d23:+.3f} | {d33:+.3f} | "
+                "{d22:+.3f} | {d21:+.3f} |".format(
                     model=row["model"],
-                    d11=row.get("delta_R1_minus_R0_verdict_accuracy", float("nan")),
-                    d12=row.get("delta_R1_minus_R0_certificate_valid_rate", float("nan")),
+                    temp=float(row.get("temperature", 0.0)),
                     d13=row.get("delta_R1_minus_R0_fully_correct_rate", float("nan")),
-                    d21=row.get("delta_R2_minus_R0_verdict_accuracy", float("nan")),
-                    d22=row.get("delta_R2_minus_R0_certificate_valid_rate", float("nan")),
                     d23=row.get("delta_R2_minus_R0_fully_correct_rate", float("nan")),
-                    d31=row.get("delta_R2_minus_R1_verdict_accuracy", float("nan")),
-                    d32=row.get("delta_R2_minus_R1_certificate_valid_rate", float("nan")),
                     d33=row.get("delta_R2_minus_R1_fully_correct_rate", float("nan")),
+                    d22=row.get("delta_R2_minus_R0_certificate_valid_rate", float("nan")),
+                    d21=row.get("delta_R2_minus_R0_verdict_accuracy", float("nan")),
                 )
             )
 
-        lines.extend(["", f"## {family} — failure movement", ""])
-        failure_labels = list(_TOOL_FAILURE_CLASSES) + list(_SUBMISSION_FAILURE_CLASSES)
-        lines.append("| Model | Track | " + " | ".join(failure_labels) + " |")
-        lines.append("|-------|-------|" + "|".join(["---:"] * len(failure_labels)) + "|")
-        for model in family_models:
-            for track in tracks:
-                row = indexed.get((model, family, track))
-                if row is None:
+        if is_matrix and temperature_delta_rows:
+            lines.extend(["", f"## {family} — temperature sensitivity by track", ""])
+            lines.append(
+                "| Model | Track | Δ_T0.2−T0.0 full | Δ_T0.7−T0.0 full | "
+                "Δ_T0.2−T0.0 cert | Δ_T0.7−T0.0 cert |"
+            )
+            lines.append(
+                "|-------|-------|-----------------:|-----------------:|"
+                "-----------------:|-----------------:|"
+            )
+            for row in temperature_delta_rows:
+                if row["family"] != family:
                     continue
-                counts = row.get("track_failure_counts", {})
-                values = " | ".join(str(counts.get(label, 0)) for label in failure_labels)
-                lines.append(f"| `{model}` | {track} | {values} |")
+                lines.append(
+                    "| `{model}` | {track} | "
+                    "{d12:+.3f} | {d17:+.3f} | "
+                    "{c12:+.3f} | {c17:+.3f} |".format(
+                        model=row["model"],
+                        track=row["track"],
+                        d12=row.get("delta_temp_0.2_minus_0.0_fully_correct_rate", float("nan")),
+                        d17=row.get("delta_temp_0.7_minus_0.0_fully_correct_rate", float("nan")),
+                        c12=row.get("delta_temp_0.2_minus_0.0_certificate_valid_rate", float("nan")),
+                        c17=row.get("delta_temp_0.7_minus_0.0_certificate_valid_rate", float("nan")),
+                    )
+                )
+
+        lines.extend(["", f"## {family} — failure movement", ""])
+        failure_labels = list(_SUBMISSION_FAILURE_CLASSES)
+        lines.append("| Model | Temp | Track | " + " | ".join(failure_labels) + " |")
+        lines.append("|-------|-----:|-------|" + "|".join(["---:"] * len(failure_labels)) + "|")
+        for model in family_models:
+            for temperature in temperatures:
+                for track in tracks:
+                    row = indexed.get((model, family, float(temperature), track))
+                    if row is None:
+                        continue
+                    counts = row.get("track_failure_counts", {})
+                    values = " | ".join(str(counts.get(label, 0)) for label in failure_labels)
+                    lines.append(
+                        f"| `{model}` | {float(temperature):g} | {track} | {values} |"
+                    )
+
+    lines.extend(["", "## Research questions", ""])
+    for rq_id, question in _RESEARCH_QUESTIONS:
+        lines.append(f"- **{rq_id}:** {question}")
 
     lines.extend(
         [
@@ -496,15 +694,15 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
             "",
             "This report is **exploratory** only:",
             "",
-            "- n=20 items per model × family × track cell.",
-            "- Local Ollama models only (no frontier API panel).",
+            "- Local Ollama models only — reproducible on a single RTX 4090; **no paid APIs**.",
+            f"- n={payload['max_items']} items per model × family × track × temperature cell (initial pilot).",
             "- Frozen **v0.1-exploratory** cohorts — not `v1.0-public`.",
-            "- **Not a final benchmark claim.**",
+            "- **Not a final benchmark score.**",
+            "- Use results to decide whether a larger-n run (100–200 items/cell) is worth executing.",
             "",
             "When reading delegation gaps, ask whether tools improve **verdict accuracy only**, "
-            "**certificate validity**, or **both** (fully correct). A positive Δ_R2−R0 on "
-            "certificate_valid_rate with flat verdict_accuracy suggests solver delegation helps "
-            "witness construction without changing boolean answers.",
+            "**certificate validity**, or **both** (fully correct). Compare temperature rows to "
+            "see whether higher temperature helps exploration or hurts certificate compliance.",
             "",
         ]
     )
