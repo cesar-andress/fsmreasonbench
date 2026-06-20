@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from fsmreasonbench.cli.run_capability_surface import main as capability_surface_main
+from fsmreasonbench.evaluator.bootstrap import BOOTSTRAP_CI_FIELDS
 from fsmreasonbench.evaluator.capability_surface import (
     CapabilitySurfaceConfig,
     run_capability_surface,
@@ -111,6 +112,42 @@ def test_combined_summary_csv_has_expected_columns(tmp_path: Path) -> None:
         assert row["family"] == "C2"
         assert row["baseline"] in {"oracle", "random", "invalid"}
         assert "failure_stage_counts" in row
+        for field in BOOTSTRAP_CI_FIELDS:
+            assert field in row
+
+
+def test_combined_summary_includes_bootstrap_cis(tmp_path: Path) -> None:
+    payload = run_capability_surface(
+        tmp_path / "bootstrap",
+        CapabilitySurfaceConfig(
+            families=("C2",),
+            n_per_level=6,
+            seed=99,
+            bootstrap_seed=1234,
+            c2_levels=(1,),
+            f1_levels=(),
+        ),
+    )
+    row = payload["rows"][0]
+    for field in BOOTSTRAP_CI_FIELDS:
+        assert field in row
+        assert 0.0 <= row[field] <= 1.0
+    assert row["fully_correct_rate_ci_low"] <= row["fully_correct_rate"] <= row["fully_correct_rate_ci_high"]
+    assert payload["bootstrap_resamples"] == 1000
+
+
+def test_bootstrap_summary_deterministic_with_fixed_seed(tmp_path: Path) -> None:
+    config = CapabilitySurfaceConfig(
+        families=("C2",),
+        n_per_level=8,
+        seed=5,
+        bootstrap_seed=4242,
+        c2_levels=(1, 2),
+        f1_levels=(),
+    )
+    first = run_capability_surface(tmp_path / "boot_a", config)
+    second = run_capability_surface(tmp_path / "boot_b", config)
+    assert first["rows"] == second["rows"]
 
 
 def test_cli_produces_combined_summary(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:

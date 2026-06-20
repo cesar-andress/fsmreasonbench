@@ -149,6 +149,53 @@ def test_plot_capability_surface_writes_pngs(tmp_path: Path) -> None:
     assert all(path.exists() for path in written)
 
 
+def test_plot_capability_surface_confidence_bands(tmp_path: Path) -> None:
+    pytest.importorskip("matplotlib")
+    summary_path = tmp_path / "combined_summary.json"
+    summary_path.write_text(
+        json.dumps(
+            {
+                "rows": [
+                    {
+                        "family": "C2",
+                        "difficulty_level": 1,
+                        "model": "mock-a",
+                        "fully_correct_rate": 0.5,
+                        "fully_correct_rate_ci_low": 0.3,
+                        "fully_correct_rate_ci_high": 0.7,
+                        "verdict_accuracy": 0.6,
+                        "verdict_accuracy_ci_low": 0.4,
+                        "verdict_accuracy_ci_high": 0.8,
+                        "certificate_valid_rate": 0.4,
+                        "extractability_rate": 1.0,
+                    },
+                    {
+                        "family": "C2",
+                        "difficulty_level": 2,
+                        "model": "mock-a",
+                        "fully_correct_rate": 0.2,
+                        "fully_correct_rate_ci_low": 0.1,
+                        "fully_correct_rate_ci_high": 0.4,
+                        "verdict_accuracy": 0.3,
+                        "verdict_accuracy_ci_low": 0.2,
+                        "verdict_accuracy_ci_high": 0.5,
+                        "certificate_valid_rate": 0.2,
+                        "extractability_rate": 1.0,
+                    },
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    written = plot_capability_surface(
+        summary_path,
+        tmp_path / "plots_bands",
+        confidence_bands=True,
+    )
+    assert written
+
+
 def test_cli_run_capability_surface_models(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

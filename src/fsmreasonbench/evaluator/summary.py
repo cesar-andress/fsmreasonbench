@@ -7,6 +7,8 @@ from typing import Any
 
 from fsmreasonbench.evaluator.models import FailureStage, ScoringRecord
 
+DEFAULT_BOOTSTRAP_RESAMPLES = 1000
+
 
 def summarize_scoring_records(records: list[ScoringRecord]) -> dict[str, Any]:
     """Compute aggregate rates and failure-stage counts."""
@@ -47,6 +49,26 @@ def summarize_scoring_records(records: list[ScoringRecord]) -> dict[str, Any]:
             for stage in FailureStage
         },
     }
+
+
+def summarize_scoring_records_with_bootstrap(
+    records: list[ScoringRecord],
+    *,
+    n_resamples: int = DEFAULT_BOOTSTRAP_RESAMPLES,
+    seed: int = 0,
+) -> dict[str, Any]:
+    """Compute aggregate rates with bootstrap confidence intervals."""
+    from fsmreasonbench.evaluator.bootstrap import bootstrap_capability_surface_cis
+
+    summary = summarize_scoring_records(records)
+    summary.update(
+        bootstrap_capability_surface_cis(
+            records,
+            n_resamples=n_resamples,
+            seed=seed,
+        )
+    )
+    return summary
 
 
 def summarize_with_baseline(

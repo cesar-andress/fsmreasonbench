@@ -15,7 +15,8 @@ from fsmreasonbench.evaluator.batch import (
 )
 from fsmreasonbench.evaluator.io import dump_json
 from fsmreasonbench.evaluator.jsonl import write_jsonl
-from fsmreasonbench.evaluator.summary import summarize_scoring_records
+from fsmreasonbench.evaluator.bootstrap import BOOTSTRAP_CI_FIELDS
+from fsmreasonbench.evaluator.summary import summarize_scoring_records_with_bootstrap
 from fsmreasonbench.generator.reachability import ReachabilityGeneratorConfig
 from fsmreasonbench.generator.separation import separation_config_for_level
 
@@ -34,6 +35,7 @@ _CSV_FIELDS = (
     "verdict_accuracy",
     "certificate_valid_rate",
     "fully_correct_rate",
+    *BOOTSTRAP_CI_FIELDS,
     "failure_stage_counts",
 )
 
@@ -47,6 +49,8 @@ class CapabilitySurfaceConfig:
     f1_levels: tuple[int, ...] = DEFAULT_F1_LEVELS
     baseline_seed: int = 0
     skip_failed_levels: bool = False
+    bootstrap_resamples: int = 1000
+    bootstrap_seed: int | None = None
 
 
 def run_capability_surface(
@@ -91,6 +95,8 @@ def run_capability_surface(
                     level_seed,
                     level_dir,
                     baseline_seed=config.baseline_seed,
+                    bootstrap_resamples=config.bootstrap_resamples,
+                    bootstrap_seed=config.bootstrap_seed,
                 )
             except RuntimeError as exc:
                 if not config.skip_failed_levels:
@@ -114,6 +120,7 @@ def run_capability_surface(
         "n_per_level": config.n_per_level,
         "seed": config.seed,
         "baseline_seed": config.baseline_seed,
+        "bootstrap_resamples": config.bootstrap_resamples,
         "rows": rows,
         "skipped_levels": skipped_levels,
     }
@@ -131,6 +138,8 @@ def _run_family_level(
     level_dir: Path,
     *,
     baseline_seed: int,
+    bootstrap_resamples: int,
+    bootstrap_seed: int | None,
 ) -> list[dict[str, Any]]:
     level_dir.mkdir(parents=True, exist_ok=True)
 
@@ -163,7 +172,15 @@ def _run_family_level(
             level_dir / f"{baseline}_scores.jsonl",
             (record.to_dict() for record in records),
         )
-        summary = summarize_scoring_records(records)
+        summary = summarize_scoring_records_with_bootstrap(
+            records,
+            n_resamples=bootstrap_resamples,
+            seed=_bootstrap_seed(
+                level_seed=seed,
+                baseline=baseline,
+                bootstrap_seed=bootstrap_seed,
+            ),
+        )
         summary_payload = {
             "family": family,
             "difficulty_axis": axis,
@@ -179,6 +196,12 @@ def _run_family_level(
 def _level_seed(base_seed: int, family: str, level: int) -> int:
     family_offset = 0 if family == "C2" else 100_000
     return base_seed + family_offset + level * 1_000
+
+
+def _bootstrap_seed(*, level_seed: int, baseline: str, bootstrap_seed: int | None) -> int:
+    if bootstrap_seed is not None:
+        return bootstrap_seed + sum(ord(char) for char in baseline)
+    return level_seed + sum(ord(char) for char in baseline)
 
 
 def write_capability_surface_csv(path: str | Path, rows: list[dict[str, Any]]) -> None:
@@ -199,6 +222,7 @@ def write_capability_surface_csv(path: str | Path, rows: list[dict[str, Any]]) -
                     "verdict_accuracy": row["verdict_accuracy"],
                     "certificate_valid_rate": row["certificate_valid_rate"],
                     "fully_correct_rate": row["fully_correct_rate"],
+                    **{field: row[field] for field in BOOTSTRAP_CI_FIELDS},
                     "failure_stage_counts": json.dumps(
                         row["failure_stage_counts"],
                         sort_keys=True,

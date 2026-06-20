@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from fsmreasonbench.evaluator.bootstrap import BOOTSTRAP_CI_FIELDS
+
 _METRIC_SPECS = (
     ("fully_correct_rate", "fully_correct_vs_difficulty.png", "Fully correct rate"),
     ("verdict_accuracy", "verdict_vs_difficulty.png", "Verdict accuracy"),
@@ -15,6 +17,8 @@ _METRIC_SPECS = (
 def plot_capability_surface(
     summary_path: str | Path,
     out_dir: str | Path | None = None,
+    *,
+    confidence_bands: bool = False,
 ) -> list[Path]:
     """
     Plot model capability curves from ``combined_summary.json``.
@@ -37,9 +41,11 @@ def plot_capability_surface(
     destination.mkdir(parents=True, exist_ok=True)
 
     families = list(dict.fromkeys(row["family"] for row in rows))
-    models = list(dict.fromkeys(row["model"] for row in rows))
+    series_values = list(
+        dict.fromkeys(_series_label(row) for row in rows if _series_label(row) is not None)
+    )
     indexed = {
-        (row["family"], row["difficulty_level"], row["model"]): row for row in rows
+        (row["family"], row["difficulty_level"], _series_label(row)): row for row in rows
     }
 
     written: list[Path] = []
@@ -50,17 +56,34 @@ def plot_capability_surface(
             levels = sorted(
                 {row["difficulty_level"] for row in rows if row["family"] == family}
             )
-            for model in models:
-                y_values = []
-                x_values = []
+            for series in series_values:
+                x_values: list[int] = []
+                y_values: list[float] = []
+                y_low: list[float] = []
+                y_high: list[float] = []
                 for level in levels:
-                    row = indexed.get((family, level, model))
+                    row = indexed.get((family, level, series))
                     if row is None:
                         continue
                     x_values.append(level)
                     y_values.append(row[metric])
-                if x_values:
-                    axis.plot(x_values, y_values, marker="o", label=model)
+                    if confidence_bands:
+                        low_key = f"{metric}_ci_low"
+                        high_key = f"{metric}_ci_high"
+                        if low_key in row and high_key in row:
+                            y_low.append(row[low_key])
+                            y_high.append(row[high_key])
+                if not x_values:
+                    continue
+                line = axis.plot(x_values, y_values, marker="o", label=series)
+                if confidence_bands and y_low and y_high:
+                    axis.fill_between(
+                        x_values,
+                        y_low,
+                        y_high,
+                        color=line[0].get_color(),
+                        alpha=0.2,
+                    )
             axis.set_title(f"{family} — {title}")
             axis.set_xlabel("Difficulty level")
             axis.set_ylabel(title)
@@ -75,3 +98,16 @@ def plot_capability_surface(
         written.append(output_path)
 
     return written
+
+
+def _series_label(row: dict[str, Any]) -> str | None:
+    if "model" in row:
+        return str(row["model"])
+    if "baseline" in row:
+        return str(row["baseline"])
+    return None
+
+
+def has_confidence_intervals(rows: list[dict[str, Any]]) -> bool:
+    """Return True when rows include bootstrap confidence interval fields."""
+    return bool(rows) and all(field in rows[0] for field in BOOTSTRAP_CI_FIELDS)

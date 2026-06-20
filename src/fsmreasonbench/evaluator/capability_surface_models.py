@@ -14,10 +14,14 @@ from fsmreasonbench.evaluator.capability_surface import (
     DEFAULT_C2_LEVELS,
     DEFAULT_F1_LEVELS,
     F1_DIFFICULTY_AXIS,
+    _bootstrap_seed,
     _level_seed,
 )
+from fsmreasonbench.evaluator.bootstrap import BOOTSTRAP_CI_FIELDS
 from fsmreasonbench.evaluator.io import dump_json
 from fsmreasonbench.evaluator.jsonl import write_jsonl
+from fsmreasonbench.evaluator.models import ScoringRecord
+from fsmreasonbench.evaluator.summary import summarize_scoring_records_with_bootstrap
 from fsmreasonbench.generator.reachability import ReachabilityGeneratorConfig
 from fsmreasonbench.generator.separation import separation_config_for_level
 from fsmreasonbench.items.assembly import BenchmarkItem
@@ -34,6 +38,7 @@ _MODEL_CSV_FIELDS = (
     "verdict_accuracy",
     "certificate_valid_rate",
     "fully_correct_rate",
+    *BOOTSTRAP_CI_FIELDS,
 )
 
 
@@ -49,6 +54,8 @@ class CapabilitySurfaceModelsConfig:
     temperature: float = 0.0
     timeout: float = 120.0
     skip_completed: bool = True
+    bootstrap_resamples: int = 1000
+    bootstrap_seed: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -121,6 +128,20 @@ def run_capability_surface_models(
                     ),
                     out_dir=model_dir,
                 )
+                parsed_records = [
+                    ScoringRecord.from_dict(record["scoring_record"])
+                    for record in batch_result.results
+                ]
+                level_seed = _level_seed(config.seed, family, level)
+                summary = summarize_scoring_records_with_bootstrap(
+                    parsed_records,
+                    n_resamples=config.bootstrap_resamples,
+                    seed=_bootstrap_seed(
+                        level_seed=level_seed,
+                        baseline=model,
+                        bootstrap_seed=config.bootstrap_seed,
+                    ),
+                )
                 rows.append(
                     {
                         "family": family,
@@ -128,12 +149,7 @@ def run_capability_surface_models(
                         "difficulty_level": level,
                         "model": model,
                         "model_dir": model_dir_name(model),
-                        "n": batch_result.summary["n"],
-                        "extractability_rate": batch_result.summary["extractability_rate"],
-                        "verdict_accuracy": batch_result.summary["verdict_accuracy"],
-                        "certificate_valid_rate": batch_result.summary["certificate_valid_rate"],
-                        "fully_correct_rate": batch_result.summary["fully_correct_rate"],
-                        "failure_stage_counts": batch_result.summary["failure_stage_counts"],
+                        **summary,
                     }
                 )
 
@@ -143,6 +159,7 @@ def run_capability_surface_models(
         "n_per_level": config.n_per_level,
         "seed": config.seed,
         "temperature": config.temperature,
+        "bootstrap_resamples": config.bootstrap_resamples,
         "rows": rows,
     }
     dump_json(root / "combined_summary.json", payload)
@@ -173,6 +190,7 @@ def write_capability_surface_models_csv(
                     "verdict_accuracy": row["verdict_accuracy"],
                     "certificate_valid_rate": row["certificate_valid_rate"],
                     "fully_correct_rate": row["fully_correct_rate"],
+                    **{field: row[field] for field in BOOTSTRAP_CI_FIELDS},
                 }
             )
 
@@ -247,6 +265,7 @@ def _row_from_summary(
         "certificate_valid_rate": summary["certificate_valid_rate"],
         "fully_correct_rate": summary["fully_correct_rate"],
         "failure_stage_counts": summary["failure_stage_counts"],
+        **{field: summary[field] for field in BOOTSTRAP_CI_FIELDS if field in summary},
         "scores_path": str(model_dir / "scores.jsonl"),
         "results_path": str(model_dir / "results.jsonl"),
     }

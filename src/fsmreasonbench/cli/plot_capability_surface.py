@@ -22,10 +22,19 @@ def main(argv: list[str] | None = None) -> int:
         "--out-dir",
         help="Directory for PNG output (default: summary parent directory)",
     )
+    parser.add_argument(
+        "--confidence-bands",
+        action="store_true",
+        help="Draw bootstrap confidence bands when CI fields are present",
+    )
     args = parser.parse_args(argv)
 
     try:
-        written = plot_capability_surface(args.summary, args.out_dir)
+        written = plot_capability_surface(
+            args.summary,
+            args.out_dir,
+            confidence_bands=args.confidence_bands,
+        )
     except (ValueError, RuntimeError, OSError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
