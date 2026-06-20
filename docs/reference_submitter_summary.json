@@ -1,0 +1,48 @@
+{
+  "rows": [
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "items_path": "cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl",
+      "n": 20,
+      "system": "oracle",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "items_path": "cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl",
+      "n": 20,
+      "system": "reference_submitter",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "items_path": "cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl",
+      "n": 20,
+      "system": "oracle",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "items_path": "cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl",
+      "n": 20,
+      "system": "reference_submitter",
+      "verdict_accuracy": 1.0
+    }
+  ]
+}

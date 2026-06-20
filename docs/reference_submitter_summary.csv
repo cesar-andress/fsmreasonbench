@@ -1,0 +1,5 @@
+cohort_id,family,system,items_path,n,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate
+c2-reachability-level3-v0.1-exploratory,C2,oracle,cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl,20,1.0,1.0,1.0,1.0
+c2-reachability-level3-v0.1-exploratory,C2,reference_submitter,cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl,20,1.0,1.0,1.0,1.0
+f1-mixed-level3-v0.1-exploratory,F1,oracle,cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl,20,1.0,1.0,1.0,1.0
+f1-mixed-level3-v0.1-exploratory,F1,reference_submitter,cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl,20,1.0,1.0,1.0,1.0

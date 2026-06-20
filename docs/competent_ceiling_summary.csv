@@ -1,0 +1,7 @@
+cohort_id,family,system,n,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate
+c2-reachability-level3-v0.1-exploratory,C2,oracle,20,1.0,1.0,1.0,1.0
+c2-reachability-level3-v0.1-exploratory,C2,reference_submitter,20,1.0,1.0,1.0,1.0
+c2-reachability-level3-v0.1-exploratory,C2,competent_submitter,20,1.0,1.0,1.0,1.0
+f1-mixed-level3-v0.1-exploratory,F1,oracle,20,1.0,1.0,1.0,1.0
+f1-mixed-level3-v0.1-exploratory,F1,reference_submitter,20,1.0,1.0,1.0,1.0
+f1-mixed-level3-v0.1-exploratory,F1,competent_submitter,20,1.0,1.0,1.0,1.0
