@@ -44,6 +44,8 @@ def freeze_cohort(
     if not raw_records:
         raise ValueError(f"items JSONL is empty: {items_path}")
 
+    _validate_unique_item_ids_in_records(raw_records)
+
     items = [item_from_record(record) for record in raw_records]
     for item in items:
         self_verify_item(item)
@@ -83,6 +85,23 @@ def freeze_cohort(
     )
 
     return manifest_body
+
+
+def _validate_unique_item_ids_in_records(records: list[dict[str, Any]]) -> None:
+    seen: set[str] = set()
+    duplicates: list[str] = []
+    for index, record in enumerate(records, start=1):
+        item_id = record.get("item_id")
+        if not isinstance(item_id, str) or not item_id.strip():
+            raise ValueError(f"items JSONL line {index}: missing item_id")
+        if item_id in seen:
+            duplicates.append(item_id)
+        seen.add(item_id)
+    if duplicates:
+        unique = sorted(set(duplicates))
+        raise ValueError(
+            "duplicate item_id in source items JSONL: " + ", ".join(unique)
+        )
 
 
 def item_from_record(record: dict[str, Any]) -> BenchmarkItem:

@@ -13,6 +13,40 @@ from fsmreasonbench.cli.summarize_scores import main as summarize_main
 from fsmreasonbench.evaluator.batch import evaluate_baseline_on_items, generate_c2_batch
 from fsmreasonbench.evaluator.jsonl import load_items_jsonl, read_jsonl, write_jsonl
 from fsmreasonbench.evaluator.summary import summarize_scoring_records
+from fsmreasonbench.generator.reachability import ReachabilityGeneratorConfig
+
+
+def test_batch_generation_produces_unique_item_ids() -> None:
+    config = ReachabilityGeneratorConfig(state_count=5, min_witness_length=3, max_witness_length=12)
+    items = generate_c2_batch(50, seed=0, config=config)
+    item_ids = [item.item_id for item in items]
+    assert len(item_ids) == len(set(item_ids))
+
+
+def test_batch_cli_min_witness_length_produces_unique_item_ids(
+    tmp_path: Path,
+) -> None:
+    items_path = tmp_path / "items.jsonl"
+    assert (
+        generate_batch_main(
+            [
+                "--n",
+                "50",
+                "--seed",
+                "0",
+                "--min-witness-length",
+                "3",
+                "--out",
+                str(items_path),
+            ]
+        )
+        == 0
+    )
+    loaded = load_items_jsonl(items_path)
+    item_ids = [item.item_id for item in loaded]
+    assert len(item_ids) == 50
+    assert len(item_ids) == len(set(item_ids))
+    assert all(item.difficulty["core"]["witness_length"] >= 3 or not item.answer_key["verdict"] for item in loaded)
 
 
 def test_batch_generation_deterministic_under_seed() -> None:

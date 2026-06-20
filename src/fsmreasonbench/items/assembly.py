@@ -89,7 +89,10 @@ def assemble_reachability_item(
     public_fingerprint = content_hash({"canonical": fingerprint_input})
 
     resolved_item_id = item_id or str(
-        uuid.uuid5(uuid.NAMESPACE_URL, f"fsmreasonbench:item:{seed}:{target_state}")
+        uuid.uuid5(
+            uuid.NAMESPACE_URL,
+            f"fsmreasonbench:item:C2:{seed}:{fsm.fsm_id}:{target_state}",
+        )
     )
 
     return BenchmarkItem(

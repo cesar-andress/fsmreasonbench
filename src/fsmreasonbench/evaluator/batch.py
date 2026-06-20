@@ -24,6 +24,27 @@ from fsmreasonbench.items.assembly import BenchmarkItem, self_verify_item
 
 _BASELINES = frozenset({"oracle", "random", "invalid"})
 _SMOKE_BASELINES = ("oracle", "random", "invalid")
+_BATCH_SEED_STRIDE = 100_003
+_MAX_BATCH_ITEM_RETRIES = 16
+
+
+def assert_unique_item_ids(items: list[BenchmarkItem]) -> None:
+    """Raise ``ValueError`` when ``items`` contains duplicate ``item_id`` values."""
+    seen: set[str] = set()
+    duplicates: list[str] = []
+    for item in items:
+        if item.item_id in seen:
+            duplicates.append(item.item_id)
+        seen.add(item.item_id)
+    if duplicates:
+        raise ValueError(
+            "duplicate item_id in batch: "
+            + ", ".join(sorted(set(duplicates)))
+        )
+
+
+def _batch_slot_seed(batch_seed: int, index: int, slot_retry: int = 0) -> int:
+    return batch_seed + index * _BATCH_SEED_STRIDE + slot_retry * _BATCH_SEED_STRIDE * _BATCH_SEED_STRIDE
 
 
 def generate_c2_batch(
@@ -36,12 +57,26 @@ def generate_c2_batch(
     if n < 1:
         raise ValueError("n must be >= 1")
 
+    config = config or ReachabilityGeneratorConfig()
     items: list[BenchmarkItem] = []
+    seen_ids: set[str] = set()
     for index in range(n):
-        item_seed = seed + index
-        item = generate_reachability_item(item_seed, config)
-        self_verify_item(item)
+        item: BenchmarkItem | None = None
+        for slot_retry in range(_MAX_BATCH_ITEM_RETRIES):
+            candidate = generate_reachability_item(_batch_slot_seed(seed, index, slot_retry), config)
+            self_verify_item(candidate)
+            if candidate.item_id not in seen_ids:
+                item = candidate
+                break
+        if item is None:
+            raise RuntimeError(
+                f"failed to generate unique C2 item_id for batch index={index} "
+                f"after {_MAX_BATCH_ITEM_RETRIES} seed retries"
+            )
+        seen_ids.add(item.item_id)
         items.append(item)
+
+    assert_unique_item_ids(items)
     return items
 
 
@@ -56,10 +91,23 @@ def generate_f1_batch(
         raise ValueError("n must be >= 1")
 
     items: list[BenchmarkItem] = []
+    seen_ids: set[str] = set()
     for index in range(n):
-        item_seed = seed + index
-        item = generate_separation_item(item_seed, config)
+        item: BenchmarkItem | None = None
+        for slot_retry in range(_MAX_BATCH_ITEM_RETRIES):
+            candidate = generate_separation_item(_batch_slot_seed(seed, index, slot_retry), config)
+            if candidate.item_id not in seen_ids:
+                item = candidate
+                break
+        if item is None:
+            raise RuntimeError(
+                f"failed to generate unique F1 item_id for batch index={index} "
+                f"after {_MAX_BATCH_ITEM_RETRIES} seed retries"
+            )
+        seen_ids.add(item.item_id)
         items.append(item)
+
+    assert_unique_item_ids(items)
     return items
 
 

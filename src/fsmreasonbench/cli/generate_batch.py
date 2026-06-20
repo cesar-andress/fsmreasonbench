@@ -19,6 +19,32 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--seed", type=int, default=1, help="Base generator seed (default: 1)")
     parser.add_argument("--out", required=True, help="Output JSONL path")
     parser.add_argument("--state-count", type=int, default=5, help="C2 state count")
+    parser.add_argument(
+        "--min-witness-length",
+        type=int,
+        default=1,
+        help="C2 minimum witness length (default: 1)",
+    )
+    parser.add_argument(
+        "--max-witness-length",
+        type=int,
+        default=12,
+        help="C2 maximum witness length (default: 12)",
+    )
+    c2_negative = parser.add_mutually_exclusive_group()
+    c2_negative.add_argument(
+        "--include-negative",
+        dest="include_negative",
+        action="store_true",
+        default=None,
+        help="C2: include unreachable target items (default)",
+    )
+    c2_negative.add_argument(
+        "--no-include-negative",
+        dest="include_negative",
+        action="store_false",
+        help="C2: generate only reachable targets",
+    )
     parser.add_argument("--state-count-a", type=int, default=4, help="F1 |Q_A|")
     parser.add_argument("--state-count-b", type=int, default=4, help="F1 |Q_B|")
     parser.add_argument("--alphabet-size", type=int, default=3, help="F1 alphabet size")
@@ -45,7 +71,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.n < 1:
         parser.error("--n must be >= 1")
 
-    c2_config = ReachabilityGeneratorConfig(state_count=args.state_count)
+    c2_kwargs: dict[str, int | bool] = {
+        "state_count": args.state_count,
+        "min_witness_length": args.min_witness_length,
+        "max_witness_length": args.max_witness_length,
+    }
+    if args.include_negative is not None:
+        c2_kwargs["include_negative"] = args.include_negative
+    c2_config = ReachabilityGeneratorConfig(**c2_kwargs)
     f1_config = SeparationGeneratorConfig(
         state_count_a=args.state_count_a,
         state_count_b=args.state_count_b,

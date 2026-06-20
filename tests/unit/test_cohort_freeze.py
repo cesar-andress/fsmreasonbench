@@ -12,7 +12,7 @@ from fsmreasonbench.cli.validate_cohort import main as validate_cohort_main
 from fsmreasonbench.cohort.freeze import freeze_cohort, hash_file
 from fsmreasonbench.cohort.validate import validate_cohort
 from fsmreasonbench.evaluator.batch import generate_c2_batch, generate_f1_batch
-from fsmreasonbench.evaluator.jsonl import write_jsonl
+from fsmreasonbench.evaluator.jsonl import read_jsonl, write_jsonl
 from fsmreasonbench.generator.reachability import ReachabilityGeneratorConfig
 from fsmreasonbench.generator.separation import SeparationGeneratorConfig
 
@@ -32,6 +32,20 @@ def _write_items(path: Path, family: str) -> None:
             ),
         )
     write_jsonl(path, (item.to_full_dict() for item in items))
+
+
+def test_freeze_cohort_rejects_duplicate_item_ids_before_output(tmp_path: Path) -> None:
+    source = tmp_path / "duplicate_items.jsonl"
+    valid_items = generate_c2_batch(2, seed=11, config=ReachabilityGeneratorConfig(state_count=4))
+    records = [item.to_full_dict() for item in valid_items]
+    records.append(dict(records[0]))
+    write_jsonl(source, records)
+
+    out_dir = tmp_path / "cohort"
+    with pytest.raises(ValueError, match="duplicate item_id"):
+        freeze_cohort(source, "dup-test-v0.1-exploratory", out_dir)
+
+    assert not out_dir.exists()
 
 
 def test_freeze_cohort_writes_manifest_checksums_and_readme(tmp_path: Path) -> None:
