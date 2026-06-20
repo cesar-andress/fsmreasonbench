@@ -1,0 +1,131 @@
+{
+  "cohort_fingerprint": "4e1e662307456c871ed8c424a4ba493ab041b3d32530feecdef7c19ffe634a67",
+  "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+  "created_at": "2026-06-20T07:34:04Z",
+  "difficulty_summary": {
+    "F1": {
+      "distinguishing_trace_length": {
+        "max": 3,
+        "mean": 3.0,
+        "min": 3
+      },
+      "equivalent_count": 11,
+      "generator_seed_range": {
+        "max": 103020,
+        "min": 103001
+      },
+      "item_count": 20,
+      "non_equivalent_count": 9
+    }
+  },
+  "family_counts": {
+    "F1": 20
+  },
+  "generator_notes": "Exploratory F1 mixed cohort, distinguishing trace length level 3, equivalent_ratio=0.5, constructive_decoy enabled for non-equivalent pairs.",
+  "item_count": 20,
+  "items": [
+    {
+      "family": "F1",
+      "item_id": "36e66d0d-eaa3-5246-afef-38031da67974",
+      "sha256": "baf98cfa97a18552ec7dbf6797b8aea0b909d4c62387abb75ec95419c2bcc891"
+    },
+    {
+      "family": "F1",
+      "item_id": "89e35114-e51e-578e-b545-e18bd7d42684",
+      "sha256": "9782c3512cea1dd065501e3023caa40c89d4764caf1323483d6de25db644c788"
+    },
+    {
+      "family": "F1",
+      "item_id": "ed303ca5-0924-5df2-9b2c-0e82f6ebba3f",
+      "sha256": "7846f01670533809c64d9bcf07bc4a80475f946b24132fcfb55ea75eed929b5b"
+    },
+    {
+      "family": "F1",
+      "item_id": "0bab78e5-6714-5512-99c9-d85afa797356",
+      "sha256": "3610c980f845227db47fa1114458d67f9003e1ea64ba6e9431dda53b996da77c"
+    },
+    {
+      "family": "F1",
+      "item_id": "4e44473a-f9be-5402-ad7e-5f99eacb1150",
+      "sha256": "7053ed8814cb3e37e10dea8825f196ceedead91b4ea3639544f67f9cebdcdc89"
+    },
+    {
+      "family": "F1",
+      "item_id": "0ef423f8-f244-5996-8224-a5985f8e5ca4",
+      "sha256": "a61e352cdc944c8e75de19b3f201c0e4ffc46d21c12988e982541d957a288e09"
+    },
+    {
+      "family": "F1",
+      "item_id": "6e2f85bb-298a-5071-ac44-71b788519c69",
+      "sha256": "df9552762925d92263de6d4425f2ec2a8debe5103dbe4ec867825ee28a86af1d"
+    },
+    {
+      "family": "F1",
+      "item_id": "68399ff1-2e7b-54d6-8666-e84dea142069",
+      "sha256": "dadfca2ac8906d8689bb45191c51742a189a087101d2287cfcd7f8249150064a"
+    },
+    {
+      "family": "F1",
+      "item_id": "e6fb643f-e138-5fb0-bcb2-e3d4f328940d",
+      "sha256": "2334619594823c0295d6b06d9feda94727200c5540d9c03b41ac875bb96f9f9d"
+    },
+    {
+      "family": "F1",
+      "item_id": "913f199b-8371-5e25-8137-5bc638a6a753",
+      "sha256": "fa02295c988e121c441e743df1e3a10884fddb3dd54b51a381872d05374ece96"
+    },
+    {
+      "family": "F1",
+      "item_id": "e685009c-f06a-50fa-9e57-34edd9fb6ec9",
+      "sha256": "3e58bc2ab700b17ce82970bdf6799498a32eceb90e4113b9d35f0ad748e7a3bf"
+    },
+    {
+      "family": "F1",
+      "item_id": "667b7f4f-9adc-54c3-af33-c7cb292796c5",
+      "sha256": "254e383a4e1079ca8b77313c885970a6f3c965afe6789de1fb2661c5a06f85c3"
+    },
+    {
+      "family": "F1",
+      "item_id": "6e556ff5-861e-55fd-9275-2705e3302c30",
+      "sha256": "cd3c70cc52d3dfa6f73379a872a3504404391f10e6de83b3c49f49a3b2f52e1a"
+    },
+    {
+      "family": "F1",
+      "item_id": "98fc415b-66a9-5f71-a20e-6e4fa0966a70",
+      "sha256": "60b93f9f54b0530c2132c300b4abcef721321d3be9fce66612ff3d2692052dd0"
+    },
+    {
+      "family": "F1",
+      "item_id": "ebe0bc67-32d0-5e95-904e-c460037e2e18",
+      "sha256": "f4cd79553f677cb13702c2570840e88149a64728a8f0764ebf722d9bcb2030c7"
+    },
+    {
+      "family": "F1",
+      "item_id": "d21cd683-f2fa-5271-b3fc-c421c319e6a5",
+      "sha256": "af0cd6aefc61754c6081211e293a96418af86a983273e982a88fb8720eb63081"
+    },
+    {
+      "family": "F1",
+      "item_id": "91c49664-83cc-5ae0-b46d-75dbab756219",
+      "sha256": "2c33bba8e9fce5123a6bac8581549be0c8d19c3c4ced63094bd05497f08ffba7"
+    },
+    {
+      "family": "F1",
+      "item_id": "b1e036bc-dc4b-59ae-80d5-a8184d40b27c",
+      "sha256": "89ab0a959d0ca6d2356b91620fb0c9a9500194eb3338015474137ed90d29c49f"
+    },
+    {
+      "family": "F1",
+      "item_id": "02828ec1-04e6-5a9a-ab35-e818f357a1c7",
+      "sha256": "f30231f85c83321fd134cacf35ec1d5c6afbc3c561e1e8ee5a4473ee488f881f"
+    },
+    {
+      "family": "F1",
+      "item_id": "3e242e24-e4b9-590d-a738-189670429da5",
+      "sha256": "f1582c0ecf600853fd86bb10389698a51edbc15e02c746bd78dc3fedc9588735"
+    }
+  ],
+  "manifest_version": "0.1-exploratory",
+  "release_tier": "exploratory",
+  "source_items_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/items.jsonl"
+}
