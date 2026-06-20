@@ -1,0 +1,100 @@
+{
+  "comparison_row": {
+    "average_tool_calls_per_item": null,
+    "certificate_valid_rate": null,
+    "delegation_gap_R1_minus_R0_certificate_valid_rate": 0.0,
+    "delegation_gap_R1_minus_R0_fully_correct_rate": 0.0,
+    "delegation_gap_R1_minus_R0_verdict_accuracy": -0.4,
+    "delegation_gap_R2_minus_R0_certificate_valid_rate": 0.0,
+    "delegation_gap_R2_minus_R0_fully_correct_rate": 0.0,
+    "delegation_gap_R2_minus_R0_verdict_accuracy": -0.4,
+    "extractability_rate": null,
+    "family": "C2",
+    "fully_correct_rate": null,
+    "model": "qwen2.5-coder:7b",
+    "n": 5,
+    "tool_invocation_rate": null,
+    "track": "comparison",
+    "verdict_accuracy": null
+  },
+  "delegation_gaps": {
+    "R1_minus_R0": {
+      "cohort_id": null,
+      "delegation_gap": {
+        "certificate_valid_rate": 0.0,
+        "fully_correct_rate": 0.0,
+        "verdict_accuracy": -0.4
+      },
+      "family": "C2",
+      "n": 5,
+      "r0_track": "R0",
+      "r2_track": "R1"
+    },
+    "R2_minus_R0": {
+      "cohort_id": null,
+      "delegation_gap": {
+        "certificate_valid_rate": 0.0,
+        "fully_correct_rate": 0.0,
+        "verdict_accuracy": -0.4
+      },
+      "family": "C2",
+      "n": 5,
+      "r0_track": "R0",
+      "r2_track": "R2"
+    }
+  },
+  "track_summaries": [
+    {
+      "certificate_valid_rate": 0.0,
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 2,
+        "correct": 0,
+        "not_extractable": 0,
+        "verdict_wrong": 3
+      },
+      "family": "C2",
+      "fully_correct_rate": 0.0,
+      "model": "qwen2.5-coder:7b",
+      "n": 5,
+      "track": "R0",
+      "verdict_accuracy": 0.4
+    },
+    {
+      "average_tool_calls_per_item": 1.0,
+      "certificate_valid_rate": 0.0,
+      "extractability_rate": 0.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 0,
+        "correct": 0,
+        "not_extractable": 5,
+        "verdict_wrong": 0
+      },
+      "family": "C2",
+      "fully_correct_rate": 0.0,
+      "model": "qwen2.5-coder:7b",
+      "n": 5,
+      "tool_invocation_rate": 1.0,
+      "track": "R1",
+      "verdict_accuracy": 0.0
+    },
+    {
+      "average_tool_calls_per_item": 1.0,
+      "certificate_valid_rate": 0.0,
+      "extractability_rate": 0.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 0,
+        "correct": 0,
+        "not_extractable": 5,
+        "verdict_wrong": 0
+      },
+      "family": "C2",
+      "fully_correct_rate": 0.0,
+      "model": "qwen2.5-coder:7b",
+      "n": 5,
+      "tool_invocation_rate": 1.0,
+      "track": "R2",
+      "verdict_accuracy": 0.0
+    }
+  ]
+}

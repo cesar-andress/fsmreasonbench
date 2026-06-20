@@ -1,0 +1,169 @@
+# LLM Track Runner Design
+
+**Date:** 2026-06-20  
+**Parent:** `docs/r1_r2_design_review.md`  
+**Scope:** C2/F1 via Ollama local models; two-phase JSON protocol
+
+---
+
+## 1. Model interfaces
+
+### R0 — single-shot submission
+
+| Field | Value |
+|-------|-------|
+| **Calls** | 1 × `generate(prompt)` |
+| **Prompt** | Existing `render_prompt()` (unchanged) |
+| **Output** | Direct submission JSON `{item_id, verdict, certificate}` |
+| **Tools** | None |
+| **Audit log** | Empty tool list (legacy `record_transcript`) |
+
+### R1 — step simulator (two-phase)
+
+| Phase | Model output | Runner action |
+|-------|--------------|---------------|
+| 1 | `{ "phase": "tool_plan", "tool_calls": [...] }` | Execute `step` via `StepSimulator`; reject other tools |
+| 2 | `{ "phase": "final_submission", "submission": {...} }` | Parse, score via `score_item` |
+
+Allowed tool: **`step`** with inputs `{fsm_id, state, symbol}`.
+
+### R2 — solver delegation (two-phase)
+
+| Phase | Model output | Runner action |
+|-------|--------------|---------------|
+| 1 | `{ "phase": "tool_plan", "tool_calls": [...] }` | Execute registered `solver.*` tools only |
+| 2 | `{ "phase": "final_submission", "submission": {...} }` | Parse, score |
+
+Registered tools: `solver.is_reachable`, `solver.reachability_certificate`, `solver.check_separation`, `solver.equivalence_certificate`, `solver.distinguishing_certificate`.
+
+---
+
+## 2. Prompt differences
+
+| Track | Phase-1 focus | Phase-2 focus |
+|-------|---------------|---------------|
+| R0 | Full task + submission schema | — |
+| R1 | Item JSON + `step` tool docs + `tool_plan` schema | Tool results JSON + submission schema |
+| R2 | Item JSON + solver tool docs + `tool_plan` schema | Tool results JSON + submission schema |
+
+Prompts: `runners/track_prompts.py`. R0 reuses `runners/prompts.py` verbatim.
+
+---
+
+## 3. Tool exposure model
+
+- **Closed-world execution:** runner validates tool name before dispatch (`runners/tool_executor.py`).
+- **Rejected calls** return `{status: "rejected", error: ...}` in phase-2 context; still logged if executed path attempted.
+- **Executed calls** append to `audit_log.tool_invocations` via `AuditLogBuilder`.
+- **Cap:** max 64 tool calls per plan round.
+- **No nested rounds in v1:** exactly one plan round, one submission round.
+
+---
+
+## 4. Audit log format
+
+Same as reference tracks (`tracks/models.py`):
+
+```json
+{
+  "track": "R1",
+  "track_version": "1.0",
+  "scratchpad": [{"phase": "...", "message": "...", "details": {}}],
+  "tool_invocations": [{
+    "sequence": 1,
+    "tool_name": "step",
+    "tool_version": "1.0",
+    "inputs": {"fsm_id": "...", "state": "q0", "symbol": "a"},
+    "outputs": {"success": false, "error": "..."},
+    "provenance": "r1_step_simulator"
+  }],
+  "certificate_assembly": []
+}
+```
+
+R1/R2 LLM runs populate `tool_invocations` from runner execution, not from model claims alone.
+
+---
+
+## 5. Transcript format (R1/R2)
+
+`LLMTrackTranscript` in `runners/ollama_track_batch.py`:
+
+| Field | Content |
+|-------|---------|
+| `messages` | Full user/assistant prompts and responses (both phases) |
+| `tool_calls_requested` | Parsed plan from phase 1 |
+| `tool_calls_executed` | Subset with `status=executed` |
+| `tool_outputs` | Full result list (executed + rejected) |
+| `audit_log` | Replayable invocation log |
+| `scoring_record` | Standard four-layer record |
+| `protocol_errors` | Parse/fallback warnings |
+
+R0 transcripts remain the legacy envelope (`evaluator/transcript.py`).
+
+---
+
+## 6. Security / trust boundaries
+
+| Rule | Enforcement |
+|------|-------------|
+| No answer key in prompts | `item.to_evaluatee_dict()` only in track prompts |
+| No oracle in R1 | `track_guards` + executor allowlist |
+| R2 oracle only via registry | Closed tool list + provenance string |
+| Tool replay integrity | `replay_audit_log()` after each item |
+| Model cannot forge tool outputs | Phase-2 prompt contains runner-produced results only |
+
+---
+
+## 7. Failure modes
+
+| Failure | Handling |
+|---------|----------|
+| Invalid phase-1 JSON | Empty tool results; `protocol_errors` logged; phase 2 proceeds |
+| Disallowed tool | Rejected entry in `tool_outputs`; no audit invocation |
+| Invalid phase-2 protocol | Best-effort `extract_submission_payload`; may fail extractability |
+| Ollama timeout / HTTP error | Propagates; no partial transcript for that item |
+| Replay mismatch | Raises during item evaluation (programmer error if log corrupt) |
+
+---
+
+## 8. Ollama / local model limitations
+
+- **No native function-calling assumed.** Two-phase JSON protocol avoids fragile tool-call APIs.
+- **Small models may ignore phase discipline.** Fallback extraction on phase 2 reduces hard failures but may inflate extractability without valid certificates.
+- **Tool planning quality varies.** A model may request zero tools on R1/R2; run still completes.
+- **Latency:** R1/R2 = 2× generate calls per item vs R0.
+- **Temperature 0 recommended** for reproducibility (same as existing Ollama runner).
+
+---
+
+## 9. Output layout
+
+```
+{out_dir}/
+  results.jsonl          # run records
+  scores.jsonl           # scoring + track, model, tool_invocation_count
+  summary.json           # backward compatible aggregate
+  track_summary.json     # same + tool_invocation_rate, average_tool_calls_per_item
+  transcripts/{item_id}.json
+```
+
+`summarize_scores --scores scores.jsonl` ignores extra fields via `ScoringRecord.from_dict`.
+
+---
+
+## 10. CLIs
+
+```bash
+# Dedicated track batch
+python -m fsmreasonbench.cli.run_ollama_track_batch \
+  --model qwen2.5-coder:7b --items cohorts/.../items.jsonl \
+  --out runs/.../results.jsonl --out-dir runs/.../R1 --track R1
+
+# Legacy CLI with --track (R0 default)
+python -m fsmreasonbench.cli.run_ollama_batch ... --track R0
+
+# Compare runs
+python -m fsmreasonbench.cli.compare_tracks \
+  --r0-dir runs/.../R0 --r1-dir runs/.../R1 --r2-dir runs/.../R2
+```

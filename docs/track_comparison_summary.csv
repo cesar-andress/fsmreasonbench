@@ -1,0 +1,4 @@
+track,model,family,n,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate,tool_invocation_rate,average_tool_calls_per_item
+R0,qwen2.5-coder:7b,C2,5,1.0,0.4,0.0,0.0,0.0,0.0
+R1,qwen2.5-coder:7b,C2,5,0.0,0.0,0.0,0.0,1.0,1.0
+R2,qwen2.5-coder:7b,C2,5,0.0,0.0,0.0,0.0,1.0,1.0
