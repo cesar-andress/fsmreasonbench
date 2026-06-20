@@ -1,0 +1,5 @@
+family,model,n_levels,missing_level_count,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate
+F1,gemma2:9b,5,0,1.000,0.510,0.170,0.170
+F1,llama3.1:8b,5,0,1.000,0.470,0.200,0.200
+F1,mistral-nemo:12b,5,0,1.000,0.470,0.140,0.140
+F1,qwen2.5-coder:7b,5,0,1.000,0.470,0.030,0.030
