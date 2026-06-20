@@ -1,0 +1,7 @@
+cohort_id,family,track,n,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate,tool_invocation_count_mean
+c2-reachability-level3-v0.1-exploratory,C2,R0,20,1.0,1.0,1.0,1.0,0.0
+c2-reachability-level3-v0.1-exploratory,C2,R1,20,1.0,1.0,1.0,1.0,7.75
+c2-reachability-level3-v0.1-exploratory,C2,R2,20,1.0,1.0,1.0,1.0,2.0
+f1-mixed-level3-v0.1-exploratory,F1,R0,20,1.0,1.0,1.0,1.0,0.0
+f1-mixed-level3-v0.1-exploratory,F1,R1,20,1.0,1.0,1.0,1.0,30.3
+f1-mixed-level3-v0.1-exploratory,F1,R2,20,1.0,1.0,1.0,1.0,2.0

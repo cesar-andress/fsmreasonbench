@@ -1,0 +1,204 @@
+{
+  "delegation_gaps": [
+    {
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "delegation_gap": {
+        "certificate_valid_rate": 0.0,
+        "fully_correct_rate": 0.0,
+        "verdict_accuracy": 0.0
+      },
+      "family": "C2",
+      "n": 20,
+      "r0_track": "R0",
+      "r2_track": "R2"
+    },
+    {
+      "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+      "delegation_gap": {
+        "certificate_valid_rate": 0.0,
+        "fully_correct_rate": 0.0,
+        "verdict_accuracy": 0.0
+      },
+      "family": "F1",
+      "n": 20,
+      "r0_track": "R0",
+      "r2_track": "R2"
+    }
+  ],
+  "example_transcripts": [
+    {
+      "audit_log": {
+        "certificate_assembly": [],
+        "scratchpad": [
+          {
+            "details": {
+              "family": "C2",
+              "item_id": "d4450489-5803-5cce-a43a-3c46d3609607"
+            },
+            "message": "loaded evaluatee-visible item fields",
+            "phase": "read_question"
+          },
+          {
+            "details": {
+              "fsm_id": "463bc7f6-4553-50c4-a417-305fbf4daf62",
+              "initial_state": "q0",
+              "target_state": "q4"
+            },
+            "message": "read_question",
+            "phase": "read_question"
+          },
+          {
+            "details": {
+              "reachable_states": [
+                "q0",
+                "q1"
+              ]
+            },
+            "message": "enumerate_reachable_states",
+            "phase": "enumerate_reachable_states"
+          },
+          {
+            "details": {
+              "reason": "target not in reachable set",
+              "target_state": "q4"
+            },
+            "message": "conclude_unreachable",
+            "phase": "conclude_unreachable"
+          },
+          {
+            "details": {},
+            "message": "assembled public submission envelope without tool invocations",
+            "phase": "construct_submission"
+          }
+        ],
+        "tool_invocations": [],
+        "track": "R0",
+        "track_version": "1.0"
+      },
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "item_id": "d4450489-5803-5cce-a43a-3c46d3609607",
+      "raw_response": {
+        "certificate": {
+          "certificate_type": "unreachability_witness",
+          "fsm_id": "463bc7f6-4553-50c4-a417-305fbf4daf62",
+          "payload": {
+            "reachable_states": [
+              "q0",
+              "q1"
+            ],
+            "target_state": "q4"
+          },
+          "verdict_supported": false,
+          "version": "1.0"
+        },
+        "item_id": "d4450489-5803-5cce-a43a-3c46d3609607",
+        "verdict": false
+      },
+      "track": "R0"
+    }
+  ],
+  "track_rows": [
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 0,
+        "correct": 20,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "tool_invocation_count_mean": 0.0,
+      "track": "R0",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 0,
+        "correct": 20,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "tool_invocation_count_mean": 7.75,
+      "track": "R1",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 0,
+        "correct": 20,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "tool_invocation_count_mean": 2.0,
+      "track": "R2",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 0,
+        "correct": 20,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "tool_invocation_count_mean": 0.0,
+      "track": "R0",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 0,
+        "correct": 20,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "tool_invocation_count_mean": 30.3,
+      "track": "R1",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+      "extractability_rate": 1.0,
+      "failure_stage_counts": {
+        "certificate_invalid": 0,
+        "correct": 20,
+        "not_extractable": 0,
+        "verdict_wrong": 0
+      },
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "tool_invocation_count_mean": 2.0,
+      "track": "R2",
+      "verdict_accuracy": 1.0
+    }
+  ]
+}
