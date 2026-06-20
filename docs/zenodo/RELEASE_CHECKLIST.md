@@ -20,7 +20,10 @@ Extended normative gate: [`docs/artifact/zenodo_checklist.md`](../artifact/zenod
 - [ ] Confirm no exploratory / pilot items from `runs/` are included
 - [ ] Document seed embargo policy if seeds are withheld initially
 
-**Current state:** no frozen cohort exists; development uses on-demand generation.
+**Current state:** no frozen public cohort exists; development uses on-demand generation.
+Exploratory snapshots can be sealed locally with `python -m fsmreasonbench.cli.freeze_cohort`
+(manifest version `0.1-exploratory`, no DOI). Validate with
+`python -m fsmreasonbench.cli.validate_cohort`.
 
 ---
 

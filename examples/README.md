@@ -168,6 +168,24 @@ python -m fsmreasonbench.cli.failure_taxonomy_batch \
   --out docs/f1_mixed_failure_taxonomy.json
 ```
 
+## Exploratory cohort freeze
+
+Seal a source `items.jsonl` into a reproducible exploratory snapshot (manifest version
+`0.1-exploratory`; not a Zenodo release or final `v1.0-public` cohort):
+
+```bash
+python -m fsmreasonbench.cli.freeze_cohort \
+  --items runs/capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/items.jsonl \
+  --cohort-id f1-mixed-level3-v0.1-exploratory \
+  --out-dir cohorts/v0.1-exploratory/f1-mixed-level3
+
+python -m fsmreasonbench.cli.validate_cohort \
+  --cohort-dir cohorts/v0.1-exploratory/f1-mixed-level3
+```
+
+Output: `items.jsonl`, `manifest.json`, `sha256sums.txt`, `README.md`. Every item passes
+`self_verify_item()` at freeze time. Use for exploratory studies only — not final paper claims.
+
 Writes per-item transcripts under `{out-dir}/transcripts/`, scoring JSONL at `{out-dir}/scores.jsonl`, and `summary.json`. Exploratory only — not for paper claims.
 
 ## Multi-model pilot runner

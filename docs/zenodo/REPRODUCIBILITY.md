@@ -169,6 +169,31 @@ Seed-based regeneration (R3) may remain under embargo until documented in the re
 
 ---
 
+## Exploratory cohort freeze (pre-Zenodo)
+
+For reproducible exploratory studies, the artifact can **seal** a source `items.jsonl` into a
+content-addressed directory without minting a DOI or assigning `v1.0-public`:
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.freeze_cohort \
+  --items runs/.../items.jsonl \
+  --cohort-id f1-mixed-level3-v0.1-exploratory \
+  --out-dir cohorts/v0.1-exploratory/f1-mixed-level3
+
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
+  --cohort-dir cohorts/v0.1-exploratory/f1-mixed-level3
+```
+
+Each freeze writes `items.jsonl`, `manifest.json`, `sha256sums.txt`, and `README.md`.
+The manifest records `cohort_id`, timestamps, family counts, difficulty summary, per-item
+SHA-256 digests, and an aggregate `cohort_fingerprint`. Every item is checked with
+`self_verify_item()` before sealing.
+
+This workflow uses manifest version **`0.1-exploratory`**. It is explicitly **not** a Zenodo
+release and must not be cited as a final benchmark result.
+
+---
+
 ## Related commands (development)
 
 ```bash
