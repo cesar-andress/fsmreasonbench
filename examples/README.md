@@ -261,3 +261,16 @@ Expected separation:
 | `invalid` | 0.0 | 0.0 |
 
 Artifacts in `runs/c2_smoke/`: `c2_items.jsonl`, `{oracle,random,invalid}_scores.jsonl`, `{oracle,random,invalid}_summary.json`, `combined_summary.json`.
+
+## Publication readiness snapshot
+
+Generate a read-only Markdown report summarizing cohorts, experimental evidence, and documentation checklists for paper and release preparation. The command never modifies benchmark artifacts.
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.publication_readiness \
+  --out docs/publication_readiness.md
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.publication_readiness \
+  --out docs/publication_readiness.md --json
+```
+
+Output: [`docs/publication_readiness.md`](../docs/publication_readiness.md). Use `--repo-root` to scan a different checkout. Exit code is non-zero only on unexpected runtime errors, not when optional artifacts are missing.

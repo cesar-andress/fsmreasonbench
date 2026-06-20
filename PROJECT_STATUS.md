@@ -140,6 +140,7 @@ generator → oracle → certificate → verifier  ✅
 | Failure taxonomy analysis | `evaluator/failure_taxonomy.py`, `cli/failure_taxonomy.py`, `cli/failure_taxonomy_batch.py` — classify `certificate_invalid` errors into interpretable categories |
 | Exploratory cohort freeze | `cohort/freeze.py`, `cohort/validate.py`, `cli/freeze_cohort.py`, `cli/validate_cohort.py` — seal JSONL snapshots with manifest + checksums (no DOI) |
 | Dataset card | [`docs/dataset_card.md`](docs/dataset_card.md) — HuggingFace-adaptable overview; references normative docs |
+| Publication readiness report | `reporting/publication_readiness.py`, `cli/publication_readiness.py` — read-only Markdown snapshot for paper/release prep |
 | Pilot report generator | `evaluator/pilot_report.py`, `cli/generate_pilot_report.py` |
 
 **End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
@@ -294,6 +295,8 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.export_capability_surface_report
   --out-csv docs/capability_surface_summary.csv
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.check_docs
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.publication_readiness \
+  --out docs/publication_readiness.md
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.audit_f1_items \
   --items runs/capability_surface_models/F1/min_distinguishing_trace_length_5/items.jsonl \
   --out runs/f1_audit_level5.json
