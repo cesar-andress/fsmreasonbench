@@ -21,7 +21,7 @@
 | **Phase 1** — Core infrastructure | ✅ **Complete** | FSM, oracle, verifier, tests |
 | **Phase 2** — First vertical (C2 reachability) | ✅ **Complete** | Difficulty controls + negative items |
 | **Phase 3** — Evaluation infrastructure | ✅ **Complete** | C2 parser, scoring, transcripts, baselines |
-| **Phase 4** — Flagship verticals | 🔄 **In progress** | F1 DFA non-equivalence vertical |
+| **Phase 4** — Flagship verticals | 🔄 **In progress** | F1 DFA non-equivalence + **F2 composition counterexample slice** |
 
 Roadmap detail: [`docs/IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)
 
@@ -48,6 +48,7 @@ Reported rates: `extractability_rate`, `verdict_accuracy`, `certificate_valid_ra
 |------|--------|------|
 | Calibration | **C2** Reachability | Operational literacy; sanity / drift detection |
 | Flagship | **F1** Separation / Witness (DFA non-equivalence) | First flagship vertical; `distinguishing_trace` certificate |
+| Flagship | **F2** Non-materialized Composition (safety counterexample) | `projected_trace_witness`; counterexample-only slice v1 |
 
 **Evaluation tracks (current artifact):**
 
@@ -111,6 +112,29 @@ generator → oracle → certificate → verifier  ✅
 **Generator defaults:** `min_distinguishing_trace_length=2`, `max_distinguishing_trace_length=12`, `max_retries=64`. Auto mode uses **constructive_decoy** generation when `min_distinguishing_trace_length ≥ 3` (decoy branches with exact witness length); legacy **constructive** chain+sink mode remains for regression tests; lower levels use random rejection sampling unless a constructive mode is set explicitly. Smoke item seed 42 uses `--min-distinguishing-trace-length 1`.
 
 **CLI:** `python3 -m fsmreasonbench.cli.generate_one --family F1 --seed 42`
+
+---
+
+## Phase 4 deliverables (F2 non-materialized composition)
+
+| Component | Path |
+|-----------|------|
+| Composition runtime (sync product, trace replay) | `runtime/composition.py` |
+| Composition oracle (shortest violation witness) | `oracle/composition.py` |
+| Certificate builder | `certificates/composition.py` |
+| Independent verifier (+ materialization guard) | `verifier/composition.py` |
+| Seeded F2 generator (counterexample-only) | `generator/f2_composition.py` |
+| F2 item assembly + self-verify | `items/assembly.py` |
+| F2 parser / scorer | `evaluator/f2_parser.py`, `scorer_f2.py` |
+| F2 baselines | `baselines/f2.py`, `baselines/runner.py` |
+| Schema | `schema/certificate/composition.schema.json` |
+| Example item | `examples/F2/item_composition_seed4202.json` |
+| Design review | `docs/f2_design_review.md` |
+| F2 batch + smoke | `cli/generate_batch --family F2`, `evaluate_baseline_batch` |
+
+**Generator defaults:** `min_violation_trace_length=1`, `max_violation_trace_length=6`, `state_count_a=3`, `state_count_b=3`, `counterexample_only=true`. Slice v1 emits only `verdict=false` items with `projected_trace_witness` certificates.
+
+**Smoke (exploratory, gitignored):** `runs/f2_smoke/` — n=20, seed=4202; oracle `fully_correct_rate=1.0`.
 
 ---
 
@@ -213,10 +237,12 @@ Current `verifier_version` (dev): `0.2.0-dev` — will pin at release.
 
 ## Next implementation milestone (Phase 4 remainder)
 
-1. **F1 equivalent-pair proof certificates** (positive items)
-2. **F1 NFA / containment subtypes**
+1. **F2 positive verdict path** (`compositional_witness` / invariant certificates)
+2. **F1 equivalent-pair proof certificates** (positive items)
+3. **F1 NFA / containment subtypes**
+4. **R0/R1/R2 track pilot on F2 exploratory cohort**
 
-**Not next:** public `1.0-public` cohort, contamination tooling, F2 composition.
+**Not next:** public `1.0-public` cohort, contamination tooling, F3/F4.
 
 ---
 

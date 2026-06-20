@@ -12,6 +12,7 @@ from fsmreasonbench.evaluator.summary import (
     combine_baseline_summaries,
     summarize_with_baseline,
 )
+from fsmreasonbench.generator.f2_composition import CompositionGeneratorConfig, generate_composition_item
 from fsmreasonbench.generator.reachability import (
     ReachabilityGeneratorConfig,
     generate_reachability_item,
@@ -111,6 +112,41 @@ def generate_f1_batch(
     return items
 
 
+def generate_f2_batch(
+    n: int,
+    seed: int,
+    *,
+    config: CompositionGeneratorConfig | None = None,
+) -> list[BenchmarkItem]:
+    """Generate ``n`` self-verifying F2 counterexample items."""
+    if n < 1:
+        raise ValueError("n must be >= 1")
+
+    config = config or CompositionGeneratorConfig()
+    items: list[BenchmarkItem] = []
+    seen_ids: set[str] = set()
+    for index in range(n):
+        item: BenchmarkItem | None = None
+        for slot_retry in range(_MAX_BATCH_ITEM_RETRIES):
+            candidate = generate_composition_item(
+                _batch_slot_seed(seed, index, slot_retry),
+                config,
+            )
+            if candidate.item_id not in seen_ids:
+                item = candidate
+                break
+        if item is None:
+            raise RuntimeError(
+                f"failed to generate unique F2 item_id for batch index={index} "
+                f"after {_MAX_BATCH_ITEM_RETRIES} seed retries"
+            )
+        seen_ids.add(item.item_id)
+        items.append(item)
+
+    assert_unique_item_ids(items)
+    return items
+
+
 def generate_batch(
     family: str,
     n: int,
@@ -118,11 +154,14 @@ def generate_batch(
     *,
     c2_config: ReachabilityGeneratorConfig | None = None,
     f1_config: SeparationGeneratorConfig | None = None,
+    f2_config: CompositionGeneratorConfig | None = None,
 ) -> list[BenchmarkItem]:
     if family == "C2":
         return generate_c2_batch(n, seed, config=c2_config)
     if family == "F1":
         return generate_f1_batch(n, seed, config=f1_config)
+    if family == "F2":
+        return generate_f2_batch(n, seed, config=f2_config)
     raise ValueError(f"unsupported batch family: {family!r}")
 
 

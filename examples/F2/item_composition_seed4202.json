@@ -1,0 +1,183 @@
+{
+  "answer_key": {
+    "certificate": {
+      "certificate_type": "projected_trace_witness",
+      "fsm_ids": [
+        "6dd02272-d7bc-5d06-a768-7a5a95838507",
+        "0a655ff2-e7bc-589d-9f79-d22398a57095"
+      ],
+      "payload": {
+        "component_trace_A": [
+          "a"
+        ],
+        "component_trace_B": [
+          "a"
+        ],
+        "projected_states_A": [
+          "q0",
+          "q0"
+        ],
+        "projected_states_B": [
+          "q0",
+          "q2"
+        ],
+        "property_evaluation": {
+          "product_state_at_violation": "q0,q2",
+          "property_kind": "safety",
+          "satisfied": false,
+          "violation_step_index": 1
+        },
+        "synchronized_trace": [
+          "a"
+        ]
+      },
+      "verdict_supported": false,
+      "version": "1.0"
+    },
+    "item_id": "3c3a1395-9ded-5c58-b838-db9fa6c2c544",
+    "verdict": false
+  },
+  "contamination": {
+    "public_fingerprint": "c8e6ef03b4fb41c0bf205aa43a7c970764b4da9cac0fccd95ff3e27ce1d72716"
+  },
+  "difficulty": {
+    "core": {
+      "alphabet_size": 2,
+      "d_comp": 1,
+      "product_width": 9,
+      "violation_trace_length": 1,
+      "|Q_A|": 3,
+      "|Q_B|": 3
+    },
+    "generator_seed": 4202,
+    "slice_metadata": {
+      "counterexample_only": true,
+      "positive_verdict_supported": false
+    }
+  },
+  "family": "F2",
+  "family_tier": "flagship",
+  "fsm_a": {
+    "accepting_states": [
+      "q1"
+    ],
+    "fsm_id": "6dd02272-d7bc-5d06-a768-7a5a95838507",
+    "fsm_type": "DFA",
+    "initial_state": "q0",
+    "input_alphabet": [
+      "a",
+      "b"
+    ],
+    "metadata": {
+      "generator_seed": 4202,
+      "state_count": 3
+    },
+    "states": [
+      "q0",
+      "q1",
+      "q2"
+    ],
+    "transitions": [
+      {
+        "from": "q0",
+        "input": "a",
+        "to": "q0"
+      },
+      {
+        "from": "q0",
+        "input": "b",
+        "to": "q2"
+      },
+      {
+        "from": "q1",
+        "input": "a",
+        "to": "q1"
+      },
+      {
+        "from": "q1",
+        "input": "b",
+        "to": "q2"
+      },
+      {
+        "from": "q2",
+        "input": "a",
+        "to": "q1"
+      }
+    ]
+  },
+  "fsm_b": {
+    "accepting_states": [
+      "q0"
+    ],
+    "fsm_id": "0a655ff2-e7bc-589d-9f79-d22398a57095",
+    "fsm_type": "DFA",
+    "initial_state": "q0",
+    "input_alphabet": [
+      "a",
+      "b"
+    ],
+    "metadata": {
+      "generator_seed": 4203,
+      "state_count": 3
+    },
+    "states": [
+      "q0",
+      "q1",
+      "q2"
+    ],
+    "transitions": [
+      {
+        "from": "q0",
+        "input": "a",
+        "to": "q2"
+      },
+      {
+        "from": "q1",
+        "input": "b",
+        "to": "q2"
+      },
+      {
+        "from": "q2",
+        "input": "a",
+        "to": "q0"
+      },
+      {
+        "from": "q2",
+        "input": "b",
+        "to": "q1"
+      }
+    ]
+  },
+  "item_id": "3c3a1395-9ded-5c58-b838-db9fa6c2c544",
+  "question": {
+    "composition_spec": {
+      "operator": "synchronous_product",
+      "synchronized_alphabet": [
+        "a",
+        "b"
+      ],
+      "version": "1.0"
+    },
+    "family": "F2",
+    "fsm_a_id": "6dd02272-d7bc-5d06-a768-7a5a95838507",
+    "fsm_b_id": "0a655ff2-e7bc-589d-9f79-d22398a57095",
+    "prompt_id": "composition.safety.v1",
+    "property": {
+      "invariant": {
+        "satisfying_states": [
+          "q0,q0",
+          "q0,q1",
+          "q1,q0",
+          "q1,q1",
+          "q1,q2",
+          "q2,q0",
+          "q2,q1",
+          "q2,q2"
+        ],
+        "type": "state_set"
+      },
+      "kind": "safety"
+    },
+    "secondary_fsm_id": "0a655ff2-e7bc-589d-9f79-d22398a57095"
+  }
+}

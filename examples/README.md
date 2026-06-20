@@ -10,6 +10,7 @@ Hand-generated and tool-generated **illustrative items** (not full cohorts).
 | `item_C2_reachability_seed43_negative.json` | Negative C2 reachability item (`seed=43`, unreachable target) |
 | `item_F1_separation_seed42.json` | F1 smoke item (`seed=42`, `min_distinguishing_trace_length=1`) |
 | `item_F1_separation_seed6_hard.json` | F1 hard item (`seed=6`, `ℓ_dist=4`, `min=3`) |
+| `F2/item_composition_seed4202.json` | F2 counterexample item (`seed=4202`, sync product safety) |
 
 Regenerate:
 
@@ -94,6 +95,28 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_f1_smoke_baselines \
 ```
 
 Default benchmark generation uses `min_distinguishing_trace_length=2`.
+
+## F2 composition (flagship, counterexample slice v1)
+
+```bash
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --family F2 --seed 4202 \
+  --output examples/F2/item_composition_seed4202.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_baseline \
+  --baseline oracle --item examples/F2/item_composition_seed4202.json --score
+```
+
+**Verdict:** `false` = synchronous product **violates** the safety property. Certificate: `projected_trace_witness` (component + synchronized traces; no product table in submission).
+
+```bash
+python -m fsmreasonbench.cli.generate_batch \
+  --family F2 --n 20 --seed 4202 --out runs/f2_smoke/items.jsonl
+python -m fsmreasonbench.cli.evaluate_baseline_batch \
+  --baseline oracle --items runs/f2_smoke/items.jsonl --out runs/f2_smoke/oracle_scores.jsonl
+python -m fsmreasonbench.cli.summarize_scores \
+  --scores runs/f2_smoke/oracle_scores.jsonl
+```
+
+Slice v1 is **counterexample-only** (`difficulty.slice_metadata.counterexample_only=true`). Design: [`docs/f2_design_review.md`](../docs/f2_design_review.md).
 
 > **Constructive F1 warning (levels ≥ 3):** Capability-surface F1 batches use `constructive_decoy` generation (decoy branches + controlled witness divergence). Legacy `constructive` chain+sink items remain available via `mode=constructive`. Scores may still rise with `ℓ_dist` because gold traces follow seeded structure, not necessarily because models reason more deeply. Audit items before interpreting curves:
 

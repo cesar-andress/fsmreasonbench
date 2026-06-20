@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsmreasonbench.org/schema/certificate/composition.schema.json",
+  "title": "CompositionCertificate",
+  "description": "Certificate envelope for F2 non-materialized composition (projected_trace_witness).",
+  "type": "object",
+  "required": ["certificate_type", "version", "fsm_ids", "payload"],
+  "additionalProperties": true,
+  "properties": {
+    "certificate_type": { "const": "projected_trace_witness" },
+    "version": { "type": "string" },
+    "fsm_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "string" }
+    },
+    "verdict_supported": { "type": "boolean" },
+    "payload": {
+      "type": "object",
+      "required": [
+        "component_trace_A",
+        "component_trace_B",
+        "synchronized_trace",
+        "projected_states_A",
+        "projected_states_B",
+        "property_evaluation"
+      ],
+      "properties": {
+        "component_trace_A": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "component_trace_B": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "synchronized_trace": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "projected_states_A": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "projected_states_B": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "property_evaluation": {
+          "type": "object",
+          "required": ["property_kind", "satisfied"],
+          "properties": {
+            "property_kind": { "enum": ["safety", "reachability", "nonblocking"] },
+            "satisfied": { "type": "boolean" },
+            "violation_step_index": { "type": "integer", "minimum": 0 },
+            "product_state_at_violation": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

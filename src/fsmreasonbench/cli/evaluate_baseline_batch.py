@@ -39,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     family = items[0].family
-    if family not in {"C2", "F1"}:
+    if family not in {"C2", "F1", "F2"}:
         print(f"ERROR: unsupported family={family!r}", file=sys.stderr)
         return 2
     if any(item.family != family for item in items):

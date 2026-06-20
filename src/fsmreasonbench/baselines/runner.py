@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fsmreasonbench.baselines import c2, f1
+from fsmreasonbench.baselines import c2, f1, f2
 from fsmreasonbench.baselines.common import run_invalid_baseline
 from fsmreasonbench.items.assembly import BenchmarkItem
 
@@ -30,5 +30,11 @@ def run_baseline(
             return f1.run_oracle_baseline(item)
         if baseline == "random":
             return f1.run_random_baseline(item, seed=seed)
+        return run_invalid_baseline(item)
+    if item.family == "F2":
+        if baseline == "oracle":
+            return f2.run_oracle_baseline(item)
+        if baseline == "random":
+            return f2.run_random_baseline(item, seed=seed)
         return run_invalid_baseline(item)
     raise ValueError(f"unsupported family for baselines: {item.family!r}")

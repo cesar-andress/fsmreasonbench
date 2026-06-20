@@ -12,13 +12,13 @@ This roadmap maps seven publication blockers (E1–E7) to executable milestones 
 
 | Area | State | Evidence |
 |------|-------|----------|
-| Implemented families | **C2, F1 only** | End-to-end generator → oracle → verifier → scorer |
+| Implemented families | **C2, F1, F2 (slice v1)** | End-to-end generator → oracle → verifier → scorer |
 | Frozen cohorts | **2 exploratory** (`v0.1-exploratory`) | C2 level-3 reachability, F1 mixed level-3; n=20 each |
 | Public cohort | **Not released** | No `v1.0-public` manifest |
 | Evaluation tracks | **R0/R1/R2 implemented** | Ollama track runner + multi-model `run_track_pilot_models` |
 | Ceilings | **oracle, reference_submitter, competent_submitter** | Reports under `docs/*_summary.*` |
 | Statistical reporting | **Bootstrap CIs from existing runs** | `docs/rate_ci_*` |
-| F2–F4, C1 | **Specified, not implemented** | `docs/specification/task_families.md` |
+| F2–F4, C1 | **F2 slice v1 implemented**; F3/F4/C1 specified only | `docs/f2_design_review.md`, `docs/specification/task_families.md` |
 | Frontier panel | **Exploratory pilots only** | `docs/pilot_v*`, capability-surface docs, `local_matrix_v1` |
 | Powered cohorts | **No** | 20 items/family is smoke-test scale |
 | Non-obvious finding | **Not established** | Exploratory separation layers exist; no frozen public claim |
@@ -40,7 +40,7 @@ This roadmap maps seven publication blockers (E1–E7) to executable milestones 
 |----|---------|------------------|
 | **E1** | R1/R2 tracks not on public cohort / panel | Runners + exploratory smoke exist; need powered public cohort + frontier panel |
 | **E2** | No competent-reasoner ceiling | M2 threat: “only oracle can satisfy contract” — partially addressed; human/frontier still open |
-| **E3** | F2 not implemented | Flagship quota (25%) missing; composition claims unsupported |
+| **E3** | F2 not fully implemented | Counterexample slice done; positive proofs + cohort quota still open |
 | **E4** | No `v1.0-public` cohort | Nothing citable, contamination-controlled, or Zenodo-ready at benchmark scale |
 | **E5** | No frontier model panel | No credible comparison to SOTA on frozen public data |
 | **E6** | Underpowered cohorts | n=20 cannot support family-level or track-level claims with tight CIs |

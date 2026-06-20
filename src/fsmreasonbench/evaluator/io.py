@@ -41,6 +41,20 @@ def item_from_dict(data: dict[str, Any]) -> BenchmarkItem:
             difficulty=data.get("difficulty", {}),
             contamination=data.get("contamination", {}),
         )
+    if family == "F2":
+        if "fsm_a" not in data or "fsm_b" not in data:
+            raise ValueError("F2 item JSON must include fsm_a and fsm_b")
+        return BenchmarkItem(
+            item_id=data["item_id"],
+            family=family,
+            family_tier=data.get("family_tier", "flagship"),
+            fsm=fsm_from_dict(data["fsm_a"]),
+            fsm_b=fsm_from_dict(data["fsm_b"]),
+            question=data["question"],
+            answer_key=data["answer_key"],
+            difficulty=data.get("difficulty", {}),
+            contamination=data.get("contamination", {}),
+        )
     if "fsm" not in data:
         raise ValueError("item JSON must include fsm")
     return BenchmarkItem(

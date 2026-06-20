@@ -10,6 +10,7 @@ from fsmreasonbench.evaluator.models import (
 from fsmreasonbench.evaluator.parser import parse_submission
 from fsmreasonbench.evaluator.scorer_c2 import score_c2_item, score_c2_parsed
 from fsmreasonbench.evaluator.scorer_f1 import score_f1_item, score_f1_parsed
+from fsmreasonbench.evaluator.scorer_f2 import score_f2_item, score_f2_parsed
 from fsmreasonbench.items.assembly import BenchmarkItem
 
 
@@ -20,6 +21,8 @@ __all__ = [
     "score_c2_parsed",
     "score_f1_item",
     "score_f1_parsed",
+    "score_f2_item",
+    "score_f2_parsed",
 ]
 
 
@@ -29,6 +32,8 @@ def score_item(item: BenchmarkItem, raw_response: object) -> ScoringRecord:
         return score_c2_item(item, raw_response)
     if item.family == "F1":
         return score_f1_item(item, raw_response)
+    if item.family == "F2":
+        return score_f2_item(item, raw_response)
     parse_result = parse_submission(raw_response, item.family)
     return ScoringRecord(
         item_id=item.item_id,
@@ -48,6 +53,8 @@ def score_parsed_submission(item: BenchmarkItem, submission: ParsedSubmission) -
         return score_c2_parsed(item, submission)
     if item.family == "F1":
         return score_f1_parsed(item, submission)
+    if item.family == "F2":
+        return score_f2_parsed(item, submission)
     return ScoringRecord(
         item_id=item.item_id,
         family=item.family,

@@ -6,6 +6,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
+from fsmreasonbench.certificates.composition import build_projected_trace_witness_certificate
 from fsmreasonbench.certificates.reachability import build_reachability_certificate
 from fsmreasonbench.certificates.separation import (
     build_distinguishing_trace_certificate,
@@ -13,8 +14,11 @@ from fsmreasonbench.certificates.separation import (
 )
 from fsmreasonbench.models.fsm import ExecutableFSM
 from fsmreasonbench.models.serialization import canonical_json, content_hash, fsm_to_dict
+from fsmreasonbench.oracle.composition import property_holds, shortest_violation_witness
 from fsmreasonbench.oracle.reachability import is_reachable, shortest_reachability_witness
 from fsmreasonbench.oracle.separation import are_equivalent, shortest_distinguishing_trace
+from fsmreasonbench.runtime.composition import ProjectedTraceWitness
+from fsmreasonbench.verifier.composition import verify_f2_certificate
 from fsmreasonbench.verifier.reachability import verify_reachability_certificate
 from fsmreasonbench.verifier.separation import (
     verify_distinguishing_trace_certificate,
@@ -53,6 +57,11 @@ class BenchmarkItem:
         if self.family == "F1":
             if self.fsm_b is None:
                 raise ValueError("F1 item requires fsm_b")
+            data["fsm_a"] = fsm_to_dict(self.fsm, include_metadata=True)
+            data["fsm_b"] = fsm_to_dict(self.fsm_b, include_metadata=True)
+        elif self.family == "F2":
+            if self.fsm_b is None:
+                raise ValueError("F2 item requires fsm_b")
             data["fsm_a"] = fsm_to_dict(self.fsm, include_metadata=True)
             data["fsm_b"] = fsm_to_dict(self.fsm_b, include_metadata=True)
         else:
@@ -267,6 +276,67 @@ def _assemble_equivalent_separation_item(
     )
 
 
+def assemble_composition_item(
+    fsm_a: ExecutableFSM,
+    fsm_b: ExecutableFSM,
+    *,
+    question: dict[str, Any],
+    witness: ProjectedTraceWitness,
+    seed: int,
+    item_id: str | None = None,
+) -> BenchmarkItem:
+    """
+    Assemble F2 counterexample item with oracle-produced projected trace witness.
+
+    Verdict convention: ``verdict=false`` means the composed property is violated.
+    """
+    certificate = build_projected_trace_witness_certificate(fsm_a, fsm_b, witness)
+    fingerprint_input = canonical_json(
+        {
+            "fsm_a": fsm_to_dict(fsm_a, include_metadata=False),
+            "fsm_b": fsm_to_dict(fsm_b, include_metadata=False),
+            "question": question,
+        }
+    )
+    public_fingerprint = content_hash({"canonical": fingerprint_input})
+    resolved_item_id = item_id or str(
+        uuid.uuid5(
+            uuid.NAMESPACE_URL,
+            f"fsmreasonbench:item:F2:{seed}:{fsm_a.fsm_id}:{fsm_b.fsm_id}",
+        )
+    )
+    product_width = fsm_a.state_count * fsm_b.state_count
+    return BenchmarkItem(
+        item_id=resolved_item_id,
+        family="F2",
+        family_tier="flagship",
+        fsm=fsm_a,
+        fsm_b=fsm_b,
+        question=question,
+        answer_key={
+            "item_id": resolved_item_id,
+            "verdict": False,
+            "certificate": certificate,
+        },
+        difficulty={
+            "core": {
+                "|Q_A|": fsm_a.state_count,
+                "|Q_B|": fsm_b.state_count,
+                "product_width": product_width,
+                "d_comp": len(witness.synchronized_trace),
+                "violation_trace_length": len(witness.synchronized_trace),
+                "alphabet_size": len(fsm_a.input_alphabet),
+            },
+            "generator_seed": seed,
+            "slice_metadata": {
+                "counterexample_only": True,
+                "positive_verdict_supported": False,
+            },
+        },
+        contamination={"public_fingerprint": public_fingerprint},
+    )
+
+
 def self_verify_item(item: BenchmarkItem) -> None:
     """
     Validate item end-to-end: oracle certificate accepted by independent verifier.
@@ -275,6 +345,9 @@ def self_verify_item(item: BenchmarkItem) -> None:
     """
     if item.family == "F1":
         _self_verify_f1_item(item)
+        return
+    if item.family == "F2":
+        _self_verify_f2_item(item)
         return
     _self_verify_c2_item(item)
 
@@ -327,3 +400,25 @@ def _self_verify_f1_item(item: BenchmarkItem) -> None:
         )
     if are_equivalent(item.fsm_a, item.fsm_b):
         raise AssertionError("oracle reports equivalent DFAs for non-equivalence item")
+
+
+def _self_verify_f2_item(item: BenchmarkItem) -> None:
+    if item.fsm_b is None:
+        raise AssertionError("F2 item missing fsm_b")
+    certificate = item.answer_key["certificate"]
+    expected_verdict = item.answer_key["verdict"]
+    result = verify_f2_certificate(item.fsm_a, item.fsm_b, item.question, certificate)
+    if not result.valid:
+        raise AssertionError(f"self-verification failed: {result.errors}")
+    if certificate["certificate_type"] != "projected_trace_witness":
+        raise AssertionError(
+            f"expected projected_trace_witness certificate, got {certificate['certificate_type']!r}"
+        )
+    holds = property_holds(item.fsm_a, item.fsm_b, item.question)
+    if expected_verdict is False and holds:
+        raise AssertionError("counterexample item but oracle reports property holds")
+    if expected_verdict is True and not holds:
+        raise AssertionError("positive item but oracle reports property violated")
+    witness = shortest_violation_witness(item.fsm_a, item.fsm_b, item.question)
+    if expected_verdict is False and witness is None:
+        raise AssertionError("counterexample item without oracle violation witness")

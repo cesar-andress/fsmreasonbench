@@ -100,6 +100,34 @@ Schema: `schema/certificate/separation.schema.json`.
 
 Counterexample to composed property without product table in payload.
 
+**Implemented payload (artifact v0.2+, schema `composition.schema.json`):**
+
+```json
+{
+  "certificate_type": "projected_trace_witness",
+  "version": "1.0",
+  "fsm_ids": ["uuid-a", "uuid-b"],
+  "verdict_supported": false,
+  "payload": {
+    "component_trace_A": ["a"],
+    "component_trace_B": ["a"],
+    "synchronized_trace": ["a"],
+    "projected_states_A": ["q0", "q1"],
+    "projected_states_B": ["q0", "q2"],
+    "property_evaluation": {
+      "property_kind": "safety",
+      "satisfied": false,
+      "violation_step_index": 1,
+      "product_state_at_violation": "q1,q2"
+    }
+  }
+}
+```
+
+**Verification:** Verifier replays component traces on A and B separately; checks synchronization consistency; derives product states stepwise; validates property violation. Does **not** accept evaluatee-supplied product graphs.
+
+**Normative sketch (future generalization):**
+
 ```json
 {
   "certificate_type": "projected_trace_witness",
@@ -116,8 +144,6 @@ Counterexample to composed property without product table in payload.
   }
 }
 ```
-
-**Verification:** Verifier rebuilds product internally; checks projections are consistent and violation holds.
 
 ### Type: `compositional_witness`
 

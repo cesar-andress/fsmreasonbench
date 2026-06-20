@@ -155,6 +155,17 @@ def build_difficulty_summary(items: list[BenchmarkItem]) -> dict[str, Any]:
                 family_summary["witness_length"] = _numeric_stats(witness_lengths)
             if state_counts:
                 family_summary["state_count"] = _numeric_stats(state_counts)
+        elif family == "F2":
+            trace_lengths = [
+                core["violation_trace_length"]
+                for core in cores
+                if "violation_trace_length" in core
+            ]
+            product_widths = [core["product_width"] for core in cores if "product_width" in core]
+            if trace_lengths:
+                family_summary["violation_trace_length"] = _numeric_stats(trace_lengths)
+            if product_widths:
+                family_summary["product_width"] = _numeric_stats(product_widths)
         summary[family] = family_summary
     return summary
 

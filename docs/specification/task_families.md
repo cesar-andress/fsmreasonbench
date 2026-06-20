@@ -135,6 +135,33 @@ Solver-delegation (R2) MAY compute products internally; they MUST NOT appear in 
 Verifier reconstructs product **only internally** (or checks compositional witness rules)
 to validate witness. Evaluatee certificate stays compressed.
 
+#### Implementation status (artifact)
+
+| Slice | Status | Certificate | Verdict convention |
+|-------|--------|-------------|-------------------|
+| F2 safety counterexample (`synchronous_product`) | ✅ implemented | `projected_trace_witness` | `verdict=false` ⟺ safety violated |
+| F2 positive proof (`verdict=true`) | ⬜ not yet | `compositional_witness` / `product_invariant_witness` | TBD |
+| F2 `no_counterexample_certificate` | ⬜ not yet | TBD | — |
+
+**Generator controls (artifact v0.2+):**
+
+| Parameter | Default | Role |
+|-----------|---------|------|
+| `min_violation_trace_length` | `1` | Shortest counterexample length floor |
+| `max_violation_trace_length` | `6` | Counterexample length cap |
+| `state_count_a`, `state_count_b` | `3` | Component state counts |
+| `alphabet_size` | `2` | Shared alphabet size |
+| `transition_density` | `0.75` | Component edge density |
+| `max_generation_attempts` | `64` | Rejection sampling budget |
+
+**Slice v1:** generator emits **counterexample-only** items (`difficulty.slice_metadata.counterexample_only=true`). Property kind: `safety` with `state_set` invariant on product states.
+
+**Batch / smoke:** `generate_batch --family F2`, `evaluate_baseline_batch --baseline oracle --family F2`.
+
+**Normative question wording:** “Does the synchronous product of FSM A and FSM B violate the given safety property?” Submit `verdict=false` with a `projected_trace_witness` when a violating synchronized trace exists.
+
+Design review: [`../f2_design_review.md`](../f2_design_review.md).
+
 ---
 
 ### F3 — Constructive Synthesis
