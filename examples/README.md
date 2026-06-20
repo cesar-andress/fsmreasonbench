@@ -204,6 +204,24 @@ python -m fsmreasonbench.cli.run_pilot_models \
 
 Layout per model/family: `{out-dir}/{model_dir}/{family}/scores.jsonl`, `results.jsonl`, `transcripts/`. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md`. Exploratory only — not for paper claims.
 
+## Multi-model track pilot (R0/R1/R2)
+
+Run the same frozen exploratory cohorts under R0, R1, and R2 across multiple Ollama models. This is the first experiment layout that measures **Δ_R1−R0** and **Δ_R2−R0** on actual LLM outputs (verdict, certificate, fully correct):
+
+```bash
+python -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 \
+  --tracks R0,R1,R2 \
+  --max-items 20 \
+  --temperature 0 \
+  --out-dir runs/track_pilot_v1
+```
+
+Default item sources: `cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl` and `cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl`.
+
+Layout per model/family/track: `{out-dir}/{model_dir}/{family}/{track}/results.jsonl`, `scores.jsonl`, `transcripts/`, `summary.json`. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md` (metrics, delegation gaps, failure movement). Skip completed cells unless `--force`. Exploratory only — not for paper claims.
+
 ## Model capability-surface evaluation
 
 Sweep difficulty levels 1–5 with multiple Ollama models:

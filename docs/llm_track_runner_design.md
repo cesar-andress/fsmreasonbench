@@ -190,4 +190,15 @@ python -m fsmreasonbench.cli.run_ollama_batch ... --track R0
 # Compare runs
 python -m fsmreasonbench.cli.compare_tracks \
   --r0-dir runs/.../R0 --r1-dir runs/.../R1 --r2-dir runs/.../R2
+
+# Multi-model track pilot (R0/R1/R2 × models × families)
+python -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 \
+  --tracks R0,R1,R2 \
+  --max-items 20 \
+  --temperature 0 \
+  --out-dir runs/track_pilot_v1
 ```
+
+`track_pilot_v1` is the first experiment layout capable of measuring **Δ_R1−R0** and **Δ_R2−R0** on actual LLM outputs across a model panel. Each cell writes `results.jsonl`, `scores.jsonl`, `transcripts/`, and `summary.json` under `{out_dir}/{model_dir}/{family}/{track}/`. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md` (with per-family metrics, delegation gaps, and failure-movement tables). Use `--force` to re-run completed cells; failures are recorded per cell without aborting the sweep.

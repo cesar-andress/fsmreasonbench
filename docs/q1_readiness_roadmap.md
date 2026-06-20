@@ -15,7 +15,7 @@ This roadmap maps seven publication blockers (E1–E7) to executable milestones 
 | Implemented families | **C2, F1 only** | End-to-end generator → oracle → verifier → scorer |
 | Frozen cohorts | **2 exploratory** (`v0.1-exploratory`) | C2 level-3 reachability, F1 mixed level-3; n=20 each |
 | Public cohort | **Not released** | No `v1.0-public` manifest |
-| Evaluation tracks | **R0-style only** | Local Ollama runners; no R1/R2 runners |
+| Evaluation tracks | **R0/R1/R2 implemented** | Ollama track runner + multi-model `run_track_pilot_models` |
 | Ceilings | **oracle, reference_submitter, competent_submitter** | Reports under `docs/*_summary.*` |
 | Statistical reporting | **Bootstrap CIs from existing runs** | `docs/rate_ci_*` |
 | F2–F4, C1 | **Specified, not implemented** | `docs/specification/task_families.md` |
@@ -38,7 +38,7 @@ This roadmap maps seven publication blockers (E1–E7) to executable milestones 
 
 | ID | Blocker | Why it blocks Q1 |
 |----|---------|------------------|
-| **E1** | R1/R2 tracks not implemented | Spec promises tool-augmented and solver-delegation tracks; artifact cannot evaluate them |
+| **E1** | R1/R2 tracks not on public cohort / panel | Runners + exploratory smoke exist; need powered public cohort + frontier panel |
 | **E2** | No competent-reasoner ceiling | M2 threat: “only oracle can satisfy contract” — partially addressed; human/frontier still open |
 | **E3** | F2 not implemented | Flagship quota (25%) missing; composition claims unsupported |
 | **E4** | No `v1.0-public` cohort | Nothing citable, contamination-controlled, or Zenodo-ready at benchmark scale |
@@ -52,7 +52,7 @@ This roadmap maps seven publication blockers (E1–E7) to executable milestones 
 
 | Milestone | Maps to | Summary |
 |-----------|---------|---------|
-| **M1** | E1 | R1 step-simulator + R2 solver-delegation runners |
+| **M1** | E1 | R1 step-simulator + R2 solver-delegation runners ✅ **implemented**; track pilot for multi-model Δ |
 | **M2** | E2 | Competent submitter ceiling + combined ceiling report ✅ **started** |
 | **M3** | E3 | F2 non-materialized composition vertical |
 | **M4** | E4 | Freeze and validate `v1.0-public` cohort |

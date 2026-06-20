@@ -57,8 +57,9 @@ Reported rates: `extractability_rate`, `verdict_accuracy`, `certificate_valid_ra
 | **Random baseline** | Seeded wrong submissions; tests scoring separation |
 | **Invalid baseline** | Non-extractable output probe |
 | **Local Ollama (no tools)** | Exploratory model evaluation; temperature=0; not frozen |
+| **R0/R1/R2 track pilot** | Multi-model delegation experiment on frozen exploratory cohorts (`run_track_pilot_models`) |
 
-Exploratory runs (pilots, capability-surface sweeps) may use on-demand JSONL under `runs/` (gitignored) or **sealed exploratory cohorts** under `cohorts/v0.1-exploratory/`. Committed summaries in `docs/pilot_v0_*` and `docs/pilot_v1_*` are illustrative only — not paper claims or final benchmark results.
+Exploratory runs (pilots, capability-surface sweeps, **track pilot v1**) may use on-demand JSONL under `runs/` (gitignored) or **sealed exploratory cohorts** under `cohorts/v0.1-exploratory/`. Committed summaries in `docs/pilot_v0_*`, `docs/pilot_v1_*`, and locally generated `runs/track_pilot_v1/` are illustrative only — not paper claims or final benchmark results.
 
 **Exploratory frozen cohorts (valid, non-public):** two snapshots pass `validate_cohort` and are intended for reproducibility smoke testing and artifact validation — **not** final public `v1.0-public` cohorts and not citable as benchmark results.
 
@@ -130,6 +131,9 @@ generator → oracle → certificate → verifier  ✅
 | Exploratory capability surface | `evaluator/capability_surface.py`, `cli/run_capability_surface.py` |
 | Ollama batch runner | `runners/`, `cli/run_ollama_batch.py` |
 | Multi-model pilot runner | `runners/pilot_models.py`, `cli/run_pilot_models.py` |
+| Multi-model track pilot (R0/R1/R2) | `runners/track_pilot_models.py`, `cli/run_track_pilot_models.py` |
+| Ollama track batch runner | `runners/ollama_track_batch.py`, `cli/run_ollama_track_batch.py` |
+| Track comparison export | `evaluator/track_comparison.py`, `cli/compare_tracks.py` |
 | Model capability-surface runner | `evaluator/capability_surface_models.py`, `cli/run_capability_surface_models.py` |
 | Capability-surface plotting | `evaluator/capability_surface_plots.py`, `cli/plot_capability_surface.py` |
 | Capability-surface report export | `evaluator/capability_surface_report_export.py`, `cli/export_capability_surface_report.py` |
@@ -281,6 +285,13 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_pilot_models \
   --f1-items runs/capability_surface_smoke2/F1/min_distinguishing_trace_length_2/items.jsonl \
   --max-items 20 \
   --out-dir runs/pilot_v1
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 \
+  --tracks R0,R1,R2 \
+  --max-items 20 \
+  --temperature 0 \
+  --out-dir runs/track_pilot_v1
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_capability_surface_models \
   --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
   --levels 1,2,3,4,5 \
