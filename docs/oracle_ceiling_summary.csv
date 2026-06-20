@@ -1,0 +1,13 @@
+source_name,family,difficulty_level,cohort_id,n,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate
+capability_surface_models/C2/min_witness_length_1/items.jsonl,C2,1,,20,1.0,1.0,1.0,1.0
+capability_surface_models/C2/min_witness_length_2/items.jsonl,C2,2,,20,1.0,1.0,1.0,1.0
+capability_surface_models/C2/min_witness_length_3/items.jsonl,C2,3,,20,1.0,1.0,1.0,1.0
+capability_surface_models/C2/min_witness_length_4/items.jsonl,C2,4,,20,1.0,1.0,1.0,1.0
+capability_surface_models/C2/min_witness_length_5/items.jsonl,C2,5,,20,1.0,1.0,1.0,1.0
+capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_1/items.jsonl,F1,1,,20,1.0,1.0,1.0,1.0
+capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_2/items.jsonl,F1,2,,20,1.0,1.0,1.0,1.0
+capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/items.jsonl,F1,3,,20,1.0,1.0,1.0,1.0
+capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_4/items.jsonl,F1,4,,20,1.0,1.0,1.0,1.0
+capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_5/items.jsonl,F1,5,,20,1.0,1.0,1.0,1.0
+cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl,C2,,c2-reachability-level3-v0.1-exploratory,20,1.0,1.0,1.0,1.0
+cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl,F1,,f1-mixed-level3-v0.1-exploratory,20,1.0,1.0,1.0,1.0

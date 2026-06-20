@@ -1,0 +1,137 @@
+{
+  "baseline": "oracle",
+  "rows": [
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 1,
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models/C2/min_witness_length_1/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 2,
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models/C2/min_witness_length_2/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 3,
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models/C2/min_witness_length_3/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 4,
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models/C2/min_witness_length_4/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 5,
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models/C2/min_witness_length_5/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 1,
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_1/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 2,
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_2/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 3,
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 4,
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_4/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": null,
+      "difficulty_level": 5,
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_5/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "difficulty_level": null,
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "certificate_valid_rate": 1.0,
+      "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+      "difficulty_level": null,
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 1.0,
+      "n": 20,
+      "source_name": "cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl",
+      "verdict_accuracy": 1.0
+    }
+  ]
+}
