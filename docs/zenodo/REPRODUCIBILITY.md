@@ -179,6 +179,15 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.generate_one --family C2 --seed 
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health --json
 
+# Failure taxonomy (certificate_invalid error categories)
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.failure_taxonomy \
+  --scores runs/.../scores.jsonl \
+  --results runs/.../results.jsonl \
+  --out runs/taxonomy_example.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.failure_taxonomy_batch \
+  --root runs/capability_surface_models_f1_mixed \
+  --out docs/f1_mixed_failure_taxonomy.json
+
 # Run unit tests (oracle, verifier, scorer, rescore)
 PYTHONPATH=src python3.11 -m pytest -v
 

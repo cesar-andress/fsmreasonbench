@@ -155,6 +155,19 @@ python -m fsmreasonbench.cli.inspect_failures \
   --json
 ```
 
+Classify `certificate_invalid` failures into interpretable taxonomy categories (trace format, replay, reachability set, acceptance, equivalence hash, certificate type, FSM ids, malformed payload, other). Output includes counts, percentages, sample `item_id`s, and grouping by family and failure stage.
+
+```bash
+python -m fsmreasonbench.cli.failure_taxonomy \
+  --scores runs/capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/qwen2.5-coder:7b/scores.jsonl \
+  --results runs/capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/qwen2.5-coder:7b/results.jsonl \
+  --out runs/taxonomy_example.json
+
+python -m fsmreasonbench.cli.failure_taxonomy_batch \
+  --root runs/capability_surface_models_f1_mixed \
+  --out docs/f1_mixed_failure_taxonomy.json
+```
+
 Writes per-item transcripts under `{out-dir}/transcripts/`, scoring JSONL at `{out-dir}/scores.jsonl`, and `summary.json`. Exploratory only — not for paper claims.
 
 ## Multi-model pilot runner

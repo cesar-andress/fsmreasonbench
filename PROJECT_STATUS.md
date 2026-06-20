@@ -1,7 +1,7 @@
 # FSMReasonBench — Project Status
 
 **Repository:** artifact (`fsmreasonbench`)  
-**Last updated:** 2025-06-19  
+**Last updated:** 2025-06-20  
 **Package version:** `0.2.0-dev`  
 **Branch:** `main`
 
@@ -120,6 +120,7 @@ generator → oracle → certificate → verifier  ✅
 | Artifact health check | `dev/artifact_health.py`, `cli/artifact_health.py` — package import, required schemas, example self-verify, CLI imports; `--json` |
 | F1 item audit diagnostics | `evaluator/f1_item_audit.py`, `cli/audit_f1_items.py` |
 | Failure inspection CLI | `evaluator/inspect_failures.py`, `cli/inspect_failures.py` — rates + per-stage failure samples |
+| Failure taxonomy analysis | `evaluator/failure_taxonomy.py`, `cli/failure_taxonomy.py`, `cli/failure_taxonomy_batch.py` — classify `certificate_invalid` errors into interpretable categories |
 | Pilot report generator | `evaluator/pilot_report.py`, `cli/generate_pilot_report.py` |
 
 **End-to-end path:** item → response → parser → extractability → verifier → scoring → transcript → rescore
@@ -241,6 +242,13 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.inspect_failures \
   --scores runs/ollama_c2_qwen7b/scores.jsonl \
   --results runs/ollama_c2_qwen7b.jsonl \
   --limit 5
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.failure_taxonomy \
+  --scores runs/capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/qwen2.5-coder:7b/scores.jsonl \
+  --results runs/capability_surface_models_f1_mixed/F1/min_distinguishing_trace_length_3/qwen2.5-coder:7b/results.jsonl \
+  --out runs/taxonomy_example.json
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.failure_taxonomy_batch \
+  --root runs/capability_surface_models_f1_mixed \
+  --out docs/f1_mixed_failure_taxonomy.json
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_pilot_models \
   --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
   --c2-items runs/capability_surface_smoke2/C2/min_witness_length_2/items.jsonl \
