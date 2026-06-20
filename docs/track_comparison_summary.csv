@@ -1,4 +1,7 @@
-track,model,family,n,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate,tool_invocation_rate,average_tool_calls_per_item
-R0,qwen2.5-coder:7b,C2,5,1.0,0.4,0.0,0.0,0.0,0.0
-R1,qwen2.5-coder:7b,C2,5,0.0,0.0,0.0,0.0,1.0,1.0
-R2,qwen2.5-coder:7b,C2,5,0.0,0.0,0.0,0.0,1.0,1.0
+track,model,family,n,extractability_rate,verdict_accuracy,certificate_valid_rate,fully_correct_rate,tool_invocation_rate,average_tool_calls_per_item,count_no_tool_plan,count_invalid_tool_plan,count_disallowed_tool,count_tool_execution_error,count_final_submission_not_extractable,count_verdict_wrong,count_certificate_invalid,count_correct
+R0,qwen2.5-coder:7b,C2,20,0.95,0.2631578947368421,0.0,0.0,0.0,0.0,0,0,0,0,1,14,5,0
+R1,qwen2.5-coder:7b,C2,20,1.0,0.8,0.15,0.15,1.0,1.0,0,0,0,0,0,4,13,3
+R2,qwen2.5-coder:7b,C2,20,1.0,0.95,0.1,0.1,1.0,1.0,0,0,0,0,0,1,17,2
+R0,qwen2.5-coder:7b,F1,20,1.0,0.45,0.0,0.0,0.0,0.0,0,0,0,0,0,11,9,0
+R1,qwen2.5-coder:7b,F1,20,0.8,1.0,0.0,0.0,1.0,1.0,0,0,0,0,4,0,16,0
+R2,qwen2.5-coder:7b,F1,20,0.8,1.0,0.5,0.4,1.0,1.0,0,0,0,0,4,0,8,8

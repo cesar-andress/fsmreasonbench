@@ -12,6 +12,10 @@ from fsmreasonbench.evaluator.jsonl import write_jsonl
 from fsmreasonbench.evaluator.models import ScoringRecord
 from fsmreasonbench.evaluator.scorer import score_item
 from fsmreasonbench.evaluator.summary import summarize_scoring_records
+from fsmreasonbench.evaluator.track_failure_taxonomy import (
+    classify_track_failure,
+    summarize_track_failure_taxonomy,
+)
 from fsmreasonbench.items.assembly import BenchmarkItem
 from fsmreasonbench.runners.ollama_batch import (
     GenerateFn,
@@ -122,6 +126,7 @@ def run_ollama_track_batch(
     results: list[dict[str, Any]] = []
     scoring_rows: list[dict[str, Any]] = []
     tool_invocation_counts: list[int] = []
+    item_records: list[dict[str, Any]] = []
 
     for item in selected:
         run = _evaluate_item_with_tools(
@@ -140,7 +145,14 @@ def run_ollama_track_batch(
         scoring_dict["tool_invocation_count"] = run["transcript"].to_dict()[
             "tool_invocation_count"
         ]
+        scoring_dict["track_failure_class"] = run["track_failure_class"]
         scoring_rows.append(scoring_dict)
+        item_records.append(
+            {
+                "track_failure_class": run["track_failure_class"],
+                "scoring_record": scoring_dict,
+            }
+        )
         tool_invocation_counts.append(scoring_dict["tool_invocation_count"])
 
         results.append(
@@ -159,6 +171,7 @@ def run_ollama_track_batch(
                 "transcript_path": str(transcript_path.relative_to(root)),
                 "scoring_record": scoring_dict,
                 "protocol_errors": list(run["transcript"].protocol_errors),
+                "track_failure_class": run["track_failure_class"],
             }
         )
 
@@ -182,6 +195,7 @@ def run_ollama_track_batch(
             if tool_invocation_counts
             else 0.0
         ),
+        **summarize_track_failure_taxonomy(item_records),
     }
     if write_summary:
         dump_json(root / "summary.json", summary)
@@ -214,14 +228,21 @@ def _evaluate_item_with_tools(
 
     tool_calls_requested: list[dict[str, Any]] = []
     tool_outputs: list[dict[str, Any]] = []
+    tool_execution_error: str | None = None
+    tool_plan_valid = False
     try:
         tool_calls_requested, notes = parse_tool_plan(plan_text)
+        tool_plan_valid = True
         if notes:
             audit.scratchpad("model_notes", notes)
         tool_outputs = execute_tool_plan(item, track, tool_calls_requested, audit)
     except TrackProtocolError as exc:
         protocol_errors.append(str(exc))
         audit.scratchpad("protocol_error", str(exc))
+    except ValueError as exc:
+        tool_execution_error = str(exc)
+        protocol_errors.append(str(exc))
+        audit.scratchpad("tool_execution_error", str(exc))
 
     results_prompt = render_track_prompt(
         item,
@@ -280,7 +301,16 @@ def _evaluate_item_with_tools(
         audit_log=audit_log.to_dict(),
         protocol_errors=tuple(protocol_errors),
     )
+    track_failure_class = classify_track_failure(
+        track=track.value,
+        scoring_record=scoring_record.to_dict(),
+        tool_calls_requested=tool_calls_requested,
+        tool_outputs=tool_outputs,
+        tool_plan_valid=tool_plan_valid,
+        tool_execution_error=tool_execution_error,
+    )
     return {
         "transcript": transcript,
         "raw_response_text": final_text,
+        "track_failure_class": track_failure_class,
     }

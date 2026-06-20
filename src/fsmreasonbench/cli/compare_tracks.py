@@ -33,6 +33,10 @@ def main(argv: list[str] | None = None) -> int:
         help="Output Markdown report",
     )
     parser.add_argument("--repo-root", help="Repository root (default: auto-detect)")
+    parser.add_argument(
+        "--cohort-id",
+        help="Optional cohort label stored in comparison JSON",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -49,6 +53,7 @@ def main(argv: list[str] | None = None) -> int:
             out_json=resolve(args.out_json),
             out_csv=resolve(args.out_csv),
             out_md=resolve(args.out_md),
+            cohort_id=args.cohort_id,
         )
     except (ValueError, OSError, FileNotFoundError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

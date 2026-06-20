@@ -141,7 +141,7 @@ def test_r0_ollama_batch_unchanged(tmp_path: Path) -> None:
     )
     assert model.calls == 1
     assert result.summary["fully_correct_rate"] == 1.0
-    assert "track" not in result.summary
+    assert result.summary.get("track", "R0") == "R0"
 
 
 def test_r1_executes_step_tools(tmp_path: Path) -> None:
@@ -257,6 +257,19 @@ def test_compare_tracks_delegation_gaps(tmp_path: Path) -> None:
             "fully_correct_rate": rate,
             "tool_invocation_rate": 0.0 if track == TrackId.R0 else 1.0,
             "average_tool_calls_per_item": 0.0 if track == TrackId.R0 else 2.0,
+            "track_failure_counts": {
+                label: (1 if label == "correct" and rate == 1.0 else 0)
+                for label in (
+                    "no_tool_plan",
+                    "invalid_tool_plan",
+                    "disallowed_tool",
+                    "tool_execution_error",
+                    "final_submission_not_extractable",
+                    "verdict_wrong",
+                    "certificate_invalid",
+                    "correct",
+                )
+            },
         }
         (run_dir / "track_summary.json").write_text(
             json.dumps(summary), encoding="utf-8"

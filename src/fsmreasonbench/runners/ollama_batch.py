@@ -9,6 +9,10 @@ from typing import Any, Protocol
 from fsmreasonbench.evaluator.io import dump_json
 from fsmreasonbench.evaluator.jsonl import write_jsonl
 from fsmreasonbench.evaluator.summary import summarize_scoring_records
+from fsmreasonbench.evaluator.track_failure_taxonomy import (
+    classify_track_failure,
+    summarize_track_failure_taxonomy,
+)
 from fsmreasonbench.evaluator.transcript import record_transcript
 from fsmreasonbench.items.assembly import BenchmarkItem
 from fsmreasonbench.runners.prompts import prompt_metadata, render_prompt
@@ -90,6 +94,13 @@ def run_ollama_batch(
         dump_json(transcript_path, transcript.to_dict())
 
         scoring_dict = transcript.scoring_record.to_dict()
+        scoring_dict["track"] = "R0"
+        scoring_dict["model"] = config.model
+        scoring_dict["tool_invocation_count"] = 0
+        scoring_dict["track_failure_class"] = classify_track_failure(
+            track="R0",
+            scoring_record=scoring_dict,
+        )
         run_record = {
             "item_id": item.item_id,
             "family": item.family,
@@ -100,6 +111,7 @@ def run_ollama_batch(
             "raw_response": raw_response,
             "transcript_path": str(transcript_path.relative_to(root)),
             "scoring_record": scoring_dict,
+            "track_failure_class": scoring_dict["track_failure_class"],
         }
         results.append(run_record)
         scoring_records.append(scoring_dict)
@@ -113,10 +125,15 @@ def run_ollama_batch(
     summary = {
         "model": config.model,
         "family": family,
+        "track": "R0",
         "n": len(parsed_records),
         **summarize_scoring_records(parsed_records),
+        "tool_invocation_rate": 0.0,
+        "average_tool_calls_per_item": 0.0,
+        **summarize_track_failure_taxonomy(scoring_records),
     }
     if write_summary:
         dump_json(root / "summary.json", summary)
+        dump_json(root / "track_summary.json", summary)
 
     return OllamaBatchResult(results=results, summary=summary, out_dir=root)

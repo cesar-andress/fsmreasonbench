@@ -7,6 +7,13 @@ from typing import Any
 
 from fsmreasonbench.items.assembly import BenchmarkItem
 from fsmreasonbench.runners.prompts import _render_c2_prompt, _render_f1_prompt
+from fsmreasonbench.runners.track_prompt_schemas import (
+    CERTIFICATE_EXAMPLES_BY_FAMILY,
+    FINAL_SUBMISSION_CHECKLIST,
+    FINAL_SUBMISSION_ENVELOPE,
+    INVALID_PAYLOAD_EXAMPLES,
+    SCHEMA_RULE,
+)
 from fsmreasonbench.tracks.models import TrackId
 
 _PROTOCOL_HEADER = """Respond with a single JSON object only (no prose outside JSON).
@@ -36,36 +43,48 @@ def _render_r0_prompt(item: BenchmarkItem) -> str:
     raise ValueError(f"unsupported family: {item.family!r}")
 
 
-def _submission_schema_hint(item: BenchmarkItem) -> str:
-    if item.family == "C2":
-        return (
-            '  "item_id": "...",\n'
-            '  "verdict": true or false,\n'
-            '  "certificate": { "certificate_type": "trace_witness" or '
-            '"unreachability_witness", "version": "1.0", "payload": { ... } }'
-        )
-    return (
-        '  "item_id": "...",\n'
-        '  "verdict": true or false,\n'
-        '  "certificate": { "certificate_type": "distinguishing_trace" or '
-        '"equivalence_witness", "version": "1.0", "payload": { ... } }'
-    )
+def _certificate_examples_block(family: str) -> str:
+    lines = ["Valid certificate examples for this family:", ""]
+    for label, example in CERTIFICATE_EXAMPLES_BY_FAMILY[family]:
+        lines.append(f"### {label}")
+        lines.append(example)
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _phase2_schema_block(item: BenchmarkItem) -> str:
+    family_examples = _certificate_examples_block(item.family)
+    return f"""## Final submission envelope (exact)
+
+{FINAL_SUBMISSION_ENVELOPE}
+
+{SCHEMA_RULE}
+
+{family_examples}
+## Invalid payload examples (do NOT emit)
+
+{INVALID_PAYLOAD_EXAMPLES}
+
+## Pre-submit checklist
+
+{FINAL_SUBMISSION_CHECKLIST}
+"""
 
 
 def _render_tool_plan_prompt(item: BenchmarkItem, track: TrackId) -> str:
     evaluatee = json.dumps(item.to_evaluatee_dict(), indent=2, sort_keys=True)
     if track == TrackId.R1:
         tools_doc = (
-            '- "step": inputs {"fsm_id": string, "state": string, "symbol": string}\n'
-            "  Returns {success, next_state?, error?}. Use only this tool."
+            '- "step": inputs {{"fsm_id": string, "state": string, "symbol": string}}\n'
+            "  Returns {{success, next_state?, error?}}. Use only this tool."
         )
     else:
         tools_doc = (
-            '- "solver.is_reachable": inputs {"fsm_id", "target_state"}\n'
-            '- "solver.reachability_certificate": inputs {"fsm_id", "target_state"}\n'
-            '- "solver.check_separation": inputs {"fsm_id_a", "fsm_id_b"}\n'
-            '- "solver.equivalence_certificate": inputs {"fsm_id_a", "fsm_id_b"}\n'
-            '- "solver.distinguishing_certificate": inputs {"fsm_id_a", "fsm_id_b"}\n'
+            '- "solver.is_reachable": inputs {{"fsm_id", "target_state"}}\n'
+            '- "solver.reachability_certificate": inputs {{"fsm_id", "target_state"}}\n'
+            '- "solver.check_separation": inputs {{"fsm_id_a", "fsm_id_b"}}\n'
+            '- "solver.equivalence_certificate": inputs {{"fsm_id_a", "fsm_id_b"}}\n'
+            '- "solver.distinguishing_certificate": inputs {{"fsm_id_a", "fsm_id_b"}}\n'
             "Use only registered solver tools above."
         )
 
@@ -76,7 +95,9 @@ Evaluatee item (JSON):
 
 Track {track.value} rules:
 - You may NOT access answer keys or oracle certificates.
-- Phase 1: request tool calls only; do NOT emit the final submission yet.
+- Phase 1 ONLY: request tool calls; do NOT emit final_submission yet.
+- Phase 2 (next message) will provide tool results and require final_submission.
+
 {tools_doc}
 
 {_PROTOCOL_HEADER}{{
@@ -96,6 +117,9 @@ def _render_tool_results_prompt(
 ) -> str:
     evaluatee = json.dumps(item.to_evaluatee_dict(), indent=2, sort_keys=True)
     results_json = json.dumps(tool_results, indent=2, sort_keys=True)
+    schema_block = _phase2_schema_block(item)
+    item_id = item.item_id
+
     return f"""You are solving an FSMReasonBench {item.family} task under track {track.value}.
 
 Evaluatee item (JSON):
@@ -104,12 +128,11 @@ Evaluatee item (JSON):
 Tool execution results from your plan:
 {results_json}
 
-Phase 2: emit the final benchmark submission JSON only.
+Phase 2: emit final_submission ONLY. Use tool results to decide verdict and build a schema-valid certificate.
 
-{_PROTOCOL_HEADER}{{
-  "phase": "final_submission",
-  "submission": {{
-{_submission_schema_hint(item)}
-  }}
-}}
+{schema_block}
+
+Emit JSON matching this envelope with item_id="{item_id}":
+
+{_PROTOCOL_HEADER}{FINAL_SUBMISSION_ENVELOPE}
 """

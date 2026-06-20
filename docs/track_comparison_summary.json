@@ -1,100 +1,566 @@
 {
-  "comparison_row": {
-    "average_tool_calls_per_item": null,
-    "certificate_valid_rate": null,
-    "delegation_gap_R1_minus_R0_certificate_valid_rate": 0.0,
-    "delegation_gap_R1_minus_R0_fully_correct_rate": 0.0,
-    "delegation_gap_R1_minus_R0_verdict_accuracy": -0.4,
-    "delegation_gap_R2_minus_R0_certificate_valid_rate": 0.0,
-    "delegation_gap_R2_minus_R0_fully_correct_rate": 0.0,
-    "delegation_gap_R2_minus_R0_verdict_accuracy": -0.4,
-    "extractability_rate": null,
-    "family": "C2",
-    "fully_correct_rate": null,
-    "model": "qwen2.5-coder:7b",
-    "n": 5,
-    "tool_invocation_rate": null,
-    "track": "comparison",
-    "verdict_accuracy": null
-  },
-  "delegation_gaps": {
-    "R1_minus_R0": {
-      "cohort_id": null,
-      "delegation_gap": {
-        "certificate_valid_rate": 0.0,
-        "fully_correct_rate": 0.0,
-        "verdict_accuracy": -0.4
-      },
-      "family": "C2",
-      "n": 5,
-      "r0_track": "R0",
-      "r2_track": "R1"
-    },
-    "R2_minus_R0": {
-      "cohort_id": null,
-      "delegation_gap": {
-        "certificate_valid_rate": 0.0,
-        "fully_correct_rate": 0.0,
-        "verdict_accuracy": -0.4
-      },
-      "family": "C2",
-      "n": 5,
-      "r0_track": "R0",
-      "r2_track": "R2"
-    }
-  },
-  "track_summaries": [
+  "cohorts": [
     {
-      "certificate_valid_rate": 0.0,
-      "extractability_rate": 1.0,
-      "failure_stage_counts": {
-        "certificate_invalid": 2,
-        "correct": 0,
-        "not_extractable": 0,
-        "verdict_wrong": 3
+      "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+      "comparison_row": {
+        "cohort_id": "c2-reachability-level3-v0.1-exploratory",
+        "delegation_gap_R1_minus_R0_certificate_valid_rate": 0.15,
+        "delegation_gap_R1_minus_R0_fully_correct_rate": 0.15,
+        "delegation_gap_R1_minus_R0_verdict_accuracy": 0.536842105263158,
+        "delegation_gap_R2_minus_R0_certificate_valid_rate": 0.1,
+        "delegation_gap_R2_minus_R0_fully_correct_rate": 0.1,
+        "delegation_gap_R2_minus_R0_verdict_accuracy": 0.6868421052631579,
+        "family": "C2",
+        "model": "qwen2.5-coder:7b",
+        "n": 20,
+        "track": "comparison"
       },
+      "delegation_gaps": {
+        "R1_minus_R0": {
+          "cohort_id": null,
+          "delegation_gap": {
+            "certificate_valid_rate": 0.15,
+            "fully_correct_rate": 0.15,
+            "verdict_accuracy": 0.536842105263158
+          },
+          "family": "C2",
+          "n": 20,
+          "r0_track": "R0",
+          "r2_track": "R1"
+        },
+        "R2_minus_R0": {
+          "cohort_id": null,
+          "delegation_gap": {
+            "certificate_valid_rate": 0.1,
+            "fully_correct_rate": 0.1,
+            "verdict_accuracy": 0.6868421052631579
+          },
+          "family": "C2",
+          "n": 20,
+          "r0_track": "R0",
+          "r2_track": "R2"
+        }
+      },
+      "track_rows": [
+        {
+          "average_tool_calls_per_item": 0.0,
+          "certificate_valid_rate": 0.0,
+          "count_certificate_invalid": 5,
+          "count_correct": 0,
+          "count_disallowed_tool": 0,
+          "count_final_submission_not_extractable": 1,
+          "count_invalid_tool_plan": 0,
+          "count_no_tool_plan": 0,
+          "count_tool_execution_error": 0,
+          "count_verdict_wrong": 14,
+          "extractability_rate": 0.95,
+          "family": "C2",
+          "fully_correct_rate": 0.0,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 0.0,
+          "track": "R0",
+          "verdict_accuracy": 0.2631578947368421
+        },
+        {
+          "average_tool_calls_per_item": 1.0,
+          "certificate_valid_rate": 0.15,
+          "count_certificate_invalid": 13,
+          "count_correct": 3,
+          "count_disallowed_tool": 0,
+          "count_final_submission_not_extractable": 0,
+          "count_invalid_tool_plan": 0,
+          "count_no_tool_plan": 0,
+          "count_tool_execution_error": 0,
+          "count_verdict_wrong": 4,
+          "extractability_rate": 1.0,
+          "family": "C2",
+          "fully_correct_rate": 0.15,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 1.0,
+          "track": "R1",
+          "verdict_accuracy": 0.8
+        },
+        {
+          "average_tool_calls_per_item": 1.0,
+          "certificate_valid_rate": 0.1,
+          "count_certificate_invalid": 17,
+          "count_correct": 2,
+          "count_disallowed_tool": 0,
+          "count_final_submission_not_extractable": 0,
+          "count_invalid_tool_plan": 0,
+          "count_no_tool_plan": 0,
+          "count_tool_execution_error": 0,
+          "count_verdict_wrong": 1,
+          "extractability_rate": 1.0,
+          "family": "C2",
+          "fully_correct_rate": 0.1,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 1.0,
+          "track": "R2",
+          "verdict_accuracy": 0.95
+        }
+      ],
+      "track_summaries": [
+        {
+          "average_tool_calls_per_item": 0.0,
+          "certificate_valid_rate": 0.0,
+          "extractability_rate": 0.95,
+          "failure_stage_counts": {
+            "certificate_invalid": 5,
+            "correct": 0,
+            "not_extractable": 1,
+            "verdict_wrong": 14
+          },
+          "family": "C2",
+          "fully_correct_rate": 0.0,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 0.0,
+          "track": "R0",
+          "track_failure_counts": {
+            "certificate_invalid": 5,
+            "correct": 0,
+            "disallowed_tool": 0,
+            "final_submission_not_extractable": 1,
+            "invalid_tool_plan": 0,
+            "no_tool_plan": 0,
+            "tool_execution_error": 0,
+            "verdict_wrong": 14
+          },
+          "track_failure_rates": {
+            "certificate_invalid_rate": 0.25,
+            "correct_rate": 0.0,
+            "disallowed_tool_rate": 0.0,
+            "final_submission_not_extractable_rate": 0.05,
+            "invalid_tool_plan_rate": 0.0,
+            "no_tool_plan_rate": 0.0,
+            "tool_execution_error_rate": 0.0,
+            "verdict_wrong_rate": 0.7
+          },
+          "verdict_accuracy": 0.2631578947368421
+        },
+        {
+          "average_tool_calls_per_item": 1.0,
+          "certificate_valid_rate": 0.15,
+          "extractability_rate": 1.0,
+          "failure_stage_counts": {
+            "certificate_invalid": 13,
+            "correct": 3,
+            "not_extractable": 0,
+            "verdict_wrong": 4
+          },
+          "family": "C2",
+          "fully_correct_rate": 0.15,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 1.0,
+          "track": "R1",
+          "track_failure_counts": {
+            "certificate_invalid": 13,
+            "correct": 3,
+            "disallowed_tool": 0,
+            "final_submission_not_extractable": 0,
+            "invalid_tool_plan": 0,
+            "no_tool_plan": 0,
+            "tool_execution_error": 0,
+            "verdict_wrong": 4
+          },
+          "track_failure_rates": {
+            "certificate_invalid_rate": 0.65,
+            "correct_rate": 0.15,
+            "disallowed_tool_rate": 0.0,
+            "final_submission_not_extractable_rate": 0.0,
+            "invalid_tool_plan_rate": 0.0,
+            "no_tool_plan_rate": 0.0,
+            "tool_execution_error_rate": 0.0,
+            "verdict_wrong_rate": 0.2
+          },
+          "verdict_accuracy": 0.8
+        },
+        {
+          "average_tool_calls_per_item": 1.0,
+          "certificate_valid_rate": 0.1,
+          "extractability_rate": 1.0,
+          "failure_stage_counts": {
+            "certificate_invalid": 17,
+            "correct": 2,
+            "not_extractable": 0,
+            "verdict_wrong": 1
+          },
+          "family": "C2",
+          "fully_correct_rate": 0.1,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 1.0,
+          "track": "R2",
+          "track_failure_counts": {
+            "certificate_invalid": 17,
+            "correct": 2,
+            "disallowed_tool": 0,
+            "final_submission_not_extractable": 0,
+            "invalid_tool_plan": 0,
+            "no_tool_plan": 0,
+            "tool_execution_error": 0,
+            "verdict_wrong": 1
+          },
+          "track_failure_rates": {
+            "certificate_invalid_rate": 0.85,
+            "correct_rate": 0.1,
+            "disallowed_tool_rate": 0.0,
+            "final_submission_not_extractable_rate": 0.0,
+            "invalid_tool_plan_rate": 0.0,
+            "no_tool_plan_rate": 0.0,
+            "tool_execution_error_rate": 0.0,
+            "verdict_wrong_rate": 0.05
+          },
+          "verdict_accuracy": 0.95
+        }
+      ]
+    },
+    {
+      "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+      "comparison_row": {
+        "cohort_id": "f1-mixed-level3-v0.1-exploratory",
+        "delegation_gap_R1_minus_R0_certificate_valid_rate": 0.0,
+        "delegation_gap_R1_minus_R0_fully_correct_rate": 0.0,
+        "delegation_gap_R1_minus_R0_verdict_accuracy": 0.55,
+        "delegation_gap_R2_minus_R0_certificate_valid_rate": 0.5,
+        "delegation_gap_R2_minus_R0_fully_correct_rate": 0.4,
+        "delegation_gap_R2_minus_R0_verdict_accuracy": 0.55,
+        "family": "F1",
+        "model": "qwen2.5-coder:7b",
+        "n": 20,
+        "track": "comparison"
+      },
+      "delegation_gaps": {
+        "R1_minus_R0": {
+          "cohort_id": null,
+          "delegation_gap": {
+            "certificate_valid_rate": 0.0,
+            "fully_correct_rate": 0.0,
+            "verdict_accuracy": 0.55
+          },
+          "family": "F1",
+          "n": 20,
+          "r0_track": "R0",
+          "r2_track": "R1"
+        },
+        "R2_minus_R0": {
+          "cohort_id": null,
+          "delegation_gap": {
+            "certificate_valid_rate": 0.5,
+            "fully_correct_rate": 0.4,
+            "verdict_accuracy": 0.55
+          },
+          "family": "F1",
+          "n": 20,
+          "r0_track": "R0",
+          "r2_track": "R2"
+        }
+      },
+      "track_rows": [
+        {
+          "average_tool_calls_per_item": 0.0,
+          "certificate_valid_rate": 0.0,
+          "count_certificate_invalid": 9,
+          "count_correct": 0,
+          "count_disallowed_tool": 0,
+          "count_final_submission_not_extractable": 0,
+          "count_invalid_tool_plan": 0,
+          "count_no_tool_plan": 0,
+          "count_tool_execution_error": 0,
+          "count_verdict_wrong": 11,
+          "extractability_rate": 1.0,
+          "family": "F1",
+          "fully_correct_rate": 0.0,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 0.0,
+          "track": "R0",
+          "verdict_accuracy": 0.45
+        },
+        {
+          "average_tool_calls_per_item": 1.0,
+          "certificate_valid_rate": 0.0,
+          "count_certificate_invalid": 16,
+          "count_correct": 0,
+          "count_disallowed_tool": 0,
+          "count_final_submission_not_extractable": 4,
+          "count_invalid_tool_plan": 0,
+          "count_no_tool_plan": 0,
+          "count_tool_execution_error": 0,
+          "count_verdict_wrong": 0,
+          "extractability_rate": 0.8,
+          "family": "F1",
+          "fully_correct_rate": 0.0,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 1.0,
+          "track": "R1",
+          "verdict_accuracy": 1.0
+        },
+        {
+          "average_tool_calls_per_item": 1.0,
+          "certificate_valid_rate": 0.5,
+          "count_certificate_invalid": 8,
+          "count_correct": 8,
+          "count_disallowed_tool": 0,
+          "count_final_submission_not_extractable": 4,
+          "count_invalid_tool_plan": 0,
+          "count_no_tool_plan": 0,
+          "count_tool_execution_error": 0,
+          "count_verdict_wrong": 0,
+          "extractability_rate": 0.8,
+          "family": "F1",
+          "fully_correct_rate": 0.4,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 1.0,
+          "track": "R2",
+          "verdict_accuracy": 1.0
+        }
+      ],
+      "track_summaries": [
+        {
+          "average_tool_calls_per_item": 0.0,
+          "certificate_valid_rate": 0.0,
+          "extractability_rate": 1.0,
+          "failure_stage_counts": {
+            "certificate_invalid": 9,
+            "correct": 0,
+            "not_extractable": 0,
+            "verdict_wrong": 11
+          },
+          "family": "F1",
+          "fully_correct_rate": 0.0,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 0.0,
+          "track": "R0",
+          "track_failure_counts": {
+            "certificate_invalid": 9,
+            "correct": 0,
+            "disallowed_tool": 0,
+            "final_submission_not_extractable": 0,
+            "invalid_tool_plan": 0,
+            "no_tool_plan": 0,
+            "tool_execution_error": 0,
+            "verdict_wrong": 11
+          },
+          "track_failure_rates": {
+            "certificate_invalid_rate": 0.45,
+            "correct_rate": 0.0,
+            "disallowed_tool_rate": 0.0,
+            "final_submission_not_extractable_rate": 0.0,
+            "invalid_tool_plan_rate": 0.0,
+            "no_tool_plan_rate": 0.0,
+            "tool_execution_error_rate": 0.0,
+            "verdict_wrong_rate": 0.55
+          },
+          "verdict_accuracy": 0.45
+        },
+        {
+          "average_tool_calls_per_item": 1.0,
+          "certificate_valid_rate": 0.0,
+          "extractability_rate": 0.8,
+          "failure_stage_counts": {
+            "certificate_invalid": 16,
+            "correct": 0,
+            "not_extractable": 4,
+            "verdict_wrong": 0
+          },
+          "family": "F1",
+          "fully_correct_rate": 0.0,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 1.0,
+          "track": "R1",
+          "track_failure_counts": {
+            "certificate_invalid": 16,
+            "correct": 0,
+            "disallowed_tool": 0,
+            "final_submission_not_extractable": 4,
+            "invalid_tool_plan": 0,
+            "no_tool_plan": 0,
+            "tool_execution_error": 0,
+            "verdict_wrong": 0
+          },
+          "track_failure_rates": {
+            "certificate_invalid_rate": 0.8,
+            "correct_rate": 0.0,
+            "disallowed_tool_rate": 0.0,
+            "final_submission_not_extractable_rate": 0.2,
+            "invalid_tool_plan_rate": 0.0,
+            "no_tool_plan_rate": 0.0,
+            "tool_execution_error_rate": 0.0,
+            "verdict_wrong_rate": 0.0
+          },
+          "verdict_accuracy": 1.0
+        },
+        {
+          "average_tool_calls_per_item": 1.0,
+          "certificate_valid_rate": 0.5,
+          "extractability_rate": 0.8,
+          "failure_stage_counts": {
+            "certificate_invalid": 8,
+            "correct": 8,
+            "not_extractable": 4,
+            "verdict_wrong": 0
+          },
+          "family": "F1",
+          "fully_correct_rate": 0.4,
+          "model": "qwen2.5-coder:7b",
+          "n": 20,
+          "tool_invocation_rate": 1.0,
+          "track": "R2",
+          "track_failure_counts": {
+            "certificate_invalid": 8,
+            "correct": 8,
+            "disallowed_tool": 0,
+            "final_submission_not_extractable": 4,
+            "invalid_tool_plan": 0,
+            "no_tool_plan": 0,
+            "tool_execution_error": 0,
+            "verdict_wrong": 0
+          },
+          "track_failure_rates": {
+            "certificate_invalid_rate": 0.4,
+            "correct_rate": 0.4,
+            "disallowed_tool_rate": 0.0,
+            "final_submission_not_extractable_rate": 0.2,
+            "invalid_tool_plan_rate": 0.0,
+            "no_tool_plan_rate": 0.0,
+            "tool_execution_error_rate": 0.0,
+            "verdict_wrong_rate": 0.0
+          },
+          "verdict_accuracy": 1.0
+        }
+      ]
+    }
+  ],
+  "track_rows": [
+    {
+      "average_tool_calls_per_item": 0.0,
+      "certificate_valid_rate": 0.0,
+      "count_certificate_invalid": 5,
+      "count_correct": 0,
+      "count_disallowed_tool": 0,
+      "count_final_submission_not_extractable": 1,
+      "count_invalid_tool_plan": 0,
+      "count_no_tool_plan": 0,
+      "count_tool_execution_error": 0,
+      "count_verdict_wrong": 14,
+      "extractability_rate": 0.95,
       "family": "C2",
       "fully_correct_rate": 0.0,
       "model": "qwen2.5-coder:7b",
-      "n": 5,
+      "n": 20,
+      "tool_invocation_rate": 0.0,
       "track": "R0",
-      "verdict_accuracy": 0.4
+      "verdict_accuracy": 0.2631578947368421
     },
     {
       "average_tool_calls_per_item": 1.0,
-      "certificate_valid_rate": 0.0,
-      "extractability_rate": 0.0,
-      "failure_stage_counts": {
-        "certificate_invalid": 0,
-        "correct": 0,
-        "not_extractable": 5,
-        "verdict_wrong": 0
-      },
+      "certificate_valid_rate": 0.15,
+      "count_certificate_invalid": 13,
+      "count_correct": 3,
+      "count_disallowed_tool": 0,
+      "count_final_submission_not_extractable": 0,
+      "count_invalid_tool_plan": 0,
+      "count_no_tool_plan": 0,
+      "count_tool_execution_error": 0,
+      "count_verdict_wrong": 4,
+      "extractability_rate": 1.0,
       "family": "C2",
-      "fully_correct_rate": 0.0,
+      "fully_correct_rate": 0.15,
       "model": "qwen2.5-coder:7b",
-      "n": 5,
+      "n": 20,
       "tool_invocation_rate": 1.0,
       "track": "R1",
-      "verdict_accuracy": 0.0
+      "verdict_accuracy": 0.8
+    },
+    {
+      "average_tool_calls_per_item": 1.0,
+      "certificate_valid_rate": 0.1,
+      "count_certificate_invalid": 17,
+      "count_correct": 2,
+      "count_disallowed_tool": 0,
+      "count_final_submission_not_extractable": 0,
+      "count_invalid_tool_plan": 0,
+      "count_no_tool_plan": 0,
+      "count_tool_execution_error": 0,
+      "count_verdict_wrong": 1,
+      "extractability_rate": 1.0,
+      "family": "C2",
+      "fully_correct_rate": 0.1,
+      "model": "qwen2.5-coder:7b",
+      "n": 20,
+      "tool_invocation_rate": 1.0,
+      "track": "R2",
+      "verdict_accuracy": 0.95
+    },
+    {
+      "average_tool_calls_per_item": 0.0,
+      "certificate_valid_rate": 0.0,
+      "count_certificate_invalid": 9,
+      "count_correct": 0,
+      "count_disallowed_tool": 0,
+      "count_final_submission_not_extractable": 0,
+      "count_invalid_tool_plan": 0,
+      "count_no_tool_plan": 0,
+      "count_tool_execution_error": 0,
+      "count_verdict_wrong": 11,
+      "extractability_rate": 1.0,
+      "family": "F1",
+      "fully_correct_rate": 0.0,
+      "model": "qwen2.5-coder:7b",
+      "n": 20,
+      "tool_invocation_rate": 0.0,
+      "track": "R0",
+      "verdict_accuracy": 0.45
     },
     {
       "average_tool_calls_per_item": 1.0,
       "certificate_valid_rate": 0.0,
-      "extractability_rate": 0.0,
-      "failure_stage_counts": {
-        "certificate_invalid": 0,
-        "correct": 0,
-        "not_extractable": 5,
-        "verdict_wrong": 0
-      },
-      "family": "C2",
+      "count_certificate_invalid": 16,
+      "count_correct": 0,
+      "count_disallowed_tool": 0,
+      "count_final_submission_not_extractable": 4,
+      "count_invalid_tool_plan": 0,
+      "count_no_tool_plan": 0,
+      "count_tool_execution_error": 0,
+      "count_verdict_wrong": 0,
+      "extractability_rate": 0.8,
+      "family": "F1",
       "fully_correct_rate": 0.0,
       "model": "qwen2.5-coder:7b",
-      "n": 5,
+      "n": 20,
+      "tool_invocation_rate": 1.0,
+      "track": "R1",
+      "verdict_accuracy": 1.0
+    },
+    {
+      "average_tool_calls_per_item": 1.0,
+      "certificate_valid_rate": 0.5,
+      "count_certificate_invalid": 8,
+      "count_correct": 8,
+      "count_disallowed_tool": 0,
+      "count_final_submission_not_extractable": 4,
+      "count_invalid_tool_plan": 0,
+      "count_no_tool_plan": 0,
+      "count_tool_execution_error": 0,
+      "count_verdict_wrong": 0,
+      "extractability_rate": 0.8,
+      "family": "F1",
+      "fully_correct_rate": 0.4,
+      "model": "qwen2.5-coder:7b",
+      "n": 20,
       "tool_invocation_rate": 1.0,
       "track": "R2",
-      "verdict_accuracy": 0.0
+      "verdict_accuracy": 1.0
     }
   ]
 }

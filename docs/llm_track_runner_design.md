@@ -48,6 +48,11 @@ Registered tools: `solver.is_reachable`, `solver.reachability_certificate`, `sol
 
 Prompts: `runners/track_prompts.py`. R0 reuses `runners/prompts.py` verbatim.
 
+**Phase-2 hardening (v2):** `runners/track_prompt_schemas.py` supplies exact
+`final_submission` envelope, family-specific certificate examples (C2
+trace/unreachability; F1 distinguishing/equivalence), invalid payload negatives,
+and a 10-point pre-submit checklist. The runner never repairs invalid certificates.
+
 ---
 
 ## 3. Tool exposure model
@@ -149,6 +154,25 @@ R0 transcripts remain the legacy envelope (`evaluator/transcript.py`).
 ```
 
 `summarize_scores --scores scores.jsonl` ignores extra fields via `ScoringRecord.from_dict`.
+
+---
+
+## 10. Track failure taxonomy
+
+Primary class per item (`evaluator/track_failure_taxonomy.py`):
+
+| Class | Meaning |
+|-------|---------|
+| `no_tool_plan` | R1/R2: valid phase-1 parse but empty `tool_calls` |
+| `invalid_tool_plan` | Phase-1 JSON/protocol parse failed |
+| `disallowed_tool` | Tools requested but all rejected |
+| `tool_execution_error` | Runner error executing plan |
+| `final_submission_not_extractable` | Submission schema/extractability failure |
+| `verdict_wrong` | Extractable but wrong verdict |
+| `certificate_invalid` | Extractable but verifier rejects certificate |
+| `correct` | Fully correct |
+
+Aggregated in `track_summary.json` as `track_failure_counts` / `track_failure_rates`.
 
 ---
 
