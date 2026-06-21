@@ -8,11 +8,13 @@ import sys
 from pathlib import Path
 
 from fsmreasonbench.dev.doc_consistency import find_repo_root
+from fsmreasonbench.runners.experiment_cells import DEFAULT_STALE_RUNNING_SECONDS
 from fsmreasonbench.runners.ollama import HttpOllamaClient, OllamaConfig
 from fsmreasonbench.runners.track_pilot_models import (
     DEFAULT_C2_ITEMS,
     DEFAULT_F1_ITEMS,
     TrackPilotModelsConfig,
+    apply_incremental_safe,
     parse_temperatures,
     run_track_pilot_models,
 )
@@ -24,6 +26,18 @@ def _parse_csv(raw: str) -> tuple[str, ...]:
     if not values:
         raise ValueError("expected at least one value")
     return values
+
+
+def _add_bool_flag(parser: argparse.ArgumentParser, name: str, default: bool, help_text: str) -> None:
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(f"--{name}", dest=name.replace("-", "_"), action="store_true", help=help_text)
+    group.add_argument(
+        f"--no-{name}",
+        dest=name.replace("-", "_"),
+        action="store_false",
+        help=f"Disable --{name}",
+    )
+    parser.set_defaults(**{name.replace("-", "_"): default})
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -74,6 +88,39 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--timeout", type=float, default=120.0)
     parser.add_argument(
+        "--item-timeout",
+        type=float,
+        help="Per-item timeout in seconds (default: inherit --timeout)",
+    )
+    parser.add_argument(
+        "--cell-timeout",
+        type=float,
+        help="Per-cell timeout in seconds (default: no cell-level timeout)",
+    )
+    parser.add_argument(
+        "--max-cells",
+        type=int,
+        help="Stop after executing N cells (default: unlimited)",
+    )
+    parser.add_argument(
+        "--sleep-between-cells",
+        type=float,
+        default=5.0,
+        help="Seconds to sleep between cells (default: 5)",
+    )
+    parser.add_argument(
+        "--stop-after-failures",
+        type=int,
+        default=3,
+        help="Stop after N consecutive cell failures (default: 3)",
+    )
+    parser.add_argument(
+        "--stale-running-seconds",
+        type=float,
+        default=DEFAULT_STALE_RUNNING_SECONDS,
+        help=f"Treat running cells as stale after N seconds (default: {DEFAULT_STALE_RUNNING_SECONDS:g})",
+    )
+    parser.add_argument(
         "--out-dir",
         default="runs/track_pilot_v1",
         help="Output directory (default: runs/track_pilot_v1)",
@@ -86,17 +133,43 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Re-run cells even when summary.json exists",
+        help="Re-run all cells (alias for --force-all)",
+    )
+    parser.add_argument(
+        "--force-all",
+        action="store_true",
+        help="Re-run all cells even when completed",
+    )
+    parser.add_argument(
+        "--force-cell",
+        action="store_true",
+        help="Wipe cell outputs before each run (disables item-level resume for that cell)",
+    )
+    _add_bool_flag(
+        parser,
+        "resume-items",
+        default=True,
+        help_text="Resume partial cells from existing scores.jsonl (default: true)",
     )
     parser.add_argument(
         "--retry-failed",
         action="store_true",
-        help="Re-run cells classified as failed, missing, or partial; skip completed",
+        help="Retry failed, missing, partial, and stale-running cells; skip completed",
     )
     parser.add_argument(
         "--skip-failed",
         action="store_true",
         help="Skip cells with error.json (do not retry failed cells)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print planned cell actions without calling models",
+    )
+    parser.add_argument(
+        "--incremental-safe",
+        action="store_true",
+        help="Run one cell at a time with conservative failure/sleep limits",
     )
     parser.add_argument(
         "--report-only",
@@ -127,36 +200,52 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.retry_failed and args.skip_failed:
         parser.error("--retry-failed and --skip-failed are mutually exclusive")
-    if args.force and args.retry_failed:
-        parser.error("--force and --retry-failed are mutually exclusive")
+    force_all = args.force or args.force_all
+    if force_all and args.retry_failed:
+        parser.error("--force/--force-all and --retry-failed are mutually exclusive")
+    if args.report_only and force_all:
+        parser.error("--report-only cannot be combined with --force/--force-all")
+    if args.dry_run and force_all:
+        parser.error("--dry-run cannot be combined with --force/--force-all")
 
-    if args.report_only and args.force:
-        parser.error("--report-only cannot be combined with --force")
-
-    config = TrackPilotModelsConfig(
-        models=models,
-        families=families,
-        tracks=tracks,
-        c2_items_path=Path(args.c2_items),
-        f1_items_path=Path(args.f1_items),
-        out_dir=args.out_dir,
-        max_items=args.max_items,
-        temperatures=temperatures,
-        timeout=args.timeout,
-        skip_completed=not args.force and not args.retry_failed,
-        retry_failed=args.retry_failed,
-        skip_failed=args.skip_failed,
-        force=args.force,
-        report_only=args.report_only,
+    config = apply_incremental_safe(
+        TrackPilotModelsConfig(
+            models=models,
+            families=families,
+            tracks=tracks,
+            c2_items_path=Path(args.c2_items),
+            f1_items_path=Path(args.f1_items),
+            out_dir=args.out_dir,
+            max_items=args.max_items,
+            temperatures=temperatures,
+            timeout=args.timeout,
+            skip_completed=not force_all and not args.retry_failed,
+            retry_failed=args.retry_failed,
+            skip_failed=args.skip_failed,
+            force=args.force,
+            force_all=force_all,
+            force_cell=args.force_cell,
+            resume_items=args.resume_items,
+            dry_run=args.dry_run,
+            report_only=args.report_only,
+            max_cells=args.max_cells,
+            cell_timeout=args.cell_timeout,
+            item_timeout=args.item_timeout,
+            sleep_between_cells=args.sleep_between_cells,
+            stop_after_failures=args.stop_after_failures,
+            stale_running_seconds=args.stale_running_seconds,
+            incremental_safe=args.incremental_safe,
+        )
     )
 
     def generate_factory(model: str, temperature: float):
+        item_timeout = args.item_timeout if args.item_timeout is not None else args.timeout
         client = HttpOllamaClient(
             OllamaConfig(
                 base_url=args.ollama_url,
                 model=model,
                 temperature=temperature,
-                timeout=args.timeout,
+                timeout=item_timeout,
             )
         )
         return client.generate
@@ -167,10 +256,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
-    completed = result.cell_status_counts.get("completed", 0)
+    counts = result.cell_status_counts
     incomplete = sum(
-        result.cell_status_counts.get(key, 0)
-        for key in ("failed", "missing", "partial")
+        counts.get(key, 0)
+        for key in ("failed", "missing", "partial", "running", "stale-running")
     )
     print(
         json.dumps(
@@ -180,9 +269,9 @@ def main(argv: list[str] | None = None) -> int:
                 "families": list(families),
                 "tracks": list(tracks),
                 "temperatures": list(temperatures),
-                "cells_completed": completed,
+                "cells_completed": counts.get("completed", 0),
                 "cells_incomplete": incomplete,
-                "cell_status_counts": result.cell_status_counts,
+                "cell_status_counts": counts,
                 "combined_summary": str(result.out_dir / "combined_summary.json"),
                 "report": str(result.out_dir / "report.md"),
             },

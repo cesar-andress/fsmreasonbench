@@ -156,7 +156,7 @@ generator → oracle → certificate → verifier  ✅
 | Exploratory capability surface | `evaluator/capability_surface.py`, `cli/run_capability_surface.py` |
 | Ollama batch runner | `runners/`, `cli/run_ollama_batch.py` |
 | Multi-model pilot runner | `runners/pilot_models.py`, `cli/run_pilot_models.py` |
-| Multi-model track pilot (R0/R1/R2) | `runners/track_pilot_models.py`, `cli/run_track_pilot_models.py` |
+| Multi-model track pilot (R0/R1/R2) | `runners/track_pilot_models.py`, `cli/run_track_pilot_models.py`, `cli/experiment_status.py`, `runners/experiment_cells.py` |
 | Ollama track batch runner | `runners/ollama_track_batch.py`, `cli/run_ollama_track_batch.py` |
 | Track comparison export | `evaluator/track_comparison.py`, `cli/compare_tracks.py` |
 | Model capability-surface runner | `evaluator/capability_surface_models.py`, `cli/run_capability_surface_models.py` |
@@ -327,6 +327,13 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_track_pilot_models \
   --max-items 20 \
   --timeout 300 \
   --out-dir runs/local_matrix_v1
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.experiment_status \
+  --root runs/local_matrix_v1
+PYTHONPATH=src python3.11 -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 --tracks R0,R1,R2 --temperatures 0,0.2,0.7 \
+  --max-items 20 --timeout 900 --out-dir runs/local_matrix_v1 \
+  --retry-failed --incremental-safe
 PYTHONPATH=src python3.11 -m fsmreasonbench.cli.plot_local_matrix \
   --summary runs/local_matrix_v1/combined_summary.json \
   --out-dir runs/local_matrix_v1/plots

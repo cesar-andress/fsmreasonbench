@@ -154,7 +154,61 @@ python -m fsmreasonbench.cli.plot_local_matrix \
   --out-dir runs/local_matrix_v1/plots
 ```
 
-Resume: re-run without `--force` to skip completed cells. Re-run with `--force` to overwrite.
+Resume: re-run without `--force` to skip completed cells and resume partial cells item-by-item. Use `--retry-failed` to retry failed, missing, partial, and stale-running cells. Use `--force-all` or `--force-cell` to wipe and restart.
+
+Each cell writes `cell_status.json` (`running` → `completed` / `failed`), appends `results.jsonl` / `scores.jsonl` per item, and records `error.json` on failure.
+
+---
+
+## 5b. Operational safety for long-running Ollama experiments
+
+Matrix runs are **incremental by default**: completed cells are skipped, partial cells resume from existing `scores.jsonl`, and failures are auditable on disk.
+
+**Dry run** (no model calls — lists cells that would run vs skip):
+
+```bash
+PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 --tracks R0,R1,R2 --temperatures 0,0.2,0.7 \
+  --max-items 20 --out-dir runs/local_matrix_v1 --dry-run
+```
+
+**Status** (counts + incomplete table + suggested retry command):
+
+```bash
+PYTHONPATH=src python -m fsmreasonbench.cli.experiment_status \
+  --root runs/local_matrix_v1
+```
+
+**Safe retry** after timeouts or stale `running` cells:
+
+```bash
+PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 --tracks R0,R1,R2 --temperatures 0,0.2,0.7 \
+  --max-items 20 --timeout 900 --out-dir runs/local_matrix_v1 \
+  --retry-failed --incremental-safe
+```
+
+Key flags:
+
+| Flag | Default | Purpose |
+|------|---------|---------|
+| `--resume-items` / `--no-resume-items` | resume on | Skip items already in `scores.jsonl` |
+| `--retry-failed` | off | Retry failed / stale-running; always resume partial |
+| `--max-cells N` | unlimited | Cap cells per invocation |
+| `--cell-timeout SECONDS` | none | Abort hung cells; write `error.json` |
+| `--item-timeout SECONDS` | `--timeout` | Per-item generate timeout |
+| `--stop-after-failures N` | 3 | Stop after N consecutive cell failures |
+| `--sleep-between-cells SECONDS` | 5 | Cool-down between cells |
+| `--incremental-safe` | off | One cell at a time (`max-cells=1`, `stop-after-failures=1`, sleep=10) |
+
+Regenerate `report.md` from persisted artifacts without model calls:
+
+```bash
+PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
+  --report-only --out-dir runs/local_matrix_v1 --temperatures 0,0.2,0.7
+```
 
 ---
 

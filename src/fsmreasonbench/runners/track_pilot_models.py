@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import csv
 import json
+import os
+import time
 import traceback
-from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable
 
@@ -14,20 +17,24 @@ from fsmreasonbench.evaluator.jsonl import load_items_jsonl
 from fsmreasonbench.evaluator.models import FailureStage
 from fsmreasonbench.items.assembly import BenchmarkItem
 from fsmreasonbench.runners.cell_failure import (
-    build_incomplete_cell_record,
-    classify_cell,
     classify_cell_error,
     error_message_from_payload,
-    has_partial_outputs,
     infer_distinguishing_trace_root_cause,
     is_cell_complete,
+)
+from fsmreasonbench.runners.experiment_cells import (
+    DEFAULT_STALE_RUNNING_SECONDS,
+    build_cell_plans,
+    build_incomplete_from_status,
+    classify_cell,
+    compute_config_hash,
+    detect_cell_status,
+    mark_cell_completed,
+    mark_cell_failed,
+    mark_cell_running,
     prepare_cell_rerun,
-    read_cell_error,
     should_run_cell,
-    summarize_cell_inventory,
-    utc_timestamp,
-    write_cell_error,
-    write_cell_state,
+    summarize_extended_inventory,
 )
 from fsmreasonbench.runners.ollama_batch import GenerateFn, OllamaBatchConfig
 from fsmreasonbench.runners.ollama_track_batch import run_ollama_track_batch
@@ -104,13 +111,28 @@ class TrackPilotModelsConfig:
     retry_failed: bool = False
     skip_failed: bool = False
     force: bool = False
+    force_all: bool = False
+    force_cell: bool = False
+    resume_items: bool = True
+    dry_run: bool = False
     report_only: bool = False
+    max_cells: int | None = None
+    cell_timeout: float | None = None
+    item_timeout: float | None = None
+    sleep_between_cells: float = 5.0
+    stop_after_failures: int = 3
+    stale_running_seconds: float = DEFAULT_STALE_RUNNING_SECONDS
+    incremental_safe: bool = False
     c2_cohort_id: str = DEFAULT_C2_COHORT_ID
     f1_cohort_id: str = DEFAULT_F1_COHORT_ID
 
     @property
     def use_temperature_dirs(self) -> bool:
         return len(self.temperatures) > 1
+
+    @property
+    def effective_force_all(self) -> bool:
+        return self.force or self.force_all
 
 
 @dataclass(frozen=True, slots=True)
@@ -325,6 +347,138 @@ def _summary_from_row(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def apply_incremental_safe(config: TrackPilotModelsConfig) -> TrackPilotModelsConfig:
+    if not config.incremental_safe:
+        return config
+    return replace(
+        config,
+        max_cells=1,
+        stop_after_failures=1,
+        sleep_between_cells=10.0,
+        resume_items=True,
+    )
+
+
+def _item_sources(config: TrackPilotModelsConfig) -> dict[str, str]:
+    return {"C2": str(config.c2_items_path), "F1": str(config.f1_items_path)}
+
+
+def _cell_execution_config_hash(
+    *,
+    model: str,
+    family: str,
+    track: str,
+    temperature: float,
+    item_source: str,
+    max_items: int,
+    timeout: float,
+    item_timeout: float,
+) -> str:
+    return compute_config_hash(
+        {
+            "model": model,
+            "family": family,
+            "track": track,
+            "temperature": temperature,
+            "item_source": item_source,
+            "max_items": max_items,
+            "timeout": timeout,
+            "item_timeout": item_timeout,
+        }
+    )
+
+
+def _wrap_generate_timeout(generate: GenerateFn, item_timeout: float) -> GenerateFn:
+    def wrapped(
+        prompt: str,
+        *,
+        model: str,
+        temperature: float,
+        timeout: float,
+    ) -> str:
+        effective = item_timeout if item_timeout > 0 else timeout
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(
+                generate,
+                prompt,
+                model=model,
+                temperature=temperature,
+                timeout=effective,
+            )
+            return future.result(timeout=effective)
+
+    return wrapped
+
+
+def _run_cell_batch(
+    *,
+    items: list[BenchmarkItem],
+    generate: GenerateFn,
+    run_dir: Path,
+    model: str,
+    family: str,
+    track: str,
+    temperature: float,
+    config: TrackPilotModelsConfig,
+    item_timeout: float,
+) -> None:
+    run_ollama_track_batch(
+        items,
+        generate,
+        run_dir / "results.jsonl",
+        OllamaBatchConfig(
+            model=model,
+            temperature=temperature,
+            timeout=item_timeout,
+            max_items=config.max_items,
+            resume_items=config.resume_items,
+            force_cell=config.force_cell or config.effective_force_all,
+        ),
+        track=track,
+        out_dir=run_dir,
+    )
+
+
+def format_dry_run_report(plans: list[Any]) -> str:
+    lines = ["# Dry run — cell execution plan", ""]
+    grouped: dict[str, list[Any]] = {}
+    for plan in plans:
+        grouped.setdefault(plan.status, []).append(plan)
+    for status in (
+        "completed",
+        "failed",
+        "missing",
+        "partial",
+        "running",
+        "stale-running",
+    ):
+        bucket = grouped.get(status, [])
+        if not bucket:
+            continue
+        lines.append(f"## {status} ({len(bucket)})")
+        lines.append("")
+        for plan in bucket:
+            action = plan.action.upper()
+            lines.append(
+                f"- [{action}] `{plan.model}` / {plan.family} / {plan.track} "
+                f"T={plan.temperature:g} → {plan.run_dir}"
+            )
+        lines.append("")
+    run_count = sum(1 for plan in plans if plan.action == "run")
+    skip_count = sum(1 for plan in plans if plan.action == "skip")
+    lines.extend(
+        [
+            "## Summary",
+            "",
+            f"- **Would run:** {run_count}",
+            f"- **Would skip:** {skip_count}",
+            f"- **Total expected:** {len(plans)}",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def scan_matrix_inventory(
     root: Path,
     config: TrackPilotModelsConfig,
@@ -348,6 +502,10 @@ def scan_matrix_inventory(
                         temperature=temperature,
                         use_temperature_dirs=config.use_temperature_dirs,
                     )
+                    extended = detect_cell_status(
+                        run_dir,
+                        stale_threshold_seconds=config.stale_running_seconds,
+                    )
                     status = classify_cell(run_dir)
                     row: dict[str, Any] = {
                         "model": model,
@@ -358,8 +516,9 @@ def scan_matrix_inventory(
                         "run_dir": str(run_dir),
                         "cohort_id": cohort_id,
                         "cell_status": status,
+                        "extended_status": extended,
                     }
-                    if status == "completed":
+                    if extended == "completed":
                         try:
                             summary = load_cell_summary(run_dir)
                             row["status"] = "completed"
@@ -376,9 +535,16 @@ def scan_matrix_inventory(
                             )
                         except FileNotFoundError:
                             row["cell_status"] = "partial"
+                            row["extended_status"] = "partial"
                             row["status"] = "partial"
-                    elif status in {"failed", "missing", "partial"}:
-                        incomplete = build_incomplete_cell_record(
+                    elif extended in {
+                        "failed",
+                        "missing",
+                        "partial",
+                        "running",
+                        "stale-running",
+                    }:
+                        incomplete = build_incomplete_from_status(
                             model=model,
                             model_dir=mdir,
                             family=family,
@@ -386,7 +552,7 @@ def scan_matrix_inventory(
                             temperature=temperature,
                             run_dir=run_dir,
                             cohort_id=cohort_id,
-                            status=status,
+                            status=extended,
                         )
                         row.update(incomplete)
                     inventory.append(row)
@@ -400,12 +566,20 @@ def finalize_matrix_run(
     *,
     cohort_ids: dict[str, str],
 ) -> TrackPilotModelsResult:
-    track_rows = [row for row in inventory if row.get("cell_status") == "completed"]
-    incomplete = [row for row in inventory if row.get("cell_status") != "completed"]
+    track_rows = [
+        row
+        for row in inventory
+        if row.get("extended_status", row.get("cell_status")) == "completed"
+    ]
+    incomplete = [
+        row
+        for row in inventory
+        if row.get("extended_status", row.get("cell_status")) != "completed"
+    ]
     failed_cells = incomplete
     delegation_rows = build_delegation_rows(track_rows)
     temperature_delta_rows = build_temperature_delta_rows(track_rows)
-    status_counts = summarize_cell_inventory(inventory)
+    status_counts = summarize_extended_inventory(inventory)
     payload = {
         "experiment": "local_matrix" if config.use_temperature_dirs else "track_pilot",
         "models": list(config.models),
@@ -476,99 +650,167 @@ def run_track_pilot_models(
 
     root = Path(config.out_dir)
     root.mkdir(parents=True, exist_ok=True)
-
-    root = Path(config.out_dir)
-    root.mkdir(parents=True, exist_ok=True)
+    config = apply_incremental_safe(config)
     cohort_ids = {"C2": config.c2_cohort_id, "F1": config.f1_cohort_id}
+    item_sources = _item_sources(config)
 
     if config.report_only:
         inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
         return finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
 
+    plans = build_cell_plans(
+        models=config.models,
+        families=config.families,
+        tracks=config.tracks,
+        temperatures=config.temperatures,
+        out_dir=root,
+        item_sources=item_sources,
+        cohort_ids=cohort_ids,
+        use_temperature_dirs=config.use_temperature_dirs,
+        skip_completed=config.skip_completed,
+        retry_failed=config.retry_failed,
+        skip_failed=config.skip_failed,
+        force_all=config.effective_force_all,
+        force_cell=config.force_cell,
+        stale_threshold_seconds=config.stale_running_seconds,
+    )
+
+    if config.dry_run:
+        print(format_dry_run_report(plans))
+        inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
+        return finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
+
     family_items = _load_family_items(config)
+    run_plans = [plan for plan in plans if plan.action == "run"]
+    item_timeout = config.item_timeout if config.item_timeout is not None else config.timeout
+    cells_executed = 0
+    consecutive_failures = 0
 
-    for model in config.models:
-        mdir = model_dir_name(model)
-        for temperature in config.temperatures:
-            generate = generate_factory(model, temperature)
-            for family in config.families:
-                items = family_items[family]
-                cohort_id = cohort_ids[family]
-                for track in config.tracks:
-                    run_dir = cell_dir(
-                        root,
-                        model,
-                        family,
-                        track,
-                        temperature=temperature,
-                        use_temperature_dirs=config.use_temperature_dirs,
+    for plan in run_plans:
+        if config.max_cells is not None and cells_executed >= config.max_cells:
+            break
+        if consecutive_failures >= config.stop_after_failures:
+            break
+
+        run_dir = plan.run_dir
+        run_dir.mkdir(parents=True, exist_ok=True)
+        prepare_cell_rerun(
+            run_dir,
+            force_cell=config.force_cell or config.effective_force_all,
+            resume_items=config.resume_items,
+        )
+
+        config_hash = _cell_execution_config_hash(
+            model=plan.model,
+            family=plan.family,
+            track=plan.track,
+            temperature=plan.temperature,
+            item_source=plan.item_source,
+            max_items=config.max_items,
+            timeout=config.timeout,
+            item_timeout=item_timeout,
+        )
+        started_at = mark_cell_running(
+            run_dir,
+            model=plan.model,
+            model_dir=plan.model_dir,
+            family=plan.family,
+            track=plan.track,
+            temperature=plan.temperature,
+            item_source=plan.item_source,
+            config_hash=config_hash,
+            max_items=config.max_items,
+        )
+
+        generate = generate_factory(plan.model, plan.temperature)
+        generate = _wrap_generate_timeout(generate, item_timeout)
+        items = family_items[plan.family]
+
+        try:
+            if config.cell_timeout is not None:
+                with ThreadPoolExecutor(max_workers=1) as pool:
+                    future = pool.submit(
+                        _run_cell_batch,
+                        items=items,
+                        generate=generate,
+                        run_dir=run_dir,
+                        model=plan.model,
+                        family=plan.family,
+                        track=plan.track,
+                        temperature=plan.temperature,
+                        config=config,
+                        item_timeout=item_timeout,
                     )
-                    run_dir.mkdir(parents=True, exist_ok=True)
-                    cell_status = classify_cell(run_dir)
+                    future.result(timeout=config.cell_timeout)
+            else:
+                _run_cell_batch(
+                    items=items,
+                    generate=generate,
+                    run_dir=run_dir,
+                    model=plan.model,
+                    family=plan.family,
+                    track=plan.track,
+                    temperature=plan.temperature,
+                    config=config,
+                    item_timeout=item_timeout,
+                )
+            mark_cell_completed(
+                run_dir,
+                started_at=started_at,
+                items_completed=config.max_items,
+            )
+            consecutive_failures = 0
+        except FuturesTimeoutError:
+            mark_cell_failed(
+                run_dir,
+                error_type="timeout",
+                error_message=f"cell exceeded timeout of {config.cell_timeout}s",
+                model=plan.model,
+                model_dir=plan.model_dir,
+                family=plan.family,
+                track=plan.track,
+                temperature=plan.temperature,
+                out_dir=run_dir,
+                started_at=started_at,
+                exc_type="TimeoutError",
+            )
+            consecutive_failures += 1
+        except Exception as exc:  # noqa: BLE001 — pilot continues after cell failure
+            message = str(exc)
+            error_type = classify_cell_error(message)
+            root_cause = None
+            if "cannot build distinguishing trace" in message:
+                root_cause = infer_distinguishing_trace_root_cause(
+                    family=plan.family,
+                    track=plan.track,
+                )
+            mark_cell_failed(
+                run_dir,
+                error_type=error_type,
+                error_message=message,
+                model=plan.model,
+                model_dir=plan.model_dir,
+                family=plan.family,
+                track=plan.track,
+                temperature=plan.temperature,
+                out_dir=run_dir,
+                started_at=started_at,
+                exc_type=type(exc).__name__,
+                tb=traceback.format_exc(),
+                root_cause=root_cause,
+            )
+            consecutive_failures += 1
 
-                    if not should_run_cell(
-                        run_dir,
-                        skip_completed=config.skip_completed,
-                        retry_failed=config.retry_failed,
-                        skip_failed=config.skip_failed,
-                        force=config.force,
-                        status=cell_status,
-                    ):
-                        continue
-
-                    prepare_cell_rerun(run_dir)
-                    started_at = utc_timestamp()
-
-                    try:
-                        batch_result = run_ollama_track_batch(
-                            items,
-                            generate,
-                            run_dir / "results.jsonl",
-                            OllamaBatchConfig(
-                                model=model,
-                                temperature=temperature,
-                                timeout=config.timeout,
-                                max_items=config.max_items,
-                            ),
-                            track=track,
-                            out_dir=run_dir,
-                        )
-                        write_cell_state(
-                            run_dir,
-                            status="completed",
-                            model=model,
-                            family=family,
-                            track=track,
-                            temperature=temperature,
-                            started_at=started_at,
-                        )
-                    except Exception as exc:  # noqa: BLE001 — pilot continues after cell failure
-                        message = str(exc)
-                        error_type = classify_cell_error(message)
-                        root_cause = None
-                        if "cannot build distinguishing trace" in message:
-                            root_cause = infer_distinguishing_trace_root_cause(
-                                family=family,
-                                track=track,
-                            )
-                        write_cell_error(
-                            run_dir,
-                            error_type=error_type,
-                            error_message=message,
-                            model=model,
-                            model_dir=mdir,
-                            family=family,
-                            track=track,
-                            temperature=temperature,
-                            out_dir=run_dir,
-                            started_at=started_at,
-                            ended_at=utc_timestamp(),
-                            partial_outputs_present=has_partial_outputs(run_dir),
-                            retryable=True,
-                            exc_type=type(exc).__name__,
-                            tb=traceback.format_exc(),
-                            root_cause=root_cause,
-                        )
+        cells_executed += 1
+        sleep_seconds = (
+            0.0 if os.environ.get("PYTEST_CURRENT_TEST") else config.sleep_between_cells
+        )
+        if (
+            sleep_seconds > 0
+            and cells_executed < len(run_plans)
+            and cells_executed < (config.max_cells or len(run_plans))
+        ):
+            time.sleep(sleep_seconds)
 
     inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
     return finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
@@ -694,6 +936,8 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
                 f"- **Failed:** {status_counts.get('failed', 0)}",
                 f"- **Missing:** {status_counts.get('missing', 0)}",
                 f"- **Partial:** {status_counts.get('partial', 0)}",
+                f"- **Running:** {status_counts.get('running', 0)}",
+                f"- **Stale-running:** {status_counts.get('stale-running', 0)}",
             ]
         )
 
@@ -701,7 +945,7 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
         lines.extend(
             [
                 "",
-                "### Incomplete cells (failed / missing / partial)",
+                "### Incomplete cells (failed / missing / partial / running / stale-running)",
                 "",
                 "| Model | Family | Track | Temp | Status | error_type | Message |",
                 "|-------|--------|-------|-----:|--------|------------|---------|",
@@ -711,6 +955,7 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
             msg = error_message_from_payload(cell).replace("|", "\\|")
             if len(msg) > 80:
                 msg = msg[:77] + "..."
+            ext = cell.get("extended_status", cell.get("cell_status", cell.get("status", "failed")))
             lines.append(
                 "| `{model}` | {family} | {track} | {temp:g} | {status} | "
                 "{error_type} | {msg} |".format(
@@ -718,7 +963,7 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
                     family=cell["family"],
                     track=cell["track"],
                     temp=float(cell.get("temperature", 0.0)),
-                    status=cell.get("cell_status", cell.get("status", "failed")),
+                    status=ext,
                     error_type=cell.get("error_type", "unknown"),
                     msg=msg,
                 )
@@ -794,22 +1039,22 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
                     row = indexed.get((model, family, float(temperature), track))
                     if row is None:
                         continue
-                    lines.append(
-                        "| `{model}` | {temp:g} | {track} | {n} | "
-                        "{extract:.3f} | {verdict:.3f} | {cert:.3f} | {full:.3f} | "
-                        "{tool_rate:.3f} | {avg_tools:.1f} |".format(
-                            model=model,
-                            temp=float(temperature),
-                            track=track,
-                            n=row.get("n", 0),
-                            extract=row.get("extractability_rate", 0.0),
-                            verdict=row.get("verdict_accuracy", 0.0),
-                            cert=row.get("certificate_valid_rate", 0.0),
-                            full=row.get("fully_correct_rate", 0.0),
-                            tool_rate=row.get("tool_invocation_rate", 0.0),
-                            avg_tools=row.get("average_tool_calls_per_item", 0.0),
+                        lines.append(
+                            "| `{model}` | {temp:g} | {track} | {n} | "
+                            "{extract:.3f} | {verdict:.3f} | {cert:.3f} | {full:.3f} | "
+                            "{tool_rate:.3f} | {avg_tools:.1f} |".format(
+                                model=model,
+                                temp=float(temperature),
+                                track=track,
+                                n=row.get("n", 0),
+                                extract=float(row.get("extractability_rate") or 0.0),
+                                verdict=float(row.get("verdict_accuracy") or 0.0),
+                                cert=float(row.get("certificate_valid_rate") or 0.0),
+                                full=float(row.get("fully_correct_rate") or 0.0),
+                                tool_rate=float(row.get("tool_invocation_rate") or 0.0),
+                                avg_tools=float(row.get("average_tool_calls_per_item") or 0.0),
+                            )
                         )
-                    )
 
         if is_matrix:
             lines.extend(["", f"## {family} — per-temperature summary (R2 fully correct)", ""])

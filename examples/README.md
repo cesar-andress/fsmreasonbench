@@ -265,6 +265,16 @@ python -m fsmreasonbench.cli.plot_local_matrix \
 
 Layout with multiple temperatures: `{out-dir}/{model_dir}/{family}/temp_{temperature}/{track}/`. n=20 initial pilot; scale to 100–200 items/cell only after smoke validation. Local models only, no paid APIs.
 
+### Operational safety for long-running Ollama experiments
+
+```bash
+python -m fsmreasonbench.cli.run_track_pilot_models ... --dry-run
+python -m fsmreasonbench.cli.experiment_status --root runs/local_matrix_v1
+python -m fsmreasonbench.cli.run_track_pilot_models ... --retry-failed --incremental-safe
+```
+
+See [`docs/local_model_matrix_experiment.md`](../docs/local_model_matrix_experiment.md) §5b.
+
 ## Model capability-surface evaluation
 
 Sweep difficulty levels 1–5 with multiple Ollama models:

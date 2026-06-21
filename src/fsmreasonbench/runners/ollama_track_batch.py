@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from fsmreasonbench.evaluator.io import dump_json
-from fsmreasonbench.evaluator.jsonl import write_jsonl
+from fsmreasonbench.evaluator.jsonl import append_jsonl, read_jsonl
 from fsmreasonbench.evaluator.models import FailureStage, ScoringRecord
 from fsmreasonbench.evaluator.scorer import score_item
 from fsmreasonbench.evaluator.summary import summarize_scoring_records
@@ -17,10 +17,13 @@ from fsmreasonbench.evaluator.track_failure_taxonomy import (
     summarize_track_failure_taxonomy,
 )
 from fsmreasonbench.items.assembly import BenchmarkItem
+from fsmreasonbench.runners.cell_failure import SCORES_JSONL
+from fsmreasonbench.runners.experiment_cells import RESULTS_JSONL, completed_item_ids
 from fsmreasonbench.runners.ollama_batch import (
     GenerateFn,
     OllamaBatchConfig,
     OllamaBatchResult,
+    _build_summary_from_scores,
     run_ollama_batch,
 )
 from fsmreasonbench.runners.prompts import prompt_metadata
@@ -121,14 +124,23 @@ def run_ollama_track_batch(
     transcript_dir = root / "transcripts"
     transcript_dir.mkdir(parents=True, exist_ok=True)
 
+    results_path = root / RESULTS_JSONL if out_dir is not None else Path(out_path)
+    scores_path = root / SCORES_JSONL
+
+    done_ids = (
+        completed_item_ids(root)
+        if config.resume_items and not config.force_cell
+        else set()
+    )
+
     from fsmreasonbench.evaluator.transcript import utc_timestamp
 
-    results: list[dict[str, Any]] = []
-    scoring_rows: list[dict[str, Any]] = []
-    tool_invocation_counts: list[int] = []
+    new_results: list[dict[str, Any]] = []
     item_records: list[dict[str, Any]] = []
 
     for item in selected:
+        if item.item_id in done_ids:
+            continue
         try:
             run = _evaluate_item_with_tools(
                 item,
@@ -155,62 +167,47 @@ def run_ollama_track_batch(
             "tool_invocation_count"
         ]
         scoring_dict["track_failure_class"] = run["track_failure_class"]
-        scoring_rows.append(scoring_dict)
         item_records.append(
             {
                 "track_failure_class": run["track_failure_class"],
                 "scoring_record": scoring_dict,
             }
         )
-        tool_invocation_counts.append(scoring_dict["tool_invocation_count"])
 
-        results.append(
-            {
-                "item_id": item.item_id,
-                "family": item.family,
-                "track": resolved.value,
-                "model": config.model,
-                "temperature": config.temperature,
-                "prompt_metadata": prompt_metadata(item),
-                "messages": list(run["transcript"].messages),
-                "tool_calls_requested": list(run["transcript"].tool_calls_requested),
-                "tool_outputs": list(run["transcript"].tool_outputs),
-                "raw_response_text": run["raw_response_text"],
-                "raw_response": run["transcript"].raw_response,
-                "transcript_path": str(transcript_path.relative_to(root)),
-                "scoring_record": scoring_dict,
-                "protocol_errors": list(run["transcript"].protocol_errors),
-                "track_failure_class": run["track_failure_class"],
-            }
-        )
+        run_record = {
+            "item_id": item.item_id,
+            "family": item.family,
+            "track": resolved.value,
+            "model": config.model,
+            "temperature": config.temperature,
+            "prompt_metadata": prompt_metadata(item),
+            "messages": list(run["transcript"].messages),
+            "tool_calls_requested": list(run["transcript"].tool_calls_requested),
+            "tool_outputs": list(run["transcript"].tool_outputs),
+            "raw_response_text": run["raw_response_text"],
+            "raw_response": run["transcript"].raw_response,
+            "transcript_path": str(transcript_path.relative_to(root)),
+            "scoring_record": scoring_dict,
+            "protocol_errors": list(run["transcript"].protocol_errors),
+            "track_failure_class": run["track_failure_class"],
+        }
+        append_jsonl(results_path, run_record)
+        append_jsonl(scores_path, scoring_dict)
+        new_results.append(run_record)
 
-    write_jsonl(out_path, results)
-    write_jsonl(root / "scores.jsonl", scoring_rows)
-
-    parsed_records = [ScoringRecord.from_dict(row) for row in scoring_rows]
-    summary = {
-        "model": config.model,
-        "family": family,
-        "track": resolved.value,
-        "n": len(parsed_records),
-        **summarize_scoring_records(parsed_records),
-        "tool_invocation_rate": (
-            sum(1 for count in tool_invocation_counts if count > 0) / len(tool_invocation_counts)
-            if tool_invocation_counts
-            else 0.0
-        ),
-        "average_tool_calls_per_item": (
-            sum(tool_invocation_counts) / len(tool_invocation_counts)
-            if tool_invocation_counts
-            else 0.0
-        ),
-        **summarize_track_failure_taxonomy(item_records),
-    }
+    scoring_rows = read_jsonl(scores_path) if scores_path.exists() else []
+    summary = _build_summary_from_scores(
+        scoring_rows=scoring_rows,
+        model=config.model,
+        family=family,
+        track=resolved.value,
+    )
     if write_summary:
         dump_json(root / "summary.json", summary)
         dump_json(root / "track_summary.json", summary)
 
-    return OllamaBatchResult(results=results, summary=summary, out_dir=root)
+    all_results = read_jsonl(results_path) if results_path.exists() else new_results
+    return OllamaBatchResult(results=all_results, summary=summary, out_dir=root)
 
 
 def _evaluate_item_with_tools(

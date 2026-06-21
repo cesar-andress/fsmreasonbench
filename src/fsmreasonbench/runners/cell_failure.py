@@ -68,13 +68,9 @@ def has_scores(run_dir: Path) -> bool:
 
 
 def classify_cell(run_dir: Path) -> CellStatus:
-    if (run_dir / ERROR_JSON).exists():
-        return "failed"
-    if has_summary(run_dir) and has_scores(run_dir):
-        return "completed"
-    if has_partial_outputs(run_dir) or has_summary(run_dir) or has_scores(run_dir):
-        return "partial"
-    return "missing"
+    from fsmreasonbench.runners.experiment_cells import classify_cell as _classify
+
+    return _classify(run_dir)
 
 
 def is_cell_failed(run_dir: Path) -> bool:
@@ -147,12 +143,16 @@ def read_cell_error(run_dir: Path) -> dict[str, Any] | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def prepare_cell_rerun(run_dir: Path) -> None:
-    """Archive prior error.json and clear it before a retry attempt."""
-    error_path = run_dir / ERROR_JSON
-    if error_path.exists():
-        shutil.copy2(error_path, run_dir / ERROR_PREVIOUS_JSON)
-        error_path.unlink()
+def prepare_cell_rerun(
+    run_dir: Path,
+    *,
+    force_cell: bool = False,
+    resume_items: bool = True,
+) -> None:
+    """Archive prior error.json; optionally wipe outputs for a forced cell restart."""
+    from fsmreasonbench.runners.experiment_cells import prepare_cell_rerun as _prepare
+
+    _prepare(run_dir, force_cell=force_cell, resume_items=resume_items)
 
 
 def clear_cell_error(run_dir: Path) -> None:
@@ -177,17 +177,19 @@ def should_run_cell(
     skip_failed: bool,
     force: bool,
     status: CellStatus | None = None,
+    force_cell: bool = False,
 ) -> bool:
-    cell_status = status or classify_cell(run_dir)
-    if force:
-        return True
-    if skip_failed and cell_status == "failed":
-        return False
-    if retry_failed:
-        return cell_status in {"failed", "missing", "partial"}
-    if skip_completed and cell_status == "completed":
-        return False
-    return cell_status != "completed"
+    from fsmreasonbench.runners.experiment_cells import should_run_cell as _should
+
+    return _should(
+        run_dir,
+        skip_completed=skip_completed,
+        retry_failed=retry_failed,
+        skip_failed=skip_failed,
+        force_all=force,
+        force_cell=force_cell,
+        status=status,  # type: ignore[arg-type]
+    )
 
 
 def infer_distinguishing_trace_root_cause(*, family: str, track: str) -> str:

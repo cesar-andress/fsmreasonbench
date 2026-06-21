@@ -201,7 +201,22 @@ python -m fsmreasonbench.cli.run_track_pilot_models \
   --out-dir runs/track_pilot_v1
 ```
 
-`track_pilot_v1` is the first experiment layout capable of measuring **Δ_R1−R0** and **Δ_R2−R0** on actual LLM outputs across a model panel. Each cell writes `results.jsonl`, `scores.jsonl`, `transcripts/`, and `summary.json` under `{out_dir}/{model_dir}/{family}/{track}/`. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md` (with per-family metrics, delegation gaps, and failure-movement tables). Use `--force` to re-run completed cells; failures are recorded per cell without aborting the sweep.
+`track_pilot_v1` is the first experiment layout capable of measuring **Δ_R1−R0** and **Δ_R2−R0** on actual LLM outputs across a model panel. Each cell writes `results.jsonl`, `scores.jsonl`, `transcripts/`, `summary.json`, and `cell_status.json` under `{out_dir}/{model_dir}/{family}/{track}/`. Failures write `error.json` without aborting the sweep. Root outputs: `combined_summary.json`, `combined_summary.csv`, `report.md` (with per-family metrics, delegation gaps, failure-movement tables, and cell-status counts). Item outputs append incrementally; partial cells resume from existing `scores.jsonl` unless `--force-cell` / `--force-all`.
+
+### Operational safety for long-running Ollama experiments
+
+```bash
+# Dry run
+python -m fsmreasonbench.cli.run_track_pilot_models ... --dry-run
+
+# Status
+python -m fsmreasonbench.cli.experiment_status --root runs/local_matrix_v1
+
+# Safe retry
+python -m fsmreasonbench.cli.run_track_pilot_models ... --retry-failed --incremental-safe
+```
+
+See [`docs/local_model_matrix_experiment.md`](local_model_matrix_experiment.md) §5b for defaults (`stop-after-failures=3`, `sleep-between-cells=5`, item-level checkpointing).
 
 ### Local model track-temperature matrix
 

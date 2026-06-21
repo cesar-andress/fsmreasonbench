@@ -33,5 +33,13 @@ def write_jsonl(path: str | Path, records: Iterator[dict[str, Any]] | list[dict[
             handle.write("\n")
 
 
+def append_jsonl(path: str | Path, record: dict[str, Any]) -> None:
+    out_path = Path(path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with out_path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, sort_keys=True))
+        handle.write("\n")
+
+
 def load_items_jsonl(path: str | Path) -> list[BenchmarkItem]:
     return [item_from_dict(record) for record in read_jsonl(path)]

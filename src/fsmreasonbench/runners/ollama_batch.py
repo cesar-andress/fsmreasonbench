@@ -7,7 +7,8 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from fsmreasonbench.evaluator.io import dump_json
-from fsmreasonbench.evaluator.jsonl import write_jsonl
+from fsmreasonbench.evaluator.jsonl import append_jsonl, read_jsonl, write_jsonl
+from fsmreasonbench.evaluator.models import ScoringRecord
 from fsmreasonbench.evaluator.summary import summarize_scoring_records
 from fsmreasonbench.evaluator.track_failure_taxonomy import (
     classify_track_failure,
@@ -15,6 +16,8 @@ from fsmreasonbench.evaluator.track_failure_taxonomy import (
 )
 from fsmreasonbench.evaluator.transcript import record_transcript
 from fsmreasonbench.items.assembly import BenchmarkItem
+from fsmreasonbench.runners.cell_failure import SCORES_JSONL
+from fsmreasonbench.runners.experiment_cells import RESULTS_JSONL, completed_item_ids
 from fsmreasonbench.runners.prompts import prompt_metadata, render_prompt
 from fsmreasonbench.runners.response_extract import extract_submission_payload
 
@@ -36,6 +39,8 @@ class OllamaBatchConfig:
     temperature: float = 0.0
     timeout: float = 120.0
     max_items: int | None = None
+    resume_items: bool = True
+    force_cell: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,6 +48,41 @@ class OllamaBatchResult:
     results: list[dict[str, Any]]
     summary: dict[str, Any]
     out_dir: Path
+
+
+def _load_scoring_rows(run_dir: Path) -> list[dict[str, Any]]:
+    path = run_dir / SCORES_JSONL
+    if not path.exists():
+        return []
+    return read_jsonl(path)
+
+
+def _build_summary_from_scores(
+    *,
+    scoring_rows: list[dict[str, Any]],
+    model: str,
+    family: str,
+    track: str,
+) -> dict[str, Any]:
+    parsed_records = [ScoringRecord.from_dict(row) for row in scoring_rows]
+    tool_counts = [int(row.get("tool_invocation_count", 0)) for row in scoring_rows]
+    item_records = [{"track_failure_class": row.get("track_failure_class"), "scoring_record": row} for row in scoring_rows]
+    return {
+        "model": model,
+        "family": family,
+        "track": track,
+        "n": len(parsed_records),
+        **summarize_scoring_records(parsed_records),
+        "tool_invocation_rate": (
+            sum(1 for count in tool_counts if count > 0) / len(tool_counts)
+            if tool_counts
+            else 0.0
+        ),
+        "average_tool_calls_per_item": (
+            sum(tool_counts) / len(tool_counts) if tool_counts else 0.0
+        ),
+        **summarize_track_failure_taxonomy(item_records),
+    }
 
 
 def run_ollama_batch(
@@ -57,11 +97,9 @@ def run_ollama_batch(
     """
     Run Ollama on items, score via existing parser/scorer, write transcripts.
 
-    Writes:
-    - ``{out_path}`` JSONL run records
-    - ``{out_dir}/scores.jsonl`` scoring records
-    - ``{out_dir}/transcripts/{item_id}.json`` per item
-    - ``{out_dir}/summary.json`` when ``write_summary`` is true
+    Writes incrementally when ``resume_items`` is true:
+    - append ``results.jsonl`` and ``scores.jsonl`` after each item
+    - skip items already present in ``scores.jsonl`` unless ``force_cell``
     """
     if not items:
         raise ValueError("items list is empty")
@@ -77,10 +115,21 @@ def run_ollama_batch(
     transcript_dir = root / "transcripts"
     transcript_dir.mkdir(parents=True, exist_ok=True)
 
-    results: list[dict[str, Any]] = []
-    scoring_records: list[dict[str, Any]] = []
+    results_path = root / RESULTS_JSONL if out_dir is not None else Path(out_path)
+    scores_path = root / SCORES_JSONL
+
+    done_ids = (
+        completed_item_ids(root)
+        if config.resume_items and not config.force_cell
+        else set()
+    )
+
+    new_results: list[dict[str, Any]] = []
 
     for item in selected:
+        if item.item_id in done_ids:
+            continue
+
         prompt = render_prompt(item)
         raw_text = generate(
             prompt,
@@ -113,27 +162,20 @@ def run_ollama_batch(
             "scoring_record": scoring_dict,
             "track_failure_class": scoring_dict["track_failure_class"],
         }
-        results.append(run_record)
-        scoring_records.append(scoring_dict)
+        append_jsonl(results_path, run_record)
+        append_jsonl(scores_path, scoring_dict)
+        new_results.append(run_record)
 
-    write_jsonl(out_path, results)
-    write_jsonl(root / "scores.jsonl", scoring_records)
-
-    from fsmreasonbench.evaluator.models import ScoringRecord
-
-    parsed_records = [ScoringRecord.from_dict(record) for record in scoring_records]
-    summary = {
-        "model": config.model,
-        "family": family,
-        "track": "R0",
-        "n": len(parsed_records),
-        **summarize_scoring_records(parsed_records),
-        "tool_invocation_rate": 0.0,
-        "average_tool_calls_per_item": 0.0,
-        **summarize_track_failure_taxonomy(scoring_records),
-    }
+    scoring_rows = _load_scoring_rows(root)
+    summary = _build_summary_from_scores(
+        scoring_rows=scoring_rows,
+        model=config.model,
+        family=family,
+        track="R0",
+    )
     if write_summary:
         dump_json(root / "summary.json", summary)
         dump_json(root / "track_summary.json", summary)
 
-    return OllamaBatchResult(results=results, summary=summary, out_dir=root)
+    all_results = read_jsonl(results_path) if results_path.exists() else new_results
+    return OllamaBatchResult(results=all_results, summary=summary, out_dir=root)
