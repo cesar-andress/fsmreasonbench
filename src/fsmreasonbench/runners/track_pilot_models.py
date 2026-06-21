@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import traceback
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
@@ -13,11 +14,18 @@ from fsmreasonbench.evaluator.jsonl import load_items_jsonl
 from fsmreasonbench.evaluator.models import FailureStage
 from fsmreasonbench.items.assembly import BenchmarkItem
 from fsmreasonbench.runners.cell_failure import (
+    build_incomplete_cell_record,
+    classify_cell,
     classify_cell_error,
-    clear_cell_error,
+    error_message_from_payload,
+    has_partial_outputs,
+    infer_distinguishing_trace_root_cause,
     is_cell_complete,
+    prepare_cell_rerun,
     read_cell_error,
     should_run_cell,
+    summarize_cell_inventory,
+    utc_timestamp,
     write_cell_error,
     write_cell_state,
 )
@@ -96,6 +104,7 @@ class TrackPilotModelsConfig:
     retry_failed: bool = False
     skip_failed: bool = False
     force: bool = False
+    report_only: bool = False
     c2_cohort_id: str = DEFAULT_C2_COHORT_ID
     f1_cohort_id: str = DEFAULT_F1_COHORT_ID
 
@@ -110,6 +119,8 @@ class TrackPilotModelsResult:
     delegation_rows: list[dict[str, Any]]
     temperature_delta_rows: list[dict[str, Any]]
     failed_cells: list[dict[str, Any]]
+    cell_inventory: list[dict[str, Any]]
+    cell_status_counts: dict[str, int]
     out_dir: Path
 
 
@@ -142,6 +153,26 @@ def cell_dir(
     if use_temperature_dirs:
         base = base / temperature_dir_name(temperature)
     return base / track
+
+
+# Re-export for tests and downstream callers
+__all__ = [
+    "TrackPilotModelsConfig",
+    "TrackPilotModelsResult",
+    "build_delegation_rows",
+    "build_temperature_delta_rows",
+    "build_track_row",
+    "cell_dir",
+    "finalize_matrix_run",
+    "is_cell_complete",
+    "load_cell_summary",
+    "parse_temperatures",
+    "render_track_pilot_report",
+    "run_track_pilot_models",
+    "scan_matrix_inventory",
+    "temperature_dir_name",
+    "write_track_pilot_csv",
+]
 
 
 def load_cell_summary(run_dir: Path) -> dict[str, Any]:
@@ -294,6 +325,126 @@ def _summary_from_row(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def scan_matrix_inventory(
+    root: Path,
+    config: TrackPilotModelsConfig,
+    *,
+    cohort_ids: dict[str, str] | None = None,
+) -> list[dict[str, Any]]:
+    """Scan all expected matrix cells on disk and classify each."""
+    cohort_ids = cohort_ids or {"C2": config.c2_cohort_id, "F1": config.f1_cohort_id}
+    inventory: list[dict[str, Any]] = []
+    for model in config.models:
+        mdir = model_dir_name(model)
+        for temperature in config.temperatures:
+            for family in config.families:
+                cohort_id = cohort_ids[family]
+                for track in config.tracks:
+                    run_dir = cell_dir(
+                        root,
+                        model,
+                        family,
+                        track,
+                        temperature=temperature,
+                        use_temperature_dirs=config.use_temperature_dirs,
+                    )
+                    status = classify_cell(run_dir)
+                    row: dict[str, Any] = {
+                        "model": model,
+                        "model_dir": mdir,
+                        "family": family,
+                        "track": track,
+                        "temperature": temperature,
+                        "run_dir": str(run_dir),
+                        "cohort_id": cohort_id,
+                        "cell_status": status,
+                    }
+                    if status == "completed":
+                        try:
+                            summary = load_cell_summary(run_dir)
+                            row["status"] = "completed"
+                            row.update(
+                                build_track_row(
+                                    summary,
+                                    model=model,
+                                    family=family,
+                                    track=track,
+                                    temperature=temperature,
+                                    cohort_id=cohort_id,
+                                    run_dir=run_dir,
+                                )
+                            )
+                        except FileNotFoundError:
+                            row["cell_status"] = "partial"
+                            row["status"] = "partial"
+                    elif status in {"failed", "missing", "partial"}:
+                        incomplete = build_incomplete_cell_record(
+                            model=model,
+                            model_dir=mdir,
+                            family=family,
+                            track=track,
+                            temperature=temperature,
+                            run_dir=run_dir,
+                            cohort_id=cohort_id,
+                            status=status,
+                        )
+                        row.update(incomplete)
+                    inventory.append(row)
+    return inventory
+
+
+def finalize_matrix_run(
+    root: Path,
+    config: TrackPilotModelsConfig,
+    inventory: list[dict[str, Any]],
+    *,
+    cohort_ids: dict[str, str],
+) -> TrackPilotModelsResult:
+    track_rows = [row for row in inventory if row.get("cell_status") == "completed"]
+    incomplete = [row for row in inventory if row.get("cell_status") != "completed"]
+    failed_cells = incomplete
+    delegation_rows = build_delegation_rows(track_rows)
+    temperature_delta_rows = build_temperature_delta_rows(track_rows)
+    status_counts = summarize_cell_inventory(inventory)
+    payload = {
+        "experiment": "local_matrix" if config.use_temperature_dirs else "track_pilot",
+        "models": list(config.models),
+        "families": list(config.families),
+        "tracks": list(config.tracks),
+        "temperatures": list(config.temperatures),
+        "max_items": config.max_items,
+        "timeout": config.timeout,
+        "cohort_ids": cohort_ids,
+        "cell_status_counts": status_counts,
+        "cell_inventory": inventory,
+        "track_rows": track_rows,
+        "delegation_rows": delegation_rows,
+        "temperature_delta_rows": temperature_delta_rows,
+        "failed_cells": failed_cells,
+        "incomplete_cells": incomplete,
+    }
+    dump_json(root / "combined_summary.json", payload)
+    write_track_pilot_csv(
+        root / "combined_summary.csv",
+        track_rows,
+        delegation_rows,
+        temperature_delta_rows,
+    )
+    (root / "report.md").write_text(
+        render_track_pilot_report(payload),
+        encoding="utf-8",
+    )
+    return TrackPilotModelsResult(
+        track_rows=track_rows,
+        delegation_rows=delegation_rows,
+        temperature_delta_rows=temperature_delta_rows,
+        failed_cells=failed_cells,
+        cell_inventory=inventory,
+        cell_status_counts=status_counts,
+        out_dir=root,
+    )
+
+
 def run_track_pilot_models(
     config: TrackPilotModelsConfig,
     generate_factory: GenerateFactory,
@@ -326,13 +477,18 @@ def run_track_pilot_models(
     root = Path(config.out_dir)
     root.mkdir(parents=True, exist_ok=True)
 
-    family_items = _load_family_items(config)
+    root = Path(config.out_dir)
+    root.mkdir(parents=True, exist_ok=True)
     cohort_ids = {"C2": config.c2_cohort_id, "F1": config.f1_cohort_id}
 
-    track_rows: list[dict[str, Any]] = []
-    failed_cells: list[dict[str, Any]] = []
+    if config.report_only:
+        inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
+        return finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
+
+    family_items = _load_family_items(config)
 
     for model in config.models:
+        mdir = model_dir_name(model)
         for temperature in config.temperatures:
             generate = generate_factory(model, temperature)
             for family in config.families:
@@ -348,6 +504,7 @@ def run_track_pilot_models(
                         use_temperature_dirs=config.use_temperature_dirs,
                     )
                     run_dir.mkdir(parents=True, exist_ok=True)
+                    cell_status = classify_cell(run_dir)
 
                     if not should_run_cell(
                         run_dir,
@@ -355,55 +512,12 @@ def run_track_pilot_models(
                         retry_failed=config.retry_failed,
                         skip_failed=config.skip_failed,
                         force=config.force,
+                        status=cell_status,
                     ):
-                        if is_cell_complete(run_dir):
-                            summary = load_cell_summary(run_dir)
-                            track_rows.append(
-                                build_track_row(
-                                    summary,
-                                    model=model,
-                                    family=family,
-                                    track=track,
-                                    temperature=temperature,
-                                    cohort_id=cohort_id,
-                                    run_dir=run_dir,
-                                )
-                            )
-                        elif read_cell_error(run_dir) is not None:
-                            error_payload = read_cell_error(run_dir)
-                            assert error_payload is not None
-                            failed_cells.append(
-                                {
-                                    "model": model,
-                                    "family": family,
-                                    "track": track,
-                                    "temperature": temperature,
-                                    "run_dir": str(run_dir),
-                                    "error": error_payload["error"],
-                                    "error_type": error_payload.get(
-                                        "error_type", "internal_runner_error"
-                                    ),
-                                }
-                            )
-                            track_rows.append(
-                                {
-                                    "model": model,
-                                    "model_dir": model_dir_name(model),
-                                    "family": family,
-                                    "track": track,
-                                    "temperature": temperature,
-                                    "cohort_id": cohort_id,
-                                    "run_dir": str(run_dir),
-                                    "status": "failed",
-                                    "error": error_payload["error"],
-                                    "error_type": error_payload.get(
-                                        "error_type", "internal_runner_error"
-                                    ),
-                                }
-                            )
                         continue
 
-                    clear_cell_error(run_dir)
+                    prepare_cell_rerun(run_dir)
+                    started_at = utc_timestamp()
 
                     try:
                         batch_result = run_ollama_track_batch(
@@ -426,90 +540,38 @@ def run_track_pilot_models(
                             family=family,
                             track=track,
                             temperature=temperature,
-                        )
-                        track_rows.append(
-                            build_track_row(
-                                batch_result.summary,
-                                model=model,
-                                family=family,
-                                track=track,
-                                temperature=temperature,
-                                cohort_id=cohort_id,
-                                run_dir=run_dir,
-                            )
+                            started_at=started_at,
                         )
                     except Exception as exc:  # noqa: BLE001 — pilot continues after cell failure
-                        error_type = classify_cell_error(str(exc))
+                        message = str(exc)
+                        error_type = classify_cell_error(message)
+                        root_cause = None
+                        if "cannot build distinguishing trace" in message:
+                            root_cause = infer_distinguishing_trace_root_cause(
+                                family=family,
+                                track=track,
+                            )
                         write_cell_error(
                             run_dir,
                             error_type=error_type,
-                            error=str(exc),
+                            error_message=message,
                             model=model,
+                            model_dir=mdir,
                             family=family,
                             track=track,
                             temperature=temperature,
+                            out_dir=run_dir,
+                            started_at=started_at,
+                            ended_at=utc_timestamp(),
+                            partial_outputs_present=has_partial_outputs(run_dir),
+                            retryable=True,
                             exc_type=type(exc).__name__,
-                        )
-                        failed_cells.append(
-                            {
-                                "model": model,
-                                "family": family,
-                                "track": track,
-                                "temperature": temperature,
-                                "run_dir": str(run_dir),
-                                "error": str(exc),
-                                "error_type": error_type,
-                            }
-                        )
-                        track_rows.append(
-                            {
-                                "model": model,
-                                "model_dir": model_dir_name(model),
-                                "family": family,
-                                "track": track,
-                                "temperature": temperature,
-                                "cohort_id": cohort_id,
-                                "run_dir": str(run_dir),
-                                "status": "failed",
-                                "error": str(exc),
-                                "error_type": error_type,
-                            }
+                            tb=traceback.format_exc(),
+                            root_cause=root_cause,
                         )
 
-    delegation_rows = build_delegation_rows(track_rows)
-    temperature_delta_rows = build_temperature_delta_rows(track_rows)
-    payload = {
-        "experiment": "local_matrix" if config.use_temperature_dirs else "track_pilot",
-        "models": list(config.models),
-        "families": list(config.families),
-        "tracks": list(config.tracks),
-        "temperatures": list(config.temperatures),
-        "max_items": config.max_items,
-        "timeout": config.timeout,
-        "cohort_ids": cohort_ids,
-        "track_rows": track_rows,
-        "delegation_rows": delegation_rows,
-        "temperature_delta_rows": temperature_delta_rows,
-        "failed_cells": failed_cells,
-    }
-    dump_json(root / "combined_summary.json", payload)
-    write_track_pilot_csv(
-        root / "combined_summary.csv",
-        track_rows,
-        delegation_rows,
-        temperature_delta_rows,
-    )
-    (root / "report.md").write_text(
-        render_track_pilot_report(payload),
-        encoding="utf-8",
-    )
-    return TrackPilotModelsResult(
-        track_rows=track_rows,
-        delegation_rows=delegation_rows,
-        temperature_delta_rows=temperature_delta_rows,
-        failed_cells=failed_cells,
-        out_dir=root,
-    )
+    inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
+    return finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
 
 
 def write_track_pilot_csv(
@@ -596,10 +658,11 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
     tracks = payload["tracks"]
     temperatures = payload.get("temperatures", [0.0])
     cohort_ids = payload["cohort_ids"]
-    track_rows = [row for row in payload["track_rows"] if row.get("status") == "completed"]
+    track_rows = [row for row in payload["track_rows"] if row.get("status", "completed") == "completed"]
     delegation_rows = payload["delegation_rows"]
     temperature_delta_rows = payload.get("temperature_delta_rows", [])
-    failed_cells = payload.get("failed_cells", [])
+    incomplete_cells = payload.get("incomplete_cells", payload.get("failed_cells", []))
+    status_counts = payload.get("cell_status_counts", {})
     is_matrix = payload.get("experiment") == "local_matrix" or len(temperatures) > 1
 
     title = "Local Model Track-Temperature Matrix Report" if is_matrix else "Track Pilot Report"
@@ -621,39 +684,89 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
     for family, cohort_id in cohort_ids.items():
         lines.append(f"- **{family}:** `{cohort_id}`")
 
-    if failed_cells:
-        lines.extend(["", "### Failed cells", ""])
+    if status_counts:
+        lines.extend(
+            [
+                "",
+                "### Cell status",
+                "",
+                f"- **Completed:** {status_counts.get('completed', 0)}",
+                f"- **Failed:** {status_counts.get('failed', 0)}",
+                f"- **Missing:** {status_counts.get('missing', 0)}",
+                f"- **Partial:** {status_counts.get('partial', 0)}",
+            ]
+        )
+
+    if incomplete_cells:
+        lines.extend(
+            [
+                "",
+                "### Incomplete cells (failed / missing / partial)",
+                "",
+                "| Model | Family | Track | Temp | Status | error_type | Message |",
+                "|-------|--------|-------|-----:|--------|------------|---------|",
+            ]
+        )
+        for cell in incomplete_cells:
+            msg = error_message_from_payload(cell).replace("|", "\\|")
+            if len(msg) > 80:
+                msg = msg[:77] + "..."
+            lines.append(
+                "| `{model}` | {family} | {track} | {temp:g} | {status} | "
+                "{error_type} | {msg} |".format(
+                    model=cell["model"],
+                    family=cell["family"],
+                    track=cell["track"],
+                    temp=float(cell.get("temperature", 0.0)),
+                    status=cell.get("cell_status", cell.get("status", "failed")),
+                    error_type=cell.get("error_type", "unknown"),
+                    msg=msg,
+                )
+            )
+        lines.append("")
+
         by_type: dict[str, list[dict[str, Any]]] = {
             "timeout": [],
             "internal_runner_error": [],
             "model_protocol_error": [],
             "tool_execution_error": [],
+            "unknown": [],
         }
-        for cell in failed_cells:
-            error_type = cell.get("error_type") or classify_cell_error(cell.get("error", ""))
-            bucket = by_type.get(error_type, by_type["internal_runner_error"])
+        for cell in incomplete_cells:
+            if cell.get("cell_status") == "missing":
+                by_type["unknown"].append(cell)
+                continue
+            error_type = cell.get("error_type") or classify_cell_error(
+                error_message_from_payload(cell)
+            )
+            bucket = by_type.get(error_type, by_type["unknown"])
             bucket.append(cell)
+        lines.extend(["", "#### Error-type breakdown", ""])
         for error_type, label in (
             ("timeout", "Timeout"),
+            ("tool_execution_error", "Tool execution error"),
             ("internal_runner_error", "Internal runner error"),
             ("model_protocol_error", "Model protocol error"),
-            ("tool_execution_error", "Tool execution error"),
+            ("unknown", "Missing / unknown"),
         ):
             cells = by_type[error_type]
             if not cells:
                 continue
-            lines.append(f"#### {label} ({len(cells)})")
-            lines.append("")
+            lines.append(f"**{label}** ({len(cells)})")
             for cell in cells:
                 temp_label = f" T={cell.get('temperature', 0)}" if "temperature" in cell else ""
+                root_cause = cell.get("root_cause")
+                suffix = f" — _{root_cause}_" if root_cause else ""
                 lines.append(
-                    f"- `{cell['model']}` / {cell['family']} / {cell['track']}{temp_label}: "
-                    f"{cell['error']}"
+                    f"- `{cell['model']}` / {cell['family']} / {cell['track']}{temp_label} "
+                    f"[{cell.get('cell_status', 'failed')}]: "
+                    f"{error_message_from_payload(cell)}{suffix}"
                 )
             lines.append("")
+
         lines.append(
-            "Delegation gap tables use `—` when a track cell is missing or failed; "
-            "do not interpret as zero improvement."
+            "Delegation gap tables use `—` when any track cell in a model×family×temperature "
+            "group is incomplete; do not interpret as zero improvement."
         )
 
     indexed = {_row_index_key(row): row for row in track_rows}

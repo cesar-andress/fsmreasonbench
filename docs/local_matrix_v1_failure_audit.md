@@ -80,13 +80,18 @@ Qwen F1 R2: `fully_correct_rate` 0.40–0.45 across temperatures with `verdict_a
 
 ## Hardening applied (post-audit)
 
-See commit **Harden local matrix runner failure handling and F1 R2 equivalent cases**:
+See commits **Harden local matrix runner failure handling and F1 R2 equivalent cases** and
+**Harden local matrix failure artifacts and retry support**:
 
 1. Family-scoped R2 tool allowlists (`C2`: reachability only; `F1`: separation only).
 2. `solver.distinguishing_certificate` checks equivalence first (`ValueError` with guidance).
 3. Tool executor catches `RuntimeError`; per-item batch failures no longer abort cell.
-4. `error.json` per failed cell with `error_type`.
-5. `--retry-failed` / `--skip-failed` CLI; delegation tables mark incomplete rows with `—`.
+4. **`error.json` per failed cell** with full schema (`error_message`, `traceback`, `started_at`, `ended_at`, `partial_outputs_present`, `retryable`, `root_cause`).
+5. Cell classification: **completed** (summary + scores), **failed** (error.json), **missing**, **partial**.
+6. `--retry-failed` reruns failed/missing/partial; `--skip-failed` skips error.json cells; `--report-only` regenerates from disk.
+7. Report includes cell status counts and incomplete-cell table; delegation gaps use `—` when incomplete.
+
+**Note:** The original `local_matrix_v1` run predates persisted `error.json`. Use `--report-only` to classify legacy missing cells, then `--retry-failed` to fill them.
 
 ---
 

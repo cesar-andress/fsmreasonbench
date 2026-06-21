@@ -265,7 +265,7 @@ def test_force_reruns_completed_cells(tmp_path: Path, pilot_items) -> None:
         f1_items_path=config.f1_items_path,
         out_dir=config.out_dir,
         max_items=config.max_items,
-        skip_completed=False,
+        force=True,
     )
     run_track_pilot_models(config_force, generate_factory)
     assert invocations["count"] > first_count
@@ -444,6 +444,8 @@ def test_is_cell_complete_detects_summary(tmp_path: Path) -> None:
     run_dir.mkdir()
     assert not is_cell_complete(run_dir)
     (run_dir / "summary.json").write_text("{}", encoding="utf-8")
+    assert not is_cell_complete(run_dir)
+    (run_dir / "scores.jsonl").write_text("{}\n", encoding="utf-8")
     assert is_cell_complete(run_dir)
 
 

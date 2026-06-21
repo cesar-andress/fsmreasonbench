@@ -91,12 +91,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--retry-failed",
         action="store_true",
-        help="Re-run only cells that have error.json from a prior failure",
+        help="Re-run cells classified as failed, missing, or partial; skip completed",
     )
     parser.add_argument(
         "--skip-failed",
         action="store_true",
         help="Skip cells with error.json (do not retry failed cells)",
+    )
+    parser.add_argument(
+        "--report-only",
+        action="store_true",
+        help="Regenerate combined_summary.json and report.md from on-disk cell artifacts",
     )
     args = parser.parse_args(argv)
 
@@ -125,6 +130,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.force and args.retry_failed:
         parser.error("--force and --retry-failed are mutually exclusive")
 
+    if args.report_only and args.force:
+        parser.error("--report-only cannot be combined with --force")
+
     config = TrackPilotModelsConfig(
         models=models,
         families=families,
@@ -139,6 +147,7 @@ def main(argv: list[str] | None = None) -> int:
         retry_failed=args.retry_failed,
         skip_failed=args.skip_failed,
         force=args.force,
+        report_only=args.report_only,
     )
 
     def generate_factory(model: str, temperature: float):
@@ -158,7 +167,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
-    completed = sum(1 for row in result.track_rows if row.get("status") == "completed")
+    completed = result.cell_status_counts.get("completed", 0)
+    incomplete = sum(
+        result.cell_status_counts.get(key, 0)
+        for key in ("failed", "missing", "partial")
+    )
     print(
         json.dumps(
             {
@@ -168,7 +181,8 @@ def main(argv: list[str] | None = None) -> int:
                 "tracks": list(tracks),
                 "temperatures": list(temperatures),
                 "cells_completed": completed,
-                "cells_failed": len(result.failed_cells),
+                "cells_incomplete": incomplete,
+                "cell_status_counts": result.cell_status_counts,
                 "combined_summary": str(result.out_dir / "combined_summary.json"),
                 "report": str(result.out_dir / "report.md"),
             },
@@ -176,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
             sort_keys=True,
         )
     )
-    return 0 if not result.failed_cells else 1
+    return 0 if incomplete == 0 else 1
 
 
 if __name__ == "__main__":
