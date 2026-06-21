@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from fsmreasonbench.evaluator.jsonl import read_jsonl
 from fsmreasonbench.runners.experiment_cells import mark_cell_running
 from fsmreasonbench.runners.experiment_status import scan_experiment_status
 from fsmreasonbench.runners.local_matrix_paths import (
@@ -223,6 +224,59 @@ def test_repair_dry_run_reports_intended_move(tmp_path: Path) -> None:
     dry = apply_repair_actions(actions, dry_run=True)
     assert dry[0].status == "planned"
     assert misplaced.exists()
+
+
+def test_repair_apply_merges_into_existing_target(tmp_path: Path) -> None:
+    root = tmp_path / "local_matrix_v1"
+    target = root / "llama3.1_8b" / "C2" / "temp_0" / "R1"
+    misplaced = root / "llama3.1_8b" / "C2" / "R1"
+    target.mkdir(parents=True)
+    misplaced.mkdir(parents=True)
+    mark_cell_running(
+        misplaced,
+        model="llama3.1:8b",
+        model_dir="llama3.1_8b",
+        family="C2",
+        track="R1",
+        temperature=0.0,
+        item_source="/items.jsonl",
+        config_hash="abc",
+        max_items=20,
+    )
+    (target / "scores.jsonl").write_text('{"item_id":"a"}\n', encoding="utf-8")
+    (misplaced / "scores.jsonl").write_text('{"item_id":"b"}\n', encoding="utf-8")
+    actions = plan_repair_actions(root, models=("llama3.1:8b",), families=("C2",), tracks=("R1",))
+    assert actions[0].status == "planned"
+    assert actions[0].message.startswith("merge")
+    applied = apply_repair_actions(actions, dry_run=False)
+    assert applied[0].status == "applied"
+    merged = read_jsonl(target / "scores.jsonl")
+    assert {row["item_id"] for row in merged} == {"a", "b"}
+    assert not misplaced.exists()
+
+
+def test_repair_discovers_models_from_filesystem_without_summary_filter(tmp_path: Path) -> None:
+    root = tmp_path / "local_matrix_v1"
+    misplaced = root / "llama3.1_8b" / "C2" / "R1"
+    misplaced.mkdir(parents=True)
+    mark_cell_running(
+        misplaced,
+        model="llama3.1:8b",
+        model_dir="llama3.1_8b",
+        family="C2",
+        track="R1",
+        temperature=0.0,
+        item_source="/items.jsonl",
+        config_hash="abc",
+        max_items=20,
+    )
+    (root / "combined_summary.json").write_text(
+        json.dumps({"experiment": "local_matrix", "models": ["mistral-nemo:12b"]}),
+        encoding="utf-8",
+    )
+    rows = scan_misplaced_cells(root)
+    assert len(rows) == 1
+    assert rows[0]["model"] == "llama3.1:8b"
 
 
 def test_repair_apply_moves_misplaced_outputs_safely(tmp_path: Path) -> None:

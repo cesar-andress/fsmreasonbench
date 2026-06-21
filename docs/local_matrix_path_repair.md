@@ -42,10 +42,12 @@ PYTHONPATH=src python -m fsmreasonbench.cli.repair_local_matrix_paths \
 The repair tool:
 
 - detects `{model}/{family}/{track}` directories directly under a family folder
+- scans **all model directories under `--root`**, not only models listed in `combined_summary.json`
 - infers temperature from `cell_status.json` or `error.json`
-- moves artifacts into `{model}/{family}/temp_{T}/{track}/`
+- merges or moves artifacts into `{model}/{family}/temp_{T}/{track}/`
+- merges `scores.jsonl` / `results.jsonl` by `item_id` when the target already exists
 - refuses ambiguous moves when temperature cannot be inferred
-- refuses conflicting merges when target files differ
+- refuses conflicting non-JSONL files unless byte-identical
 - writes `repair_log.json`
 
 ## Manual repair (Llama C2 R1 T=0 example)

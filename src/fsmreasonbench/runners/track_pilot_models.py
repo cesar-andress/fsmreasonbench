@@ -429,28 +429,6 @@ def _cell_execution_config_hash(
     )
 
 
-def _wrap_generate_timeout(generate: GenerateFn, item_timeout: float) -> GenerateFn:
-    def wrapped(
-        prompt: str,
-        *,
-        model: str,
-        temperature: float,
-        timeout: float,
-    ) -> str:
-        effective = item_timeout if item_timeout > 0 else timeout
-        with ThreadPoolExecutor(max_workers=1) as pool:
-            future = pool.submit(
-                generate,
-                prompt,
-                model=model,
-                temperature=temperature,
-                timeout=effective,
-            )
-            return future.result(timeout=effective)
-
-    return wrapped
-
-
 def _run_cell_batch(
     *,
     items: list[BenchmarkItem],
@@ -764,43 +742,54 @@ def run_track_pilot_models(
         )
 
         generate = generate_factory(plan.model, plan.temperature)
-        generate = _wrap_generate_timeout(generate, item_timeout)
         items = family_items[plan.family]
+
+        def _execute_cell() -> None:
+            _run_cell_batch(
+                items=items,
+                generate=generate,
+                run_dir=run_dir,
+                model=plan.model,
+                family=plan.family,
+                track=plan.track,
+                temperature=plan.temperature,
+                config=config,
+                item_timeout=item_timeout,
+            )
 
         try:
             if config.cell_timeout is not None:
-                with ThreadPoolExecutor(max_workers=1) as pool:
-                    future = pool.submit(
-                        _run_cell_batch,
-                        items=items,
-                        generate=generate,
-                        run_dir=run_dir,
-                        model=plan.model,
-                        family=plan.family,
-                        track=plan.track,
-                        temperature=plan.temperature,
-                        config=config,
-                        item_timeout=item_timeout,
-                    )
+                pool = ThreadPoolExecutor(max_workers=1)
+                future = pool.submit(_execute_cell)
+                try:
                     future.result(timeout=config.cell_timeout)
+                finally:
+                    pool.shutdown(wait=False, cancel_futures=True)
             else:
-                _run_cell_batch(
-                    items=items,
-                    generate=generate,
-                    run_dir=run_dir,
-                    model=plan.model,
-                    family=plan.family,
-                    track=plan.track,
-                    temperature=plan.temperature,
-                    config=config,
-                    item_timeout=item_timeout,
-                )
+                _execute_cell()
             mark_cell_completed(
                 run_dir,
                 started_at=started_at,
                 items_completed=config.max_items,
             )
             consecutive_failures = 0
+        except KeyboardInterrupt:
+            mark_cell_failed(
+                run_dir,
+                error_type="internal_runner_error",
+                error_message="interrupted by user",
+                model=plan.model,
+                model_dir=plan.model_dir,
+                family=plan.family,
+                track=plan.track,
+                temperature=plan.temperature,
+                out_dir=run_dir,
+                started_at=started_at,
+                exc_type="KeyboardInterrupt",
+            )
+            inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
+            finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
+            raise
         except FuturesTimeoutError:
             mark_cell_failed(
                 run_dir,

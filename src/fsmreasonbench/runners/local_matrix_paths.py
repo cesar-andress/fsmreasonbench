@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
 
+from fsmreasonbench.evaluator.jsonl import append_jsonl, read_jsonl
 from fsmreasonbench.runners.cell_failure import read_cell_error
 from fsmreasonbench.runners.experiment_cells import (
     detect_cell_status,
@@ -31,6 +32,18 @@ MisplacedExtendedStatus = Literal[
 ]
 
 REPAIR_LOG_JSON = "repair_log.json"
+NON_MODEL_DIR_NAMES = frozenset({"plots", "repair_log.json"})
+DEFAULT_MATRIX_TEMPERATURES = (0.0, 0.2, 0.7)
+
+
+def infer_model_from_artifacts(run_dir: Path, *, model_dir: str) -> str | None:
+    payload = read_cell_status(run_dir)
+    if payload is not None and payload.get("model"):
+        return str(payload["model"])
+    error_payload = read_cell_error(run_dir)
+    if error_payload is not None and error_payload.get("model"):
+        return str(error_payload["model"])
+    return None
 
 
 def infer_temperature_from_artifacts(run_dir: Path) -> float | None:
@@ -41,6 +54,79 @@ def infer_temperature_from_artifacts(run_dir: Path) -> float | None:
     if error_payload is not None and error_payload.get("temperature") is not None:
         return float(error_payload["temperature"])
     return None
+
+
+def infer_temperature_for_misplaced_cell(
+    root: Path,
+    *,
+    model: str,
+    family: str,
+    track: str,
+    run_dir: Path,
+) -> float | None:
+    temperature = infer_temperature_from_artifacts(run_dir)
+    if temperature is not None:
+        return temperature
+    for candidate_temp in DEFAULT_MATRIX_TEMPERATURES:
+        target = build_cell_dir(
+            root,
+            model,
+            family,
+            candidate_temp,
+            track,
+            matrix_layout=True,
+        )
+        if target.exists() and read_cell_status(target) is not None:
+            payload = read_cell_status(target)
+            if payload is not None and payload.get("temperature") is not None:
+                return float(payload["temperature"])
+            return candidate_temp
+    return None
+
+
+def discover_model_roots(
+    root: Path,
+    *,
+    models: tuple[str, ...] | None = None,
+) -> list[tuple[str | None, Path]]:
+    """Return model roots as (canonical model name if known, directory path)."""
+    entries: list[tuple[str | None, Path]] = []
+    seen_dirs: set[str] = set()
+
+    if models:
+        for model in models:
+            mdir = model_dir_name(model)
+            if mdir in seen_dirs:
+                continue
+            seen_dirs.add(mdir)
+            entries.append((model, root / mdir))
+
+    summary_path = root / "combined_summary.json"
+    if summary_path.exists():
+        try:
+            payload = json.loads(summary_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            payload = {}
+        summary_models = payload.get("models", [])
+        if isinstance(summary_models, list):
+            for model in summary_models:
+                mdir = model_dir_name(str(model))
+                if mdir in seen_dirs:
+                    continue
+                seen_dirs.add(mdir)
+                entries.append((str(model), root / mdir))
+
+    for child in sorted(root.iterdir()):
+        if not child.is_dir() or child.name in NON_MODEL_DIR_NAMES:
+            continue
+        if not any((child / family).is_dir() for family in ("C2", "F1")):
+            continue
+        if child.name in seen_dirs:
+            continue
+        seen_dirs.add(child.name)
+        entries.append((None, child))
+
+    return entries
 
 
 def misplaced_extended_status(run_dir: Path, *, stale_threshold_seconds: float) -> MisplacedExtendedStatus:
@@ -76,27 +162,11 @@ def scan_misplaced_cells(
     if not infer_matrix_layout(root):
         return []
 
-    model_entries: list[tuple[str, str]] = []
-    if models:
-        model_entries = [(model, model_dir_name(model)) for model in models]
-    else:
-        summary_path = root / "combined_summary.json"
-        if summary_path.exists():
-            payload = json.loads(summary_path.read_text(encoding="utf-8"))
-            summary_models = payload.get("models", [])
-            if isinstance(summary_models, list):
-                model_entries = [
-                    (str(model), model_dir_name(str(model))) for model in summary_models
-                ]
-        if not model_entries:
-            for child in sorted(root.iterdir()):
-                if child.is_dir() and child.name not in {REPAIR_LOG_JSON}:
-                    model_entries.append((child.name, child.name))
     rows: list[dict[str, Any]] = []
-    for model, mdir in model_entries:
-        model_root = root / mdir
+    for model_hint, model_root in discover_model_roots(root, models=models):
         if not model_root.is_dir():
             continue
+        mdir = model_root.name
         for family in families:
             family_root = model_root / family
             if not family_root.is_dir():
@@ -105,7 +175,16 @@ def scan_misplaced_cells(
                 if not is_misplaced_cell_dir(child, tracks=tracks):
                     continue
                 track = child.name
-                temperature = infer_temperature_from_artifacts(child)
+                model = infer_model_from_artifacts(child, model_dir=mdir) or model_hint
+                if model is None:
+                    model = mdir
+                temperature = infer_temperature_for_misplaced_cell(
+                    root,
+                    model=model,
+                    family=family,
+                    track=track,
+                    run_dir=child,
+                )
                 extended = misplaced_extended_status(
                     child,
                     stale_threshold_seconds=stale_running_seconds,
@@ -155,6 +234,28 @@ def _file_digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _merge_jsonl_by_item_id(source: Path, target: Path) -> tuple[RepairActionStatus, str]:
+    source_rows = read_jsonl(source)
+    if target.exists():
+        target_ids = {
+            str(row.get("item_id"))
+            for row in read_jsonl(target)
+            if row.get("item_id") is not None
+        }
+    else:
+        target_ids = set()
+    appended = 0
+    for row in source_rows:
+        item_id = row.get("item_id")
+        if item_id is None or str(item_id) in target_ids:
+            continue
+        append_jsonl(target, row)
+        target_ids.add(str(item_id))
+        appended += 1
+    source.unlink()
+    return "applied", f"merged {appended} row(s) from {source.name} into {target.name}"
+
+
 def _merge_path(source: Path, target: Path) -> tuple[RepairActionStatus, str]:
     if not target.exists():
         shutil.move(str(source), str(target))
@@ -165,11 +266,19 @@ def _merge_path(source: Path, target: Path) -> tuple[RepairActionStatus, str]:
             status, message = _merge_path(child, target / child.name)
             if status == "conflict":
                 return status, message
-        if not any(source.iterdir()):
+        if source.exists() and not any(source.iterdir()):
             source.rmdir()
         return "applied", f"merged directory {source.name} into {target}"
 
     if source.is_file() and target.is_file():
+        if source.name in {"scores.jsonl", "results.jsonl"}:
+            return _merge_jsonl_by_item_id(source, target)
+        if source.name in {"cell_status.json", "error.json", "summary.json", "track_summary.json"}:
+            source.unlink()
+            return "applied", f"kept existing {target.name}; removed misplaced {source.name}"
+        if "transcripts" in source.parts and target.exists():
+            source.unlink()
+            return "applied", f"kept existing transcript {target.name}; removed misplaced duplicate"
         if _file_digest(source) == _file_digest(target):
             source.unlink()
             return "applied", f"removed duplicate file {source.name} (identical to target)"
@@ -216,20 +325,7 @@ def plan_repair_actions(
             row["track"],
             matrix_layout=True,
         )
-        if target.exists() and any(target.iterdir()) and any(source.iterdir()):
-            actions.append(
-                RepairAction(
-                    source_dir=source,
-                    target_dir=target,
-                    model=row["model"],
-                    family=row["family"],
-                    track=row["track"],
-                    temperature=float(temperature),
-                    status="conflict",
-                    message=f"target already exists and is non-empty: {target}",
-                )
-            )
-            continue
+        verb = "merge" if target.exists() and any(target.iterdir()) else "move"
         actions.append(
             RepairAction(
                 source_dir=source,
@@ -239,7 +335,7 @@ def plan_repair_actions(
                 track=row["track"],
                 temperature=float(temperature),
                 status="planned",
-                message=f"move {source} -> {target}",
+                message=f"{verb} {source} -> {target}",
             )
         )
     return actions
