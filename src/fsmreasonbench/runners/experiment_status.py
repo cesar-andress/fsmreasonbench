@@ -11,8 +11,10 @@ from fsmreasonbench.runners.experiment_cells import (
     suggested_retry_command,
     summarize_extended_inventory,
 )
+from fsmreasonbench.runners.local_matrix_paths import scan_misplaced_cells
 from fsmreasonbench.runners.track_pilot_models import (
     TrackPilotModelsConfig,
+    infer_matrix_layout,
     scan_matrix_inventory,
 )
 
@@ -21,6 +23,7 @@ from fsmreasonbench.runners.track_pilot_models import (
 class ExperimentStatusResult:
     root: Path
     inventory: list[dict[str, Any]]
+    misplaced_cells: list[dict[str, Any]]
     status_counts: dict[str, int]
     incomplete_cells: list[dict[str, Any]]
     suggested_retry: str
@@ -46,6 +49,7 @@ def scan_experiment_status(
         out_dir=root,
         temperatures=temperatures,
         stale_running_seconds=stale_running_seconds,
+        matrix_layout=infer_matrix_layout(root),
         c2_cohort_id=c2_cohort_id,
         f1_cohort_id=f1_cohort_id,
     )
@@ -54,11 +58,19 @@ def scan_experiment_status(
         config,
         cohort_ids={"C2": c2_cohort_id, "F1": f1_cohort_id},
     )
-    status_counts = summarize_extended_inventory(inventory)
+    misplaced = scan_misplaced_cells(
+        root,
+        models=models,
+        families=families,
+        tracks=tracks,
+        stale_running_seconds=stale_running_seconds,
+    )
+    combined_inventory = inventory + misplaced
+    status_counts = summarize_extended_inventory(combined_inventory)
     incomplete = [
         row
-        for row in inventory
-        if row.get("extended_status", row.get("cell_status")) != "completed"
+        for row in combined_inventory
+        if row.get("extended_status", row.get("cell_status")) not in {"completed", "misplaced_completed"}
     ]
     retry = suggested_retry_command(
         root=root,
@@ -70,6 +82,7 @@ def scan_experiment_status(
     return ExperimentStatusResult(
         root=root,
         inventory=inventory,
+        misplaced_cells=misplaced,
         status_counts=status_counts,
         incomplete_cells=incomplete,
         suggested_retry=retry,
@@ -90,8 +103,33 @@ def format_experiment_status_report(result: ExperimentStatusResult) -> str:
         f"- **Partial:** {counts.get('partial', 0)}",
         f"- **Running:** {counts.get('running', 0)}",
         f"- **Stale-running:** {counts.get('stale-running', 0)}",
+        f"- **Misplaced partial:** {counts.get('misplaced_partial', 0)}",
+        f"- **Misplaced running:** {counts.get('misplaced_running', 0)}",
+        f"- **Misplaced failed:** {counts.get('misplaced_failed', 0)}",
         "",
     ]
+    if result.misplaced_cells:
+        lines.extend(
+            [
+                "## Misplaced cells",
+                "",
+                "| Model | Family | Track | Temp | Status | Current path | Expected path |",
+                "|-------|--------|-------|-----:|--------|--------------|---------------|",
+            ]
+        )
+        for cell in result.misplaced_cells:
+            lines.append(
+                "| `{model}` | {family} | {track} | {temp} | {status} | `{current}` | `{expected}` |".format(
+                    model=cell["model"],
+                    family=cell["family"],
+                    track=cell["track"],
+                    temp=cell.get("temperature", "—"),
+                    status=cell.get("extended_status", "misplaced_partial"),
+                    current=cell["run_dir"],
+                    expected=cell.get("expected_run_dir", "—"),
+                )
+            )
+        lines.append("")
     if result.incomplete_cells:
         lines.extend(
             [
@@ -119,6 +157,13 @@ def format_experiment_status_report(result: ExperimentStatusResult) -> str:
             "",
             "```bash",
             result.suggested_retry,
+            "```",
+            "",
+            "If misplaced cells are present, repair paths first:",
+            "",
+            "```bash",
+            "PYTHONPATH=src python -m fsmreasonbench.cli.repair_local_matrix_paths "
+            f"--root {result.root} --dry-run",
             "```",
             "",
         ]

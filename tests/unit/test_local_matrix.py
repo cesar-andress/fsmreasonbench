@@ -13,7 +13,7 @@ from fsmreasonbench.runners.track_pilot_models import (
     build_delegation_rows,
     build_temperature_delta_rows,
     build_track_row,
-    cell_dir,
+    build_cell_dir,
     parse_temperatures,
     render_track_pilot_report,
     temperature_dir_name,
@@ -36,18 +36,30 @@ def test_temperature_dir_name() -> None:
 
 def test_output_directory_layout_with_temperatures() -> None:
     root = Path("runs/local_matrix_v1")
-    path = cell_dir(
+    path = build_cell_dir(
         root,
         "qwen2.5-coder:7b",
         "C2",
+        0.2,
         "R1",
-        temperature=0.2,
-        use_temperature_dirs=True,
+        matrix_layout=True,
     )
     assert path == root / "qwen2.5-coder_7b" / "C2" / "temp_0.2" / "R1"
 
 
-def test_single_temperature_uses_legacy_layout() -> None:
+def test_build_cell_dir_includes_temp_for_single_temperature_matrix_layout() -> None:
+    path = build_cell_dir(
+        Path("runs/local_matrix_v1"),
+        "llama3.1:8b",
+        "C2",
+        0.0,
+        "R1",
+        matrix_layout=True,
+    )
+    assert path == Path("runs/local_matrix_v1/llama3.1_8b/C2/temp_0/R1")
+
+
+def test_single_temperature_uses_legacy_layout_without_matrix_layout() -> None:
     config = TrackPilotModelsConfig(
         models=("mock",),
         families=("C2",),
@@ -56,15 +68,16 @@ def test_single_temperature_uses_legacy_layout() -> None:
         f1_items_path=".",
         out_dir="runs/track_pilot_v1",
         temperatures=(0.0,),
+        matrix_layout=False,
     )
     assert config.use_temperature_dirs is False
-    path = cell_dir(
+    path = build_cell_dir(
         Path(config.out_dir),
         "mock",
         "C2",
+        0.0,
         "R0",
-        temperature=0.0,
-        use_temperature_dirs=config.use_temperature_dirs,
+        matrix_layout=config.matrix_layout,
     )
     assert path == Path("runs/track_pilot_v1/mock/C2/R0")
 

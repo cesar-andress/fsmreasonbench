@@ -88,6 +88,7 @@ def main(argv: list[str] | None = None) -> int:
         payload = {
             "root": str(result.root),
             "status_counts": result.status_counts,
+            "misplaced_cells": result.misplaced_cells,
             "incomplete_cells": result.incomplete_cells,
             "suggested_retry": result.suggested_retry,
         }

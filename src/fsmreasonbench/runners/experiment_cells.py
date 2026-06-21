@@ -310,6 +310,10 @@ def summarize_extended_inventory(
         "partial": 0,
         "running": 0,
         "stale-running": 0,
+        "misplaced_partial": 0,
+        "misplaced_running": 0,
+        "misplaced_failed": 0,
+        "misplaced_completed": 0,
         "expected": len(inventory),
     }
     for row in inventory:
@@ -382,7 +386,8 @@ def build_cell_plans(
     out_dir: Path,
     item_sources: dict[str, str],
     cohort_ids: dict[str, str],
-    use_temperature_dirs: bool,
+    use_temperature_dirs: bool = False,
+    matrix_layout: bool | None = None,
     skip_completed: bool,
     retry_failed: bool,
     skip_failed: bool,
@@ -392,6 +397,7 @@ def build_cell_plans(
 ) -> list[CellPlan]:
     from fsmreasonbench.runners.pilot_models import model_dir_name
 
+    layout = matrix_layout if matrix_layout is not None else use_temperature_dirs
     plans: list[CellPlan] = []
     for model in models:
         mdir = model_dir_name(model)
@@ -400,13 +406,13 @@ def build_cell_plans(
                 item_source = item_sources[family]
                 cohort_id = cohort_ids[family]
                 for track in tracks:
-                    run_dir = _cell_dir(
+                    run_dir = build_cell_dir(
                         out_dir,
                         model,
                         family,
+                        temperature,
                         track,
-                        temperature=temperature,
-                        use_temperature_dirs=use_temperature_dirs,
+                        matrix_layout=layout,
                     )
                     status = detect_cell_status(
                         run_dir,
@@ -443,24 +449,24 @@ def build_cell_plans(
     return plans
 
 
-def _cell_dir(
+def build_cell_dir(
     out_dir: Path,
     model: str,
     family: str,
+    temperature: float,
     track: str,
     *,
-    temperature: float,
-    use_temperature_dirs: bool,
+    matrix_layout: bool = True,
 ) -> Path:
-    from fsmreasonbench.runners.track_pilot_models import cell_dir
+    from fsmreasonbench.runners.track_pilot_models import build_cell_dir as _build
 
-    return cell_dir(
+    return _build(
         out_dir,
         model,
         family,
+        temperature,
         track,
-        temperature=temperature,
-        use_temperature_dirs=use_temperature_dirs,
+        matrix_layout=matrix_layout,
     )
 
 

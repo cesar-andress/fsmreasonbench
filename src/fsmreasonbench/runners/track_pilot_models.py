@@ -48,6 +48,8 @@ DEFAULT_C2_ITEMS = "cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl"
 DEFAULT_F1_ITEMS = "cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl"
 DEFAULT_C2_COHORT_ID = "c2-reachability-level3-v0.1-exploratory"
 DEFAULT_F1_COHORT_ID = "f1-mixed-level3-v0.1-exploratory"
+TRACK_IDS = ("R0", "R1", "R2")
+FAMILY_IDS = ("C2", "F1")
 
 _TRACK_ROW_FIELDS = (
     "model",
@@ -123,12 +125,13 @@ class TrackPilotModelsConfig:
     stop_after_failures: int = 3
     stale_running_seconds: float = DEFAULT_STALE_RUNNING_SECONDS
     incremental_safe: bool = False
+    matrix_layout: bool = False
     c2_cohort_id: str = DEFAULT_C2_COHORT_ID
     f1_cohort_id: str = DEFAULT_F1_COHORT_ID
 
     @property
     def use_temperature_dirs(self) -> bool:
-        return len(self.temperatures) > 1
+        return self.matrix_layout
 
     @property
     def effective_force_all(self) -> bool:
@@ -162,6 +165,35 @@ def temperature_dir_name(temperature: float) -> str:
     return f"temp_{temperature:g}"
 
 
+def infer_matrix_layout(out_dir: str | Path) -> bool:
+    """Return True when ``out_dir`` uses local-matrix temp_* cell directories."""
+    root = Path(out_dir)
+    summary_path = root / "combined_summary.json"
+    if summary_path.exists():
+        try:
+            payload = json.loads(summary_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            payload = {}
+        if payload.get("experiment") == "local_matrix":
+            return True
+    return "local_matrix" in root.name
+
+
+def build_cell_dir(
+    out_dir: str | Path,
+    model: str,
+    family: str,
+    temperature: float,
+    track: str,
+    *,
+    matrix_layout: bool = True,
+) -> Path:
+    base = Path(out_dir) / model_dir_name(model) / family
+    if matrix_layout:
+        base = base / temperature_dir_name(temperature)
+    return base / track
+
+
 def cell_dir(
     out_dir: Path,
     model: str,
@@ -170,22 +202,31 @@ def cell_dir(
     *,
     temperature: float = 0.0,
     use_temperature_dirs: bool = False,
+    matrix_layout: bool | None = None,
 ) -> Path:
-    base = out_dir / model_dir_name(model) / family
-    if use_temperature_dirs:
-        base = base / temperature_dir_name(temperature)
-    return base / track
+    """Backward-compatible alias for :func:`build_cell_dir`."""
+    layout = use_temperature_dirs if matrix_layout is None else matrix_layout
+    return build_cell_dir(
+        out_dir,
+        model,
+        family,
+        temperature,
+        track,
+        matrix_layout=layout,
+    )
 
 
 # Re-export for tests and downstream callers
 __all__ = [
     "TrackPilotModelsConfig",
     "TrackPilotModelsResult",
+    "build_cell_dir",
     "build_delegation_rows",
     "build_temperature_delta_rows",
     "build_track_row",
     "cell_dir",
     "finalize_matrix_run",
+    "infer_matrix_layout",
     "is_cell_complete",
     "load_cell_summary",
     "parse_temperatures",
@@ -494,13 +535,13 @@ def scan_matrix_inventory(
             for family in config.families:
                 cohort_id = cohort_ids[family]
                 for track in config.tracks:
-                    run_dir = cell_dir(
+                    run_dir = build_cell_dir(
                         root,
                         model,
                         family,
+                        temperature,
                         track,
-                        temperature=temperature,
-                        use_temperature_dirs=config.use_temperature_dirs,
+                        matrix_layout=config.matrix_layout,
                     )
                     extended = detect_cell_status(
                         run_dir,
@@ -581,7 +622,7 @@ def finalize_matrix_run(
     temperature_delta_rows = build_temperature_delta_rows(track_rows)
     status_counts = summarize_extended_inventory(inventory)
     payload = {
-        "experiment": "local_matrix" if config.use_temperature_dirs else "track_pilot",
+        "experiment": "local_matrix" if config.matrix_layout else "track_pilot",
         "models": list(config.models),
         "families": list(config.families),
         "tracks": list(config.tracks),
@@ -666,7 +707,7 @@ def run_track_pilot_models(
         out_dir=root,
         item_sources=item_sources,
         cohort_ids=cohort_ids,
-        use_temperature_dirs=config.use_temperature_dirs,
+        matrix_layout=config.matrix_layout,
         skip_completed=config.skip_completed,
         retry_failed=config.retry_failed,
         skip_failed=config.skip_failed,

@@ -15,6 +15,7 @@ from fsmreasonbench.runners.track_pilot_models import (
     DEFAULT_F1_ITEMS,
     TrackPilotModelsConfig,
     apply_incremental_safe,
+    infer_matrix_layout,
     parse_temperatures,
     run_track_pilot_models,
 )
@@ -176,6 +177,12 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Regenerate combined_summary.json and report.md from on-disk cell artifacts",
     )
+    _add_bool_flag(
+        parser,
+        "matrix-layout",
+        default=None,
+        help_text="Use temp_{temperature}/ track directories (auto for local_matrix runs)",
+    )
     args = parser.parse_args(argv)
 
     if args.max_items < 1:
@@ -208,6 +215,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.dry_run and force_all:
         parser.error("--dry-run cannot be combined with --force/--force-all")
 
+    if args.matrix_layout is None:
+        matrix_layout = infer_matrix_layout(args.out_dir) or args.temperatures is not None
+    else:
+        matrix_layout = args.matrix_layout
+
     config = apply_incremental_safe(
         TrackPilotModelsConfig(
             models=models,
@@ -235,6 +247,7 @@ def main(argv: list[str] | None = None) -> int:
             stop_after_failures=args.stop_after_failures,
             stale_running_seconds=args.stale_running_seconds,
             incremental_safe=args.incremental_safe,
+            matrix_layout=matrix_layout,
         )
     )
 
