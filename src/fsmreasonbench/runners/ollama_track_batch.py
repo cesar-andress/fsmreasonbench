@@ -9,7 +9,7 @@ from typing import Any, Protocol
 
 from fsmreasonbench.evaluator.io import dump_json
 from fsmreasonbench.evaluator.jsonl import write_jsonl
-from fsmreasonbench.evaluator.models import ScoringRecord
+from fsmreasonbench.evaluator.models import FailureStage, ScoringRecord
 from fsmreasonbench.evaluator.scorer import score_item
 from fsmreasonbench.evaluator.summary import summarize_scoring_records
 from fsmreasonbench.evaluator.track_failure_taxonomy import (
@@ -129,13 +129,22 @@ def run_ollama_track_batch(
     item_records: list[dict[str, Any]] = []
 
     for item in selected:
-        run = _evaluate_item_with_tools(
-            item,
-            generate,
-            config,
-            resolved,
-            timestamp=utc_timestamp(),
-        )
+        try:
+            run = _evaluate_item_with_tools(
+                item,
+                generate,
+                config,
+                resolved,
+                timestamp=utc_timestamp(),
+            )
+        except Exception as exc:  # noqa: BLE001 — continue batch after per-item failure
+            run = _failed_item_run(
+                item,
+                config,
+                resolved,
+                timestamp=utc_timestamp(),
+                error=str(exc),
+            )
         transcript_path = transcript_dir / f"{item.item_id}.json"
         dump_json(transcript_path, run["transcript"].to_dict())
 
@@ -239,7 +248,7 @@ def _evaluate_item_with_tools(
     except TrackProtocolError as exc:
         protocol_errors.append(str(exc))
         audit.scratchpad("protocol_error", str(exc))
-    except ValueError as exc:
+    except (ValueError, RuntimeError) as exc:
         tool_execution_error = str(exc)
         protocol_errors.append(str(exc))
         audit.scratchpad("tool_execution_error", str(exc))
@@ -313,4 +322,57 @@ def _evaluate_item_with_tools(
         "transcript": transcript,
         "raw_response_text": final_text,
         "track_failure_class": track_failure_class,
+    }
+
+
+def _failed_item_run(
+    item: BenchmarkItem,
+    config: OllamaBatchConfig,
+    track: TrackId,
+    *,
+    timestamp: str,
+    error: str,
+) -> dict[str, Any]:
+    """Record a per-item runner failure without aborting the batch."""
+    scoring_record = ScoringRecord(
+        item_id=item.item_id,
+        family=item.family,
+        extractable=False,
+        verdict_correct=None,
+        certificate_valid=None,
+        fully_correct=False,
+        failure_stage=FailureStage.NOT_EXTRACTABLE,
+        parse_errors=(error,),
+    )
+    audit = AuditLogBuilder(track)
+    audit.scratchpad("runner_error", error)
+    transcript = LLMTrackTranscript(
+        transcript_version="1.1",
+        tracks_version=TRACKS_VERSION,
+        track=track.value,
+        model=config.model,
+        temperature=config.temperature,
+        timestamp=timestamp,
+        item=item.to_full_dict(),
+        messages=(),
+        tool_calls_requested=(),
+        tool_calls_executed=(),
+        tool_outputs=(),
+        raw_response={"runner_error": error},
+        parsed_submission=None,
+        scoring_record=scoring_record,
+        audit_log=audit.build().to_dict(),
+        protocol_errors=(error,),
+    )
+    return {
+        "transcript": transcript,
+        "raw_response_text": error,
+        "track_failure_class": classify_track_failure(
+            track=track.value,
+            scoring_record=scoring_record.to_dict(),
+            tool_calls_requested=[],
+            tool_outputs=[],
+            tool_plan_valid=False,
+            tool_execution_error=error,
+        ),
     }

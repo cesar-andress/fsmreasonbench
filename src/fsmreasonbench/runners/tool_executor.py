@@ -11,7 +11,28 @@ from fsmreasonbench.tracks.solver_tools import REGISTERED_TOOL_NAMES, SolverTool
 from fsmreasonbench.tracks.step_simulator import StepSimulator
 
 R1_ALLOWED_TOOLS: frozenset[str] = frozenset({"step"})
+C2_R2_ALLOWED_TOOLS: frozenset[str] = frozenset(
+    {
+        "solver.is_reachable",
+        "solver.reachability_certificate",
+    }
+)
+F1_R2_ALLOWED_TOOLS: frozenset[str] = frozenset(
+    {
+        "solver.check_separation",
+        "solver.equivalence_certificate",
+        "solver.distinguishing_certificate",
+    }
+)
 MAX_TOOL_CALLS_PER_ROUND = 64
+
+
+def allowed_r2_tools_for_family(family: str) -> frozenset[str]:
+    if family == "C2":
+        return C2_R2_ALLOWED_TOOLS
+    if family == "F1":
+        return F1_R2_ALLOWED_TOOLS
+    raise ValueError(f"unsupported family for R2 tools: {family!r}")
 
 
 def _fsm_index(item: BenchmarkItem) -> dict[str, Any]:
@@ -31,7 +52,12 @@ def execute_tool_plan(
     if len(tool_calls) > MAX_TOOL_CALLS_PER_ROUND:
         raise ValueError(f"tool plan exceeds max calls ({MAX_TOOL_CALLS_PER_ROUND})")
 
-    allowed = R1_ALLOWED_TOOLS if track == TrackId.R1 else REGISTERED_TOOL_NAMES
+    if track == TrackId.R1:
+        allowed = R1_ALLOWED_TOOLS
+    elif track == TrackId.R2:
+        allowed = allowed_r2_tools_for_family(item.family)
+    else:
+        raise ValueError(f"track {track.value} does not support tool execution")
     fsm_by_id = _fsm_index(item)
     results: list[dict[str, Any]] = []
 
@@ -101,12 +127,22 @@ def _execute_r2_call(
     call_id = call["call_id"]
     tool = call["tool"]
     inputs = call["inputs"]
-    if tool not in allowed:
+    if tool not in REGISTERED_TOOL_NAMES:
         return {
             "call_id": call_id,
             "tool": tool,
             "status": "rejected",
             "error": f"tool {tool!r} not registered for R2",
+        }
+    if tool not in allowed:
+        return {
+            "call_id": call_id,
+            "tool": tool,
+            "status": "rejected",
+            "error": (
+                f"tool {tool!r} not allowed for family {item.family!r} on R2 "
+                f"(allowed: {sorted(allowed)})"
+            ),
         }
 
     try:
@@ -155,7 +191,7 @@ def _execute_r2_call(
             "status": "rejected",
             "error": f"missing or invalid input field: {exc}",
         }
-    except (TypeError, ValueError) as exc:
+    except (TypeError, ValueError, RuntimeError) as exc:
         return {
             "call_id": call_id,
             "tool": tool,

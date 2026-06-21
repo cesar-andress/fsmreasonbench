@@ -12,6 +12,15 @@ from fsmreasonbench.evaluator.io import dump_json
 from fsmreasonbench.evaluator.jsonl import load_items_jsonl
 from fsmreasonbench.evaluator.models import FailureStage
 from fsmreasonbench.items.assembly import BenchmarkItem
+from fsmreasonbench.runners.cell_failure import (
+    classify_cell_error,
+    clear_cell_error,
+    is_cell_complete,
+    read_cell_error,
+    should_run_cell,
+    write_cell_error,
+    write_cell_state,
+)
 from fsmreasonbench.runners.ollama_batch import GenerateFn, OllamaBatchConfig
 from fsmreasonbench.runners.ollama_track_batch import run_ollama_track_batch
 from fsmreasonbench.runners.pilot_models import model_dir_name
@@ -84,6 +93,9 @@ class TrackPilotModelsConfig:
     temperatures: tuple[float, ...] = (0.0,)
     timeout: float = 120.0
     skip_completed: bool = True
+    retry_failed: bool = False
+    skip_failed: bool = False
+    force: bool = False
     c2_cohort_id: str = DEFAULT_C2_COHORT_ID
     f1_cohort_id: str = DEFAULT_F1_COHORT_ID
 
@@ -130,13 +142,6 @@ def cell_dir(
     if use_temperature_dirs:
         base = base / temperature_dir_name(temperature)
     return base / track
-
-
-def is_cell_complete(run_dir: Path) -> bool:
-    for name in ("track_summary.json", "summary.json"):
-        if (run_dir / name).exists():
-            return True
-    return False
 
 
 def load_cell_summary(run_dir: Path) -> dict[str, Any]:
@@ -214,6 +219,14 @@ def build_delegation_rows(track_rows: list[dict[str, Any]]) -> list[dict[str, An
             "cohort_id": r0.get("cohort_id"),
             "n": r0.get("n"),
         }
+        missing_tracks: list[str] = []
+        if r1 is None:
+            missing_tracks.append("R1")
+        if r2 is None:
+            missing_tracks.append("R2")
+        if missing_tracks:
+            row["missing_tracks"] = missing_tracks
+            row["delegation_incomplete"] = True
         if r1 is not None:
             gap = compute_delegation_gap(_summary_from_row(r0), _summary_from_row(r1))
             for metric, value in gap["delegation_gap"].items():
@@ -336,20 +349,61 @@ def run_track_pilot_models(
                     )
                     run_dir.mkdir(parents=True, exist_ok=True)
 
-                    if config.skip_completed and is_cell_complete(run_dir):
-                        summary = load_cell_summary(run_dir)
-                        track_rows.append(
-                            build_track_row(
-                                summary,
-                                model=model,
-                                family=family,
-                                track=track,
-                                temperature=temperature,
-                                cohort_id=cohort_id,
-                                run_dir=run_dir,
+                    if not should_run_cell(
+                        run_dir,
+                        skip_completed=config.skip_completed,
+                        retry_failed=config.retry_failed,
+                        skip_failed=config.skip_failed,
+                        force=config.force,
+                    ):
+                        if is_cell_complete(run_dir):
+                            summary = load_cell_summary(run_dir)
+                            track_rows.append(
+                                build_track_row(
+                                    summary,
+                                    model=model,
+                                    family=family,
+                                    track=track,
+                                    temperature=temperature,
+                                    cohort_id=cohort_id,
+                                    run_dir=run_dir,
+                                )
                             )
-                        )
+                        elif read_cell_error(run_dir) is not None:
+                            error_payload = read_cell_error(run_dir)
+                            assert error_payload is not None
+                            failed_cells.append(
+                                {
+                                    "model": model,
+                                    "family": family,
+                                    "track": track,
+                                    "temperature": temperature,
+                                    "run_dir": str(run_dir),
+                                    "error": error_payload["error"],
+                                    "error_type": error_payload.get(
+                                        "error_type", "internal_runner_error"
+                                    ),
+                                }
+                            )
+                            track_rows.append(
+                                {
+                                    "model": model,
+                                    "model_dir": model_dir_name(model),
+                                    "family": family,
+                                    "track": track,
+                                    "temperature": temperature,
+                                    "cohort_id": cohort_id,
+                                    "run_dir": str(run_dir),
+                                    "status": "failed",
+                                    "error": error_payload["error"],
+                                    "error_type": error_payload.get(
+                                        "error_type", "internal_runner_error"
+                                    ),
+                                }
+                            )
                         continue
+
+                    clear_cell_error(run_dir)
 
                     try:
                         batch_result = run_ollama_track_batch(
@@ -365,6 +419,14 @@ def run_track_pilot_models(
                             track=track,
                             out_dir=run_dir,
                         )
+                        write_cell_state(
+                            run_dir,
+                            status="completed",
+                            model=model,
+                            family=family,
+                            track=track,
+                            temperature=temperature,
+                        )
                         track_rows.append(
                             build_track_row(
                                 batch_result.summary,
@@ -377,6 +439,17 @@ def run_track_pilot_models(
                             )
                         )
                     except Exception as exc:  # noqa: BLE001 — pilot continues after cell failure
+                        error_type = classify_cell_error(str(exc))
+                        write_cell_error(
+                            run_dir,
+                            error_type=error_type,
+                            error=str(exc),
+                            model=model,
+                            family=family,
+                            track=track,
+                            temperature=temperature,
+                            exc_type=type(exc).__name__,
+                        )
                         failed_cells.append(
                             {
                                 "model": model,
@@ -385,6 +458,7 @@ def run_track_pilot_models(
                                 "temperature": temperature,
                                 "run_dir": str(run_dir),
                                 "error": str(exc),
+                                "error_type": error_type,
                             }
                         )
                         track_rows.append(
@@ -398,6 +472,7 @@ def run_track_pilot_models(
                                 "run_dir": str(run_dir),
                                 "status": "failed",
                                 "error": str(exc),
+                                "error_type": error_type,
                             }
                         )
 
@@ -548,11 +623,38 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
 
     if failed_cells:
         lines.extend(["", "### Failed cells", ""])
+        by_type: dict[str, list[dict[str, Any]]] = {
+            "timeout": [],
+            "internal_runner_error": [],
+            "model_protocol_error": [],
+            "tool_execution_error": [],
+        }
         for cell in failed_cells:
-            temp_label = f" T={cell.get('temperature', 0)}" if "temperature" in cell else ""
-            lines.append(
-                f"- `{cell['model']}` / {cell['family']} / {cell['track']}{temp_label}: {cell['error']}"
-            )
+            error_type = cell.get("error_type") or classify_cell_error(cell.get("error", ""))
+            bucket = by_type.get(error_type, by_type["internal_runner_error"])
+            bucket.append(cell)
+        for error_type, label in (
+            ("timeout", "Timeout"),
+            ("internal_runner_error", "Internal runner error"),
+            ("model_protocol_error", "Model protocol error"),
+            ("tool_execution_error", "Tool execution error"),
+        ):
+            cells = by_type[error_type]
+            if not cells:
+                continue
+            lines.append(f"#### {label} ({len(cells)})")
+            lines.append("")
+            for cell in cells:
+                temp_label = f" T={cell.get('temperature', 0)}" if "temperature" in cell else ""
+                lines.append(
+                    f"- `{cell['model']}` / {cell['family']} / {cell['track']}{temp_label}: "
+                    f"{cell['error']}"
+                )
+            lines.append("")
+        lines.append(
+            "Delegation gap tables use `—` when a track cell is missing or failed; "
+            "do not interpret as zero improvement."
+        )
 
     indexed = {_row_index_key(row): row for row in track_rows}
     metric_headers = ("extract", "verdict", "cert", "full", "tool_rate", "avg_tools")
@@ -627,17 +729,23 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
         for row in delegation_rows:
             if row["family"] != family:
                 continue
+            def _fmt_delta(key: str) -> str:
+                value = row.get(key)
+                if value is None:
+                    return "—" if row.get("delegation_incomplete") else "+nan"
+                return f"{value:+.3f}"
+
             lines.append(
                 "| `{model}` | {temp:g} | "
-                "{d13:+.3f} | {d23:+.3f} | {d33:+.3f} | "
-                "{d22:+.3f} | {d21:+.3f} |".format(
+                "{d13} | {d23} | {d33} | "
+                "{d22} | {d21} |".format(
                     model=row["model"],
                     temp=float(row.get("temperature", 0.0)),
-                    d13=row.get("delta_R1_minus_R0_fully_correct_rate", float("nan")),
-                    d23=row.get("delta_R2_minus_R0_fully_correct_rate", float("nan")),
-                    d33=row.get("delta_R2_minus_R1_fully_correct_rate", float("nan")),
-                    d22=row.get("delta_R2_minus_R0_certificate_valid_rate", float("nan")),
-                    d21=row.get("delta_R2_minus_R0_verdict_accuracy", float("nan")),
+                    d13=_fmt_delta("delta_R1_minus_R0_fully_correct_rate"),
+                    d23=_fmt_delta("delta_R2_minus_R0_fully_correct_rate"),
+                    d33=_fmt_delta("delta_R2_minus_R1_fully_correct_rate"),
+                    d22=_fmt_delta("delta_R2_minus_R0_certificate_valid_rate"),
+                    d21=_fmt_delta("delta_R2_minus_R0_verdict_accuracy"),
                 )
             )
 

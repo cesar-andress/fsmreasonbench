@@ -126,6 +126,12 @@ class SolverToolRegistry:
         fsm_a: ExecutableFSM,
         fsm_b: ExecutableFSM,
     ) -> dict[str, Any]:
+        separation = check_separation(fsm_a, fsm_b)
+        if separation.equivalent:
+            raise ValueError(
+                "DFAs are equivalent; use solver.equivalence_certificate instead of "
+                "solver.distinguishing_certificate"
+            )
         certificate = build_distinguishing_trace_certificate(fsm_a, fsm_b)
         self._audit.record_tool(
             "solver.distinguishing_certificate",

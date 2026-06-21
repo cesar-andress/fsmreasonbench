@@ -88,6 +88,16 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Re-run cells even when summary.json exists",
     )
+    parser.add_argument(
+        "--retry-failed",
+        action="store_true",
+        help="Re-run only cells that have error.json from a prior failure",
+    )
+    parser.add_argument(
+        "--skip-failed",
+        action="store_true",
+        help="Skip cells with error.json (do not retry failed cells)",
+    )
     args = parser.parse_args(argv)
 
     if args.max_items < 1:
@@ -110,6 +120,11 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError as exc:
         parser.error(str(exc))
 
+    if args.retry_failed and args.skip_failed:
+        parser.error("--retry-failed and --skip-failed are mutually exclusive")
+    if args.force and args.retry_failed:
+        parser.error("--force and --retry-failed are mutually exclusive")
+
     config = TrackPilotModelsConfig(
         models=models,
         families=families,
@@ -120,7 +135,10 @@ def main(argv: list[str] | None = None) -> int:
         max_items=args.max_items,
         temperatures=temperatures,
         timeout=args.timeout,
-        skip_completed=not args.force,
+        skip_completed=not args.force and not args.retry_failed,
+        retry_failed=args.retry_failed,
+        skip_failed=args.skip_failed,
+        force=args.force,
     )
 
     def generate_factory(model: str, temperature: float):
