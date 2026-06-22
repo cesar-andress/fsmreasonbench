@@ -10,7 +10,11 @@ from pathlib import Path
 from fsmreasonbench.cohort.expanded_n100 import resolve_cohort_bundle
 from fsmreasonbench.dev.doc_consistency import find_repo_root
 from fsmreasonbench.runners.experiment_cells import DEFAULT_STALE_RUNNING_SECONDS
-from fsmreasonbench.runners.ollama import HttpOllamaClient, OllamaConfig
+from fsmreasonbench.runners.providers.base import (
+    ANTHROPIC_COST_WARNING,
+    GenerateBackendConfig,
+    build_generate_factory,
+)
 from fsmreasonbench.runners.track_pilot_models import (
     DEFAULT_C2_COHORT_ID,
     DEFAULT_C2_ITEMS,
@@ -48,12 +52,18 @@ def _add_bool_flag(parser: argparse.ArgumentParser, name: str, default: bool, he
 def main(argv: list[str] | None = None) -> int:
     repo_root = find_repo_root()
     parser = argparse.ArgumentParser(
-        description="Run R0/R1/R2 track pilot across multiple Ollama models and families",
+        description="Run R0/R1/R2 track pilot across Ollama or Anthropic model backends",
+    )
+    parser.add_argument(
+        "--provider",
+        choices=("ollama", "anthropic"),
+        default="ollama",
+        help="Model backend (default: ollama)",
     )
     parser.add_argument(
         "--models",
         default="qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b",
-        help="Comma-separated Ollama model names",
+        help="Comma-separated model names for the selected provider",
     )
     parser.add_argument(
         "--families",
@@ -107,7 +117,17 @@ def main(argv: list[str] | None = None) -> int:
         default=0.0,
         help="Single temperature when --temperatures is not set (default: 0.0)",
     )
-    parser.add_argument("--timeout", type=float, default=120.0)
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=120.0,
+        help="Per-item HTTP timeout in seconds (default: 120; use --no-timeout to disable)",
+    )
+    parser.add_argument(
+        "--no-timeout",
+        action="store_true",
+        help="Disable per-item HTTP timeout (cell-level --cell-timeout still applies if set)",
+    )
     parser.add_argument(
         "--item-timeout",
         type=float,
@@ -183,6 +203,22 @@ def main(argv: list[str] | None = None) -> int:
         help="Skip cells with error.json (do not retry failed cells)",
     )
     parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=8192,
+        help="Anthropic max_tokens per request (default: 8192)",
+    )
+    parser.add_argument(
+        "--provider-dry-run",
+        action="store_true",
+        help="Build provider request payloads and write provider_dry_run.json without API calls",
+    )
+    parser.add_argument(
+        "--estimate-only",
+        action="store_true",
+        help="Write frontier_estimate.json with planned item/API-call counts and exit",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print planned cell actions without calling models",
@@ -207,6 +243,14 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.max_items < 1:
         parser.error("--max-items must be >= 1")
+    if args.max_tokens < 1:
+        parser.error("--max-tokens must be >= 1")
+    if args.estimate_only and args.report_only:
+        parser.error("--estimate-only cannot be combined with --report-only")
+    if args.provider_dry_run and args.report_only:
+        parser.error("--provider-dry-run cannot be combined with --report-only")
+    if args.provider == "anthropic" and not args.report_only:
+        print(ANTHROPIC_COST_WARNING, file=sys.stderr)
 
     try:
         models = _parse_csv(args.models)
@@ -234,6 +278,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--report-only cannot be combined with --force/--force-all")
     if args.dry_run and force_all:
         parser.error("--dry-run cannot be combined with --force/--force-all")
+    if args.no_timeout and args.timeout != 120.0:
+        parser.error("--no-timeout cannot be combined with an explicit --timeout value")
+
+    request_timeout = None if args.no_timeout else args.timeout
 
     if args.matrix_layout is None:
         matrix_layout = infer_matrix_layout(args.out_dir) or args.temperatures is not None
@@ -259,7 +307,7 @@ def main(argv: list[str] | None = None) -> int:
             out_dir=args.out_dir,
             max_items=args.max_items,
             temperatures=temperatures,
-            timeout=args.timeout,
+            timeout=request_timeout,
             skip_completed=not force_all and not args.retry_failed,
             retry_failed=args.retry_failed,
             skip_failed=args.skip_failed,
@@ -279,20 +327,37 @@ def main(argv: list[str] | None = None) -> int:
             matrix_layout=matrix_layout,
             c2_cohort_id=c2_cohort_id,
             f1_cohort_id=f1_cohort_id,
+            provider=args.provider,
+            max_tokens=args.max_tokens,
+            provider_dry_run=args.provider_dry_run,
+            estimate_only=args.estimate_only,
+            ollama_base_url=args.ollama_url,
         )
     )
 
+    backend = GenerateBackendConfig(
+        provider=args.provider,
+        timeout=request_timeout,
+        max_tokens=args.max_tokens,
+        ollama_base_url=args.ollama_url,
+        provider_dry_run=args.provider_dry_run,
+    )
+
     def generate_factory(model: str, temperature: float):
-        item_timeout = args.item_timeout if args.item_timeout is not None else args.timeout
-        client = HttpOllamaClient(
-            OllamaConfig(
-                base_url=args.ollama_url,
-                model=model,
+        factory = build_generate_factory(
+            GenerateBackendConfig(
+                provider=backend.provider,
                 temperature=temperature,
-                timeout=item_timeout,
+                timeout=(
+                    args.item_timeout
+                    if args.item_timeout is not None
+                    else request_timeout
+                ),
+                max_tokens=backend.max_tokens,
+                ollama_base_url=backend.ollama_base_url,
             )
         )
-        return client.generate
+        return factory(model, temperature)
 
     try:
         result = run_track_pilot_models(config, generate_factory)
@@ -313,6 +378,7 @@ def main(argv: list[str] | None = None) -> int:
                 "families": list(families),
                 "tracks": list(tracks),
                 "temperatures": list(temperatures),
+                "provider": args.provider,
                 "cells_completed": counts.get("completed", 0),
                 "cells_incomplete": incomplete,
                 "cell_status_counts": counts,

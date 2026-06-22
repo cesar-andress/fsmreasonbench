@@ -457,25 +457,33 @@ def test_cli_with_mocked_client(
 ) -> None:
     c2_items_path, f1_items_path, c2_item, f1_item = pilot_items
 
-    class FakeClient:
-        def generate(
-            self,
-            prompt: str,
-            *,
-            model: str,
-            temperature: float,
-            timeout: float,
-        ) -> str:
-            return _make_fake_generate(c2_item, f1_item, TrackId.R0)(
-                prompt,
-                model=model,
-                temperature=temperature,
-                timeout=timeout,
-            )
+    fake_generate = _make_fake_generate(c2_item, f1_item, TrackId.R0)
+
+    def fake_build_generate_factory(_backend):
+        def factory(model: str, temperature: float):
+            _ = (model, temperature)
+
+            def generate(
+                prompt: str,
+                *,
+                model: str,
+                temperature: float,
+                timeout: float,
+            ) -> str:
+                return fake_generate(
+                    prompt,
+                    model=model,
+                    temperature=temperature,
+                    timeout=timeout,
+                )
+
+            return generate
+
+        return factory
 
     monkeypatch.setattr(
-        "fsmreasonbench.cli.run_track_pilot_models.HttpOllamaClient",
-        lambda config: FakeClient(),
+        "fsmreasonbench.cli.run_track_pilot_models.build_generate_factory",
+        fake_build_generate_factory,
     )
 
     out_dir = tmp_path / "cli_pilot"

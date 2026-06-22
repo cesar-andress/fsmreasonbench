@@ -201,6 +201,8 @@ def run_ollama_track_batch(
         model=config.model,
         family=family,
         track=resolved.value,
+        provider=config.provider,
+        max_tokens=config.max_tokens,
     )
     if write_summary:
         dump_json(root / "summary.json", summary)

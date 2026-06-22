@@ -26,7 +26,7 @@ class OllamaConfig:
     base_url: str = "http://localhost:11434"
     model: str = "qwen2.5-coder:7b"
     temperature: float = 0.0
-    timeout: float = 120.0
+    timeout: float | None = 120.0
 
 
 def build_ollama_generate_request_body(
@@ -79,7 +79,20 @@ class HttpOllamaClient:
         try:
             with urllib.request.urlopen(request, timeout=resolved_timeout) as response:
                 payload = json.loads(response.read().decode("utf-8"))
+        except TimeoutError as exc:
+            if resolved_timeout is None:
+                raise RuntimeError("ollama request failed: timed out") from exc
+            raise TimeoutError(
+                f"ollama request exceeded timeout of {resolved_timeout:g}s"
+            ) from exc
         except urllib.error.URLError as exc:
+            reason = exc.reason
+            if isinstance(reason, TimeoutError):
+                if resolved_timeout is None:
+                    raise TimeoutError("ollama request timed out") from exc
+                raise TimeoutError(
+                    f"ollama request exceeded timeout of {resolved_timeout:g}s"
+                ) from exc
             raise RuntimeError(f"ollama request failed: {exc}") from exc
 
         text = payload.get("response")

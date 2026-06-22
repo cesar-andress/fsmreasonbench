@@ -7,7 +7,7 @@ import json
 import os
 import time
 import traceback
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable
@@ -39,6 +39,11 @@ from fsmreasonbench.runners.experiment_cells import (
 from fsmreasonbench.runners.ollama_batch import GenerateFn, OllamaBatchConfig
 from fsmreasonbench.runners.ollama_track_batch import run_ollama_track_batch
 from fsmreasonbench.runners.pilot_models import model_dir_name
+from fsmreasonbench.runners.providers.base import (
+    estimate_frontier_run,
+    validate_provider_tracks,
+    write_provider_dry_run_diagnostic,
+)
 from fsmreasonbench.tracks.delegation import DELEGATION_GAP_METRICS, compute_delegation_gap
 from fsmreasonbench.tracks.models import TrackId
 
@@ -113,7 +118,7 @@ class TrackPilotModelsConfig:
     out_dir: str | Path
     max_items: int = 20
     temperatures: tuple[float, ...] = (0.0,)
-    timeout: float = 120.0
+    timeout: float | None = 120.0
     skip_completed: bool = True
     retry_failed: bool = False
     skip_failed: bool = False
@@ -131,6 +136,11 @@ class TrackPilotModelsConfig:
     stale_running_seconds: float = DEFAULT_STALE_RUNNING_SECONDS
     incremental_safe: bool = False
     matrix_layout: bool = False
+    provider: str = "ollama"
+    max_tokens: int = 8192
+    provider_dry_run: bool = False
+    estimate_only: bool = False
+    ollama_base_url: str = "http://localhost:11434"
     c2_cohort_id: str = DEFAULT_C2_COHORT_ID
     f1_cohort_id: str = DEFAULT_F1_COHORT_ID
 
@@ -230,7 +240,9 @@ __all__ = [
     "build_temperature_delta_rows",
     "build_track_row",
     "cell_dir",
-    "finalize_matrix_run",
+    "format_cell_timeout_message",
+    "format_item_timeout_message",
+    "resolved_item_timeout",
     "infer_matrix_layout",
     "is_cell_complete",
     "load_cell_summary",
@@ -408,6 +420,23 @@ def _item_sources(config: TrackPilotModelsConfig) -> dict[str, str]:
     return {"C2": str(config.c2_items_path), "F1": str(config.f1_items_path)}
 
 
+def resolved_item_timeout(config: TrackPilotModelsConfig) -> float | None:
+    """Return the per-item HTTP timeout, or None when disabled."""
+    if config.item_timeout is not None:
+        return config.item_timeout
+    return config.timeout
+
+
+def format_cell_timeout_message(cell_timeout: float) -> str:
+    return f"cell exceeded timeout of {cell_timeout:g}s"
+
+
+def format_item_timeout_message(item_timeout: float | None) -> str:
+    if item_timeout is None:
+        return "operation timed out (no item timeout configured)"
+    return f"item request exceeded timeout of {item_timeout:g}s"
+
+
 def _cell_execution_config_hash(
     *,
     model: str,
@@ -416,8 +445,10 @@ def _cell_execution_config_hash(
     temperature: float,
     item_source: str,
     max_items: int,
-    timeout: float,
-    item_timeout: float,
+    timeout: float | None,
+    item_timeout: float | None,
+    provider: str,
+    max_tokens: int,
 ) -> str:
     return compute_config_hash(
         {
@@ -429,6 +460,8 @@ def _cell_execution_config_hash(
             "max_items": max_items,
             "timeout": timeout,
             "item_timeout": item_timeout,
+            "provider": provider,
+            "max_tokens": max_tokens,
         }
     )
 
@@ -443,7 +476,7 @@ def _run_cell_batch(
     track: str,
     temperature: float,
     config: TrackPilotModelsConfig,
-    item_timeout: float,
+    item_timeout: float | None,
 ) -> None:
     run_ollama_track_batch(
         items,
@@ -456,6 +489,8 @@ def _run_cell_batch(
             max_items=config.max_items,
             resume_items=config.resume_items,
             force_cell=config.force_cell or config.effective_force_all,
+            provider=config.provider,
+            max_tokens=config.max_tokens if config.provider == "anthropic" else None,
         ),
         track=track,
         out_dir=run_dir,
@@ -612,6 +647,8 @@ def finalize_matrix_run(
         "max_items": config.max_items,
         "timeout": config.timeout,
         "cohort_ids": cohort_ids,
+        "provider": config.provider,
+        "max_tokens": config.max_tokens if config.provider == "anthropic" else None,
         "cell_status_counts": status_counts,
         "cell_inventory": inventory,
         "track_rows": track_rows,
@@ -671,6 +708,8 @@ def run_track_pilot_models(
     for track in config.tracks:
         TrackId(track)
 
+    validate_provider_tracks(config.provider, config.tracks)
+
     root = Path(config.out_dir)
     root.mkdir(parents=True, exist_ok=True)
     config = apply_incremental_safe(config)
@@ -700,12 +739,50 @@ def run_track_pilot_models(
 
     if config.dry_run:
         print(format_dry_run_report(plans))
+
+    family_items: dict[str, list] | None = None
+    if config.estimate_only or config.provider_dry_run or not config.dry_run:
+        family_items = _load_family_items(config)
+
+    if config.estimate_only:
+        estimate = estimate_frontier_run(
+            provider=config.provider,
+            models=config.models,
+            families=config.families,
+            tracks=config.tracks,
+            temperatures=config.temperatures,
+            max_items=config.max_items,
+            max_cells=config.max_cells,
+            max_tokens=config.max_tokens,
+        )
+        dump_json(root / "frontier_estimate.json", estimate)
         inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
         return finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
 
-    family_items = _load_family_items(config)
+    if config.provider_dry_run:
+        assert family_items is not None
+        diagnostic_path = write_provider_dry_run_diagnostic(
+            out_dir=root,
+            provider=config.provider,
+            models=config.models,
+            families=config.families,
+            tracks=config.tracks,
+            temperatures=config.temperatures,
+            max_items=config.max_items,
+            max_tokens=config.max_tokens,
+            family_items=family_items,
+        )
+        print(f"Wrote provider dry-run diagnostic: {diagnostic_path}")
+        inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
+        return finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
+
+    if config.dry_run:
+        inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
+        return finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
+
+    assert family_items is not None
     run_plans = [plan for plan in plans if plan.action == "run"]
-    item_timeout = config.item_timeout if config.item_timeout is not None else config.timeout
+    item_timeout = resolved_item_timeout(config)
     cells_executed = 0
     consecutive_failures = 0
 
@@ -732,6 +809,8 @@ def run_track_pilot_models(
             max_items=config.max_items,
             timeout=config.timeout,
             item_timeout=item_timeout,
+            provider=config.provider,
+            max_tokens=config.max_tokens,
         )
         started_at = mark_cell_running(
             run_dir,
@@ -767,16 +846,42 @@ def run_track_pilot_models(
                 future = pool.submit(_execute_cell)
                 try:
                     future.result(timeout=config.cell_timeout)
+                except TimeoutError:
+                    if future.done():
+                        inner = future.exception()
+                        if inner is not None:
+                            raise inner
+                    mark_cell_failed(
+                        run_dir,
+                        error_type="timeout",
+                        error_message=format_cell_timeout_message(config.cell_timeout),
+                        model=plan.model,
+                        model_dir=plan.model_dir,
+                        family=plan.family,
+                        track=plan.track,
+                        temperature=plan.temperature,
+                        out_dir=run_dir,
+                        started_at=started_at,
+                        exc_type="TimeoutError",
+                    )
+                    consecutive_failures += 1
+                else:
+                    mark_cell_completed(
+                        run_dir,
+                        started_at=started_at,
+                        items_completed=config.max_items,
+                    )
+                    consecutive_failures = 0
                 finally:
                     pool.shutdown(wait=False, cancel_futures=True)
             else:
                 _execute_cell()
-            mark_cell_completed(
-                run_dir,
-                started_at=started_at,
-                items_completed=config.max_items,
-            )
-            consecutive_failures = 0
+                mark_cell_completed(
+                    run_dir,
+                    started_at=started_at,
+                    items_completed=config.max_items,
+                )
+                consecutive_failures = 0
         except KeyboardInterrupt:
             mark_cell_failed(
                 run_dir,
@@ -794,11 +899,11 @@ def run_track_pilot_models(
             inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
             finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
             raise
-        except FuturesTimeoutError:
+        except TimeoutError:
             mark_cell_failed(
                 run_dir,
                 error_type="timeout",
-                error_message=f"cell exceeded timeout of {config.cell_timeout}s",
+                error_message=format_item_timeout_message(item_timeout),
                 model=plan.model,
                 model_dir=plan.model_dir,
                 family=plan.family,
@@ -1030,7 +1135,7 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
         f"- **Tracks:** {', '.join(tracks)}",
         f"- **Temperatures:** {', '.join(str(t) for t in temperatures)}",
         f"- **Items per cell:** n={payload['max_items']}",
-        f"- **Timeout (s):** {payload.get('timeout', 120.0)}",
+        f"- **Timeout (s):** {payload.get('timeout') if payload.get('timeout') is not None else 'none (disabled)'}",
         "",
         "### Cohort IDs",
         "",

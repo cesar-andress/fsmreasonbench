@@ -37,10 +37,12 @@ class GenerateFn(Protocol):
 class OllamaBatchConfig:
     model: str
     temperature: float = 0.0
-    timeout: float = 120.0
+    timeout: float | None = 120.0
     max_items: int | None = None
     resume_items: bool = True
     force_cell: bool = False
+    provider: str = "ollama"
+    max_tokens: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,11 +65,13 @@ def _build_summary_from_scores(
     model: str,
     family: str,
     track: str,
+    provider: str | None = None,
+    max_tokens: int | None = None,
 ) -> dict[str, Any]:
     parsed_records = [ScoringRecord.from_dict(row) for row in scoring_rows]
     tool_counts = [int(row.get("tool_invocation_count", 0)) for row in scoring_rows]
     item_records = [{"track_failure_class": row.get("track_failure_class"), "scoring_record": row} for row in scoring_rows]
-    return {
+    summary = {
         "model": model,
         "family": family,
         "track": track,
@@ -83,6 +87,11 @@ def _build_summary_from_scores(
         ),
         **summarize_track_failure_taxonomy(item_records),
     }
+    if provider is not None:
+        summary["provider"] = provider
+    if max_tokens is not None:
+        summary["max_tokens"] = max_tokens
+    return summary
 
 
 def run_ollama_batch(
@@ -172,6 +181,8 @@ def run_ollama_batch(
         model=config.model,
         family=family,
         track="R0",
+        provider=config.provider,
+        max_tokens=config.max_tokens,
     )
     if write_summary:
         dump_json(root / "summary.json", summary)
