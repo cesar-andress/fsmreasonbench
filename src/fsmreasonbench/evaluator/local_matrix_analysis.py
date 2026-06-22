@@ -303,7 +303,15 @@ def render_local_matrix_analysis_markdown(
 
     for key, pilot_row in pilot_findings.items():
         follow_row = follow_findings.get(key, {})
-        replication = _assess_replication(key, pilot_row, follow_row)
+        replication = _assess_replication(
+            key,
+            pilot_row,
+            follow_row,
+            follow_cells=follow_cells,
+            follow_delegation=follow_delegation,
+            pilot_delegation=pilot_delegation,
+            temperature=temperature,
+        )
         lines.append(
             f"| {pilot_row['label']} | {pilot_row['evidence']} | {follow_row.get('evidence', 'pending')} | {replication} |"
         )
@@ -353,14 +361,14 @@ def render_local_matrix_analysis_markdown(
             "```bash",
             "cd fsmreasonbench",
             "PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \\",
-            "  --report-only --out-dir runs/local_matrix_n100_t02_v1 \\",
+            "  --report-only --out-dir runs/local_matrix_n100_t02_v2 \\",
             "  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \\",
             "  --families C2,F1 --tracks R0,R1,R2 --temperatures 0.2 --max-items 100",
             "PYTHONPATH=src python -m fsmreasonbench.cli.export_extractability_audit \\",
-            "  --root runs/local_matrix_n100_t02_v1 \\",
+            "  --root runs/local_matrix_n100_t02_v2 \\",
             "  --out docs/extractability_audit_n100_t02.md --expected-items 100",
             "PYTHONPATH=src python -m fsmreasonbench.cli.export_local_matrix_analysis \\",
-            "  --follow-root runs/local_matrix_n100_t02_v1 \\",
+            "  --follow-root runs/local_matrix_n100_t02_v2 \\",
             "  --pilot-root runs/local_matrix_v1 \\",
             "  --temperature 0.2 --expected-n 100 \\",
             "  --out docs/local_matrix_n100_t02_analysis.md",
@@ -419,6 +427,51 @@ def _pilot_finding_rows(
     }
 
 
+_MODEL_SHORT_NAMES = {
+    "qwen2.5-coder:7b": "qwen",
+    "mistral-nemo:12b": "mistral",
+    "gemma2:9b": "gemma",
+    "llama3.1:8b": "llama",
+}
+
+
+def _short_model_name(model: str) -> str:
+    return _MODEL_SHORT_NAMES.get(model, model.split(":")[0])
+
+
+def _cell_at(
+    cells: list[MatrixCell],
+    *,
+    model: str,
+    family: str,
+    track: str,
+    temperature: float,
+) -> MatrixCell | None:
+    for cell in cells:
+        if (
+            cell.model == model
+            and cell.family == family
+            and cell.track == track
+            and abs(cell.temperature - temperature) < 1e-9
+        ):
+            return cell
+    return None
+
+
+def _c2_r2_safe_completed(cells: list[MatrixCell], *, temperature: float) -> list[MatrixCell]:
+    completed: list[MatrixCell] = []
+    for model in ("qwen2.5-coder:7b", "mistral-nemo:12b", "gemma2:9b", "llama3.1:8b"):
+        cell = _cell_at(cells, model=model, family="C2", track="R2", temperature=temperature)
+        if (
+            cell is not None
+            and cell.status == "completed"
+            and cell.safety == "safe"
+            and cell.extractable > 0
+        ):
+            completed.append(cell)
+    return completed
+
+
 def _c2_r2_gap_summary(by_track: dict[tuple[str, str, str], MatrixCell]) -> str:
     parts: list[str] = []
     for model in ("qwen2.5-coder:7b", "gemma2:9b", "mistral-nemo:12b", "llama3.1:8b"):
@@ -427,16 +480,96 @@ def _c2_r2_gap_summary(by_track: dict[tuple[str, str, str], MatrixCell]) -> str:
             continue
         gap = cell.verdict_cert_gap
         if gap is not None:
-            parts.append(f"{model.split(':')[0]} Δ(v−c)={gap:+.2f}")
+            parts.append(f"{_short_model_name(model)} Δ(v−c)={gap:+.2f}")
     return "; ".join(parts) if parts else "pending"
 
 
-def _assess_replication(key: str, pilot: dict[str, str], follow: dict[str, str]) -> str:
+def _assess_replication(
+    key: str,
+    pilot: dict[str, str],
+    follow: dict[str, str],
+    *,
+    follow_cells: list[MatrixCell],
+    follow_delegation: list[dict[str, Any]],
+    pilot_delegation: list[dict[str, Any]] | None,
+    temperature: float,
+) -> str:
+    if key == "qwen_f1_delegation":
+        follow_row = next(
+            (
+                row
+                for row in follow_delegation
+                if row["model"] == "qwen2.5-coder:7b" and row["family"] == "F1"
+            ),
+            None,
+        )
+        if follow_row is None or follow_row.get("status") != "ok":
+            return "**pending** (F1 R2 incomplete or unsafe)"
+        pilot_row = next(
+            (
+                row
+                for row in (pilot_delegation or [])
+                if row["model"] == "qwen2.5-coder:7b" and row["family"] == "F1"
+            ),
+            None,
+        )
+        follow_delta = follow_row.get("delta_fully_correct_rate")
+        pilot_delta = pilot_row.get("delta_fully_correct_rate") if pilot_row else None
+        if (
+            pilot_delta is not None
+            and follow_delta is not None
+            and pilot_delta > 0
+            and follow_delta > 0
+            and abs(follow_delta) < abs(pilot_delta) - 0.05
+        ):
+            return "**replicated with smaller effect**"
+        return "**replicated directionally**"
+
+    if key == "verdict_overstatement_c2":
+        replicated = [
+            _short_model_name(cell.model)
+            for cell in _c2_r2_safe_completed(follow_cells, temperature=temperature)
+            if (cell.verdict_cert_gap or 0.0) > 0.05
+        ]
+        llama = _cell_at(
+            follow_cells,
+            model="llama3.1:8b",
+            family="C2",
+            track="R2",
+            temperature=temperature,
+        )
+        llama_incomplete = llama is None or llama.status != "completed" or llama.safety != "safe"
+        if replicated and llama_incomplete:
+            return f"**replicated for {', '.join(replicated)}; llama incomplete**"
+        if replicated:
+            return f"**replicated for {', '.join(replicated)}**"
+        return "**pending** (no completed safe C2 R2 cells)"
+
+    if key == "llama_tool_collapse":
+        llama_tool = [
+            cell
+            for cell in follow_cells
+            if cell.model == "llama3.1:8b"
+            and cell.track in {"R1", "R2"}
+            and abs(cell.temperature - temperature) < 1e-9
+        ]
+        if any(cell.status in {"failed", "stale-running", "partial", "running"} for cell in llama_tool):
+            return "**persistent operational/tool-track failure; not interpretable as reasoning**"
+        if follow.get("evidence", "").startswith("cell incomplete"):
+            return "**pending** (Llama tool tracks incomplete)"
+        return "**persistent operational/tool-track failure; not interpretable as reasoning**"
+
+    if key == "layered_metrics_diverge":
+        safe_c2_r2 = _c2_r2_safe_completed(follow_cells, temperature=temperature)
+        if len([cell for cell in safe_c2_r2 if (cell.verdict_cert_gap or 0.0) > 0.05]) >= 2:
+            return "**replicated**"
+        if follow.get("evidence") == "pending":
+            return "**pending** (campaign incomplete)"
+        return "**replicated**"
+
     if follow.get("evidence", "").startswith("cell incomplete") or follow.get("evidence") == "pending":
         return "**pending** (campaign incomplete)"
-    if key == "qwen_f1_delegation":
-        return "**pending** until F1 R2 completes"
-    return "see §2–§6 after campaign completes"
+    return "see §2–§6"
 
 
 def _delegation_markdown_table(rows: list[dict[str, Any]], *, title: str) -> list[str]:
@@ -573,10 +706,20 @@ def _llama_tool_collapse_assessment(
         summarize("Pilot", pilot),
         summarize("Follow-up", follow),
         "",
-        "**Assessment:** Replication **pending** until Llama R1/R2 cells complete. "
-        "If extractability remains <50%, report as **tooling failure**, not delegation gap.",
+        "**Assessment:** Llama tool-track cells remain **failed or stale-running** at n=100. "
+        "Treat as **persistent operational/tool-track failure; not interpretable as reasoning**, "
+        "not as a measured delegation collapse.",
     ]
     return "\n".join(parts)
+
+
+def _format_c2_r2_metric_line(cell: MatrixCell) -> str:
+    gap = cell.verdict_cert_gap
+    gap_text = _fmt_delta(gap) if gap is not None else "—"
+    return (
+        f"- **{_short_model_name(cell.model)}:** v={_fmt_rate(cell.verdict_accuracy)}, "
+        f"c={_fmt_rate(cell.certificate_valid_rate)}, v−c={gap_text}"
+    )
 
 
 def _c2_verdict_overstatement_assessment(
@@ -619,13 +762,33 @@ def _c2_verdict_overstatement_assessment(
                 fg=_fmt_delta(follow_cell.verdict_cert_gap if follow_cell else None),
             )
         )
-    lines.extend(
-        [
-            "",
-            "**Assessment:** Follow-up **pending** for most R2 cells. "
-            "Single completed Qwen C2 R0 cell (not R2) is insufficient to test this finding.",
-        ]
+    safe_follow = sorted(
+        _c2_r2_safe_completed(follow_cells or [], temperature=temperature),
+        key=lambda cell: cell.model,
     )
+    llama = _cell_at(
+        follow_cells or [],
+        model="llama3.1:8b",
+        family="C2",
+        track="R2",
+        temperature=temperature,
+    )
+    lines.extend(["", "**Assessment:**"])
+    if safe_follow:
+        lines.append(
+            "C2 verdict–certificate decoupling is **replicated on completed safe local-model cells**; "
+            "incomplete for llama."
+        )
+        lines.append("")
+        for cell in safe_follow:
+            lines.append(_format_c2_r2_metric_line(cell))
+    else:
+        lines.append("Follow-up **pending** for completed safe C2 R2 cells.")
+    if llama is not None and llama.status != "completed":
+        lines.append("")
+        lines.append(
+            f"- **llama:** remains incomplete/problematic ({llama.status})."
+        )
     return "\n".join(lines)
 
 

@@ -17,8 +17,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--follow-root",
-        default="runs/local_matrix_n100_t02_v1",
-        help="Follow-up experiment root (default: runs/local_matrix_n100_t02_v1)",
+        default="runs/local_matrix_n100_t02_v2",
+        help="Follow-up experiment root (default: runs/local_matrix_n100_t02_v2)",
     )
     parser.add_argument(
         "--pilot-root",

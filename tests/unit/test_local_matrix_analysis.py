@@ -90,3 +90,121 @@ def test_render_analysis_includes_disclaimer() -> None:
     assert "Not final benchmark scores" in markdown
     assert "Cohort cap" in markdown
     assert "## 2. Delegation gaps" in markdown
+
+
+def test_assess_replication_for_completed_n100_follow_up() -> None:
+    inventory = [
+        {
+            "model": "qwen2.5-coder:7b",
+            "family": "F1",
+            "track": "R0",
+            "temperature": 0.2,
+            "n": 100,
+            "extractability_rate": 1.0,
+            "verdict_accuracy": 0.49,
+            "certificate_valid_rate": 0.03,
+            "fully_correct_rate": 0.03,
+            "failure_stage_counts": {"not_extractable": 0},
+            "extended_status": "completed",
+        },
+        {
+            "model": "qwen2.5-coder:7b",
+            "family": "F1",
+            "track": "R2",
+            "temperature": 0.2,
+            "n": 100,
+            "extractability_rate": 0.66,
+            "verdict_accuracy": 1.0,
+            "certificate_valid_rate": 0.455,
+            "fully_correct_rate": 0.30,
+            "failure_stage_counts": {"not_extractable": 34},
+            "extended_status": "completed",
+        },
+        {
+            "model": "qwen2.5-coder:7b",
+            "family": "C2",
+            "track": "R2",
+            "temperature": 0.2,
+            "n": 100,
+            "extractability_rate": 1.0,
+            "verdict_accuracy": 0.97,
+            "certificate_valid_rate": 0.05,
+            "fully_correct_rate": 0.05,
+            "failure_stage_counts": {"not_extractable": 0},
+            "extended_status": "completed",
+        },
+        {
+            "model": "mistral-nemo:12b",
+            "family": "C2",
+            "track": "R2",
+            "temperature": 0.2,
+            "n": 100,
+            "extractability_rate": 1.0,
+            "verdict_accuracy": 1.0,
+            "certificate_valid_rate": 0.06,
+            "fully_correct_rate": 0.06,
+            "failure_stage_counts": {"not_extractable": 0},
+            "extended_status": "completed",
+        },
+        {
+            "model": "gemma2:9b",
+            "family": "C2",
+            "track": "R2",
+            "temperature": 0.2,
+            "n": 100,
+            "extractability_rate": 1.0,
+            "verdict_accuracy": 1.0,
+            "certificate_valid_rate": 0.17,
+            "fully_correct_rate": 0.17,
+            "failure_stage_counts": {"not_extractable": 0},
+            "extended_status": "completed",
+        },
+        {
+            "model": "llama3.1:8b",
+            "family": "C2",
+            "track": "R2",
+            "temperature": 0.2,
+            "extended_status": "failed",
+        },
+        {
+            "model": "llama3.1:8b",
+            "family": "C2",
+            "track": "R1",
+            "temperature": 0.2,
+            "extended_status": "stale-running",
+        },
+    ]
+    cells = cells_from_inventory(inventory, temperature=0.2, expected_n=100)
+    delegation = compute_delegation_table(cells, temperature=0.2)
+    pilot_delegation = [
+        {
+            "model": "qwen2.5-coder:7b",
+            "family": "F1",
+            "status": "ok",
+            "delta_fully_correct_rate": 0.4,
+        }
+    ]
+    markdown = render_local_matrix_analysis_markdown(
+        follow_root="runs/local_matrix_n100_t02_v2",
+        follow_summary={
+            "cell_inventory": inventory,
+            "cell_status_counts": {"completed": 5},
+            "max_items": 100,
+            "cohort_ids": {"C2": "c2", "F1": "f1"},
+        },
+        follow_cells=cells,
+        follow_delegation=delegation,
+        pilot_summary=None,
+        pilot_cells=None,
+        pilot_delegation=pilot_delegation,
+        extractability_audit_path=None,
+        plots_dir=None,
+        report_path=None,
+        temperature=0.2,
+        expected_n=100,
+    )
+    assert "**replicated with smaller effect**" in markdown
+    assert "**replicated for qwen, mistral, gemma; llama incomplete**" in markdown
+    assert "**persistent operational/tool-track failure; not interpretable as reasoning**" in markdown
+    assert "replicated on completed safe local-model cells" in markdown
+    assert "v=0.970, c=0.050, v−c=+0.920" in markdown
