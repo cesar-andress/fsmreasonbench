@@ -6,7 +6,7 @@ import json
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
 
 class OllamaClient(Protocol):
@@ -29,6 +29,22 @@ class OllamaConfig:
     timeout: float = 120.0
 
 
+def build_ollama_generate_request_body(
+    *,
+    model: str,
+    prompt: str,
+    temperature: float,
+    stream: bool = False,
+) -> dict[str, Any]:
+    """Build the JSON body for Ollama ``/api/generate``."""
+    return {
+        "model": model,
+        "prompt": prompt,
+        "stream": stream,
+        "options": {"temperature": temperature},
+    }
+
+
 class HttpOllamaClient:
     """Minimal Ollama /api/generate client."""
 
@@ -48,12 +64,11 @@ class HttpOllamaClient:
         resolved_timeout = self._config.timeout if timeout is None else timeout
         url = f"{self._config.base_url.rstrip('/')}/api/generate"
         body = json.dumps(
-            {
-                "model": resolved_model,
-                "prompt": prompt,
-                "stream": False,
-                "options": {"temperature": resolved_temperature},
-            }
+            build_ollama_generate_request_body(
+                model=resolved_model,
+                prompt=prompt,
+                temperature=resolved_temperature,
+            )
         ).encode("utf-8")
         request = urllib.request.Request(
             url,

@@ -48,6 +48,11 @@ DEFAULT_C2_ITEMS = "cohorts/v0.1-exploratory/c2-reachability-level3/items.jsonl"
 DEFAULT_F1_ITEMS = "cohorts/v0.1-exploratory/f1-mixed-level3/items.jsonl"
 DEFAULT_C2_COHORT_ID = "c2-reachability-level3-v0.1-exploratory"
 DEFAULT_F1_COHORT_ID = "f1-mixed-level3-v0.1-exploratory"
+EXPANDED_COHORT_ROOT = "cohorts/v0.1-expanded-n100"
+EXPANDED_C2_ITEMS = f"{EXPANDED_COHORT_ROOT}/c2-reachability-level3/items.jsonl"
+EXPANDED_F1_ITEMS = f"{EXPANDED_COHORT_ROOT}/f1-mixed-level3/items.jsonl"
+EXPANDED_C2_COHORT_ID = "c2-reachability-level3-v0.1-expanded-n100"
+EXPANDED_F1_COHORT_ID = "f1-mixed-level3-v0.1-expanded-n100"
 TRACK_IDS = ("R0", "R1", "R2")
 FAMILY_IDS = ("C2", "F1")
 
@@ -393,7 +398,6 @@ def apply_incremental_safe(config: TrackPilotModelsConfig) -> TrackPilotModelsCo
         return config
     return replace(
         config,
-        max_cells=1,
         stop_after_failures=1,
         sleep_between_cells=10.0,
         resume_items=True,
@@ -924,6 +928,84 @@ def write_track_pilot_csv(
                 temp_writer.writerow({"row_type": "temperature_delta", **row})
 
 
+_EXTRACTABILITY_UNSAFE_THRESHOLD = 0.5
+_FAILURE_STAGE_LABELS = ("not_extractable", "verdict_wrong", "certificate_invalid", "correct")
+
+
+def _failure_stage_counts(row: dict[str, Any]) -> dict[str, int]:
+    raw = row.get("failure_stage_counts") or {}
+    return {stage: int(raw.get(stage, 0)) for stage in _FAILURE_STAGE_LABELS}
+
+
+def _row_item_count(row: dict[str, Any]) -> int:
+    return int(row.get("n") or 0)
+
+
+def _extractable_count(row: dict[str, Any]) -> int:
+    counts = _failure_stage_counts(row)
+    n = _row_item_count(row)
+    if n:
+        return max(0, n - counts["not_extractable"])
+    extract_rate = row.get("extractability_rate")
+    if extract_rate is None:
+        return 0
+    return int(round(float(extract_rate) * n))
+
+
+def _format_extractability(row: dict[str, Any]) -> str:
+    n = _row_item_count(row)
+    extractable = _extractable_count(row)
+    rate = row.get("extractability_rate")
+    if rate is None or n == 0:
+        return "—"
+    return f"{float(rate):.3f} ({extractable}/{n})"
+
+
+def _format_verdict_accuracy(row: dict[str, Any]) -> str:
+    counts = _failure_stage_counts(row)
+    extractable = _extractable_count(row)
+    if extractable == 0:
+        return "undefined (0 extractable)"
+    verdict_correct = counts["certificate_invalid"] + counts["correct"]
+    rate = row.get("verdict_accuracy")
+    if rate is None:
+        return f"{verdict_correct}/{extractable} ext"
+    return f"{float(rate):.3f} ({verdict_correct}/{extractable} ext)"
+
+
+def _format_certificate_valid_rate(row: dict[str, Any]) -> str:
+    counts = _failure_stage_counts(row)
+    extractable = _extractable_count(row)
+    if extractable == 0:
+        return "undefined (0 extractable)"
+    cert_valid = counts["correct"]
+    rate = row.get("certificate_valid_rate")
+    if rate is None:
+        return f"{cert_valid}/{extractable} ext"
+    return f"{float(rate):.3f} ({cert_valid}/{extractable} ext)"
+
+
+def _format_fully_correct_rate(row: dict[str, Any]) -> str:
+    n = _row_item_count(row)
+    if n == 0:
+        return "—"
+    counts = _failure_stage_counts(row)
+    fully_correct = counts["correct"]
+    rate = row.get("fully_correct_rate")
+    if rate is None:
+        return f"{fully_correct}/{n}"
+    return f"{float(rate):.3f} ({fully_correct}/{n})"
+
+
+def _extractability_safety_flag(row: dict[str, Any]) -> str:
+    rate = row.get("extractability_rate")
+    if rate is None:
+        return ""
+    if float(rate) < _EXTRACTABILITY_UNSAFE_THRESHOLD:
+        return "UNSAFE (<50% extractable)"
+    return ""
+
+
 def render_track_pilot_report(payload: dict[str, Any]) -> str:
     models = payload["models"]
     families = payload["families"]
@@ -1045,7 +1127,55 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
         )
 
     indexed = {_row_index_key(row): row for row in track_rows}
-    metric_headers = ("extract", "verdict", "cert", "full", "tool_rate", "avg_tools")
+    unsafe_cells = [
+        row
+        for row in track_rows
+        if _extractability_safety_flag(row)
+    ]
+
+    lines.extend(
+        [
+            "",
+            "### Metric denominators",
+            "",
+            "- **extractability_rate:** extractable items / total n",
+            "- **verdict_accuracy:** correct verdict among extractable outputs "
+            "(denominator = n − not_extractable; undefined when extractable = 0)",
+            "- **certificate_valid_rate:** valid certificate among extractable outputs "
+            "(same denominator; undefined when extractable = 0)",
+            "- **fully_correct_rate:** fully correct items / total n",
+            "- **not_extractable** (failure-stage table): includes tool-phase failures on R1/R2 "
+            "as well as final submission parse failures",
+        ]
+    )
+
+    if unsafe_cells:
+        lines.extend(["", "### Low-extractability cells (unsafe for reasoning comparisons)", ""])
+        for row in unsafe_cells:
+            extractable = _extractable_count(row)
+            lines.append(
+                "- `{model}` / {family} / {track} / T={temp:g}: "
+                "extractability={rate:.3f} ({extractable}/{n} extractable) — "
+                "do not treat verdict/certificate rates as reasoning signal".format(
+                    model=row["model"],
+                    family=row["family"],
+                    track=row["track"],
+                    temp=float(row.get("temperature", 0.0)),
+                    rate=float(row.get("extractability_rate") or 0.0),
+                    extractable=extractable,
+                    n=_row_item_count(row),
+                )
+            )
+
+    metric_headers = (
+        "extract",
+        "verdict",
+        "cert",
+        "full",
+        "safety",
+        "tool_rate",
+        "avg_tools",
+    )
 
     for family in families:
         family_models = [
@@ -1069,22 +1199,24 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
                     row = indexed.get((model, family, float(temperature), track))
                     if row is None:
                         continue
-                        lines.append(
-                            "| `{model}` | {temp:g} | {track} | {n} | "
-                            "{extract:.3f} | {verdict:.3f} | {cert:.3f} | {full:.3f} | "
-                            "{tool_rate:.3f} | {avg_tools:.1f} |".format(
-                                model=model,
-                                temp=float(temperature),
-                                track=track,
-                                n=row.get("n", 0),
-                                extract=float(row.get("extractability_rate") or 0.0),
-                                verdict=float(row.get("verdict_accuracy") or 0.0),
-                                cert=float(row.get("certificate_valid_rate") or 0.0),
-                                full=float(row.get("fully_correct_rate") or 0.0),
-                                tool_rate=float(row.get("tool_invocation_rate") or 0.0),
-                                avg_tools=float(row.get("average_tool_calls_per_item") or 0.0),
-                            )
+                    safety = _extractability_safety_flag(row) or "—"
+                    lines.append(
+                        "| `{model}` | {temp:g} | {track} | {n} | "
+                        "{extract} | {verdict} | {cert} | {full} | "
+                        "{safety} | {tool_rate:.3f} | {avg_tools:.1f} |".format(
+                            model=model,
+                            temp=float(temperature),
+                            track=track,
+                            n=row.get("n", 0),
+                            extract=_format_extractability(row),
+                            verdict=_format_verdict_accuracy(row),
+                            cert=_format_certificate_valid_rate(row),
+                            full=_format_fully_correct_rate(row),
+                            safety=safety,
+                            tool_rate=float(row.get("tool_invocation_rate") or 0.0),
+                            avg_tools=float(row.get("average_tool_calls_per_item") or 0.0),
                         )
+                    )
 
         if is_matrix:
             lines.extend(["", f"## {family} — per-temperature summary (R2 fully correct)", ""])
@@ -1163,8 +1295,8 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
                     )
                 )
 
-        lines.extend(["", f"## {family} — failure movement", ""])
-        failure_labels = list(_SUBMISSION_FAILURE_CLASSES)
+        lines.extend(["", f"## {family} — failure movement (failure_stage_counts)", ""])
+        failure_labels = list(_FAILURE_STAGE_LABELS)
         lines.append("| Model | Temp | Track | " + " | ".join(failure_labels) + " |")
         lines.append("|-------|-----:|-------|" + "|".join(["---:"] * len(failure_labels)) + "|")
         for model in family_models:
@@ -1173,8 +1305,8 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
                     row = indexed.get((model, family, float(temperature), track))
                     if row is None:
                         continue
-                    counts = row.get("track_failure_counts", {})
-                    values = " | ".join(str(counts.get(label, 0)) for label in failure_labels)
+                    counts = _failure_stage_counts(row)
+                    values = " | ".join(str(counts[label]) for label in failure_labels)
                     lines.append(
                         f"| `{model}` | {float(temperature):g} | {track} | {values} |"
                     )

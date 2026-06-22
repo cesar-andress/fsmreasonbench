@@ -201,7 +201,7 @@ Key flags:
 | `--item-timeout SECONDS` | `--timeout` | Per-item generate timeout |
 | `--stop-after-failures N` | 3 | Stop after N consecutive cell failures |
 | `--sleep-between-cells SECONDS` | 5 | Cool-down between cells |
-| `--incremental-safe` | off | One cell at a time (`max-cells=1`, `stop-after-failures=1`, sleep=10) |
+| `--incremental-safe` | off | Resume partial cells; `stop-after-failures=1`, sleep=10 (use `--max-cells` to cap) |
 
 Regenerate `report.md` from persisted artifacts without model calls:
 

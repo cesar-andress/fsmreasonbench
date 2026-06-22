@@ -31,6 +31,7 @@ def freeze_cohort(
     *,
     generator_notes: str | None = None,
     created_at: datetime | None = None,
+    generation_parameters: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Copy and seal an exploratory cohort with manifest and checksums."""
     items_path = Path(items_path).resolve()
@@ -67,6 +68,8 @@ def freeze_cohort(
         "generator_notes": generator_notes or default_generator_notes(items, items_path),
         "items": item_entries,
     }
+    if generation_parameters is not None:
+        manifest_body["generation_parameters"] = generation_parameters
     manifest_body["cohort_fingerprint"] = compute_cohort_fingerprint(item_entries)
 
     manifest_path = out_dir / "manifest.json"

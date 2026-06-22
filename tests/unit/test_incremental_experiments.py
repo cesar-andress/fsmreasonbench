@@ -216,14 +216,14 @@ def test_experiment_status_output(tmp_path: Path) -> None:
     assert "Suggested retry" in report
 
 
-def test_incremental_safe_only_runs_one_cell(
+def test_incremental_safe_runs_all_pending_cells(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     calls: list[str] = []
 
     def fake_batch(*, items, generate, run_dir, model, family, track, temperature, config, item_timeout):
-        calls.append("run")
+        calls.append(f"{family}:{track}")
         summary = {
             "n": 1,
             "extractability_rate": 1.0,
@@ -233,6 +233,7 @@ def test_incremental_safe_only_runs_one_cell(
             "tool_invocation_rate": 0.0,
             "average_tool_calls_per_item": 0.0,
         }
+        run_dir.mkdir(parents=True, exist_ok=True)
         (run_dir / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
         (run_dir / "scores.jsonl").write_text('{"item_id":"x"}\n', encoding="utf-8")
 
@@ -259,9 +260,12 @@ def test_incremental_safe_only_runs_one_cell(
             skip_completed=False,
         )
     )
-    assert config.max_cells == 1
+    assert config.max_cells is None
+    assert config.stop_after_failures == 1
+    assert config.sleep_between_cells == 10.0
+    assert config.resume_items is True
     run_track_pilot_models(config, lambda _m, _t: lambda *_a, **_k: "{}")
-    assert len(calls) == 1
+    assert calls == ["C2:R0", "C2:R1"]
 
 
 def test_stop_after_failures_stops_run(

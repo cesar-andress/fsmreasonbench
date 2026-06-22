@@ -7,12 +7,16 @@ import json
 import sys
 from pathlib import Path
 
+from fsmreasonbench.cohort.expanded_n100 import resolve_cohort_bundle
 from fsmreasonbench.dev.doc_consistency import find_repo_root
 from fsmreasonbench.runners.experiment_cells import DEFAULT_STALE_RUNNING_SECONDS
 from fsmreasonbench.runners.ollama import HttpOllamaClient, OllamaConfig
 from fsmreasonbench.runners.track_pilot_models import (
+    DEFAULT_C2_COHORT_ID,
     DEFAULT_C2_ITEMS,
+    DEFAULT_F1_COHORT_ID,
     DEFAULT_F1_ITEMS,
+    EXPANDED_COHORT_ROOT,
     TrackPilotModelsConfig,
     apply_incremental_safe,
     infer_matrix_layout,
@@ -70,6 +74,22 @@ def main(argv: list[str] | None = None) -> int:
         "--f1-items",
         default=str(repo_root / DEFAULT_F1_ITEMS),
         help=f"F1 items JSONL (default: {DEFAULT_F1_ITEMS})",
+    )
+    parser.add_argument(
+        "--cohort-root",
+        type=Path,
+        help=(
+            "Cohort bundle root with c2-reachability-level3/ and f1-mixed-level3/ "
+            f"(e.g. {EXPANDED_COHORT_ROOT}); overrides --c2-items/--f1-items and cohort IDs"
+        ),
+    )
+    parser.add_argument(
+        "--c2-cohort-id",
+        help="Cohort ID recorded in reports (default: inferred from items path or manifest)",
+    )
+    parser.add_argument(
+        "--f1-cohort-id",
+        help="Cohort ID recorded in reports (default: inferred from items path or manifest)",
     )
     parser.add_argument(
         "--max-items",
@@ -170,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--incremental-safe",
         action="store_true",
-        help="Run one cell at a time with conservative failure/sleep limits",
+        help="Resume partial cells and stop after the first cell failure (sleep=10s between cells)",
     )
     parser.add_argument(
         "--report-only",
@@ -220,13 +240,22 @@ def main(argv: list[str] | None = None) -> int:
     else:
         matrix_layout = args.matrix_layout
 
+    c2_items_path = Path(args.c2_items)
+    f1_items_path = Path(args.f1_items)
+    c2_cohort_id = args.c2_cohort_id or DEFAULT_C2_COHORT_ID
+    f1_cohort_id = args.f1_cohort_id or DEFAULT_F1_COHORT_ID
+    if args.cohort_root is not None:
+        c2_items_path, f1_items_path, c2_cohort_id, f1_cohort_id = resolve_cohort_bundle(
+            args.cohort_root
+        )
+
     config = apply_incremental_safe(
         TrackPilotModelsConfig(
             models=models,
             families=families,
             tracks=tracks,
-            c2_items_path=Path(args.c2_items),
-            f1_items_path=Path(args.f1_items),
+            c2_items_path=c2_items_path,
+            f1_items_path=f1_items_path,
             out_dir=args.out_dir,
             max_items=args.max_items,
             temperatures=temperatures,
@@ -248,6 +277,8 @@ def main(argv: list[str] | None = None) -> int:
             stale_running_seconds=args.stale_running_seconds,
             incremental_safe=args.incremental_safe,
             matrix_layout=matrix_layout,
+            c2_cohort_id=c2_cohort_id,
+            f1_cohort_id=f1_cohort_id,
         )
     )
 

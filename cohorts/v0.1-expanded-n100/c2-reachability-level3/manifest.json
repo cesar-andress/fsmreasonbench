@@ -1,0 +1,546 @@
+{
+  "cohort_fingerprint": "ba0be6ae3895c9bc02bf74442d240cc02f42bfc53e3380d332b6a07e0742ee2b",
+  "cohort_id": "c2-reachability-level3-v0.1-expanded-n100",
+  "created_at": "2026-06-22T02:26:04Z",
+  "difficulty_summary": {
+    "C2": {
+      "generator_seed_range": {
+        "max": 9904298,
+        "min": 4001
+      },
+      "item_count": 100,
+      "state_count": {
+        "max": 5,
+        "mean": 5.0,
+        "min": 5
+      },
+      "witness_length": {
+        "max": 4,
+        "mean": 0.86,
+        "min": 0
+      }
+    }
+  },
+  "family_counts": {
+    "C2": 100
+  },
+  "generation_parameters": {
+    "batch_seed": 4001,
+    "config": {
+      "include_negative": true,
+      "max_witness_length": 12,
+      "min_witness_length": 3,
+      "state_count": 5
+    },
+    "family": "C2",
+    "generator": "fsmreasonbench.generator.reachability",
+    "item_count": 100
+  },
+  "generator_notes": "Expanded exploratory C2 reachability cohort (witness length level 3), n=100, batch_seed=4001. Disjoint from v0.1-exploratory item IDs.",
+  "item_count": 100,
+  "items": [
+    {
+      "family": "C2",
+      "item_id": "22a4974e-3300-51a4-bfa7-f5c1ec96c7b9",
+      "sha256": "69b5d764e4063910ce10b4ad4821db45055b05a17c0f81177490f5cec5ced92e"
+    },
+    {
+      "family": "C2",
+      "item_id": "c603d889-438d-5039-8eaf-f2424a88453f",
+      "sha256": "a2c2a043233408b07e53b65b80e27729c2cfc99e50eea9116b6e1ab32cf2f934"
+    },
+    {
+      "family": "C2",
+      "item_id": "99ca7752-5539-51f0-aec8-285cf5843bc5",
+      "sha256": "e9d02521fe123fc648b0ce2800be152ab9946f8087667774f4beb9acfa3681d8"
+    },
+    {
+      "family": "C2",
+      "item_id": "a166d6d6-cbd8-5312-8d60-306a94b8220a",
+      "sha256": "d2833b2dda30d8412c9bbd57402aa0ce7605d94141bf11c537be7397bc0dec3a"
+    },
+    {
+      "family": "C2",
+      "item_id": "4fa51a03-b249-57e6-a145-d952f515deab",
+      "sha256": "52404d4b4e294b7cf306d266d36b8d7f31b9f8aaa06221f4e3bc131fc4b737d8"
+    },
+    {
+      "family": "C2",
+      "item_id": "48a82b66-43fb-5e3e-8641-e245edafb403",
+      "sha256": "8ab661ae4a3fe1a7c98ff8114fb8bf432fcfddf7fffcd384676cc2a52ce6a0b4"
+    },
+    {
+      "family": "C2",
+      "item_id": "53e454d9-1bfd-5078-a2c1-d0f7631cfb4a",
+      "sha256": "c2fa55bab15ba71173174594b899e6eadc52910a02ec18014612eb66471b3757"
+    },
+    {
+      "family": "C2",
+      "item_id": "b6bd58b0-7d12-57e9-b00f-55c5a2c07a32",
+      "sha256": "0769dd5dd6493b5eed1a478a07f4912b5133bd6ab0dedfac6aee82b0949a45eb"
+    },
+    {
+      "family": "C2",
+      "item_id": "cc50bc20-5009-51cf-a634-6c405d5d80a5",
+      "sha256": "3cec6a7cbbe801f12b8863406df13a08d441a46632b0452514fdb8b03dc5b7ae"
+    },
+    {
+      "family": "C2",
+      "item_id": "32ed4cd6-1f10-5667-9e10-38b081417c76",
+      "sha256": "cf72619c14407a6aab43d72ac05b891633d92c60627448fabc22caa2f43cb651"
+    },
+    {
+      "family": "C2",
+      "item_id": "6562f358-7931-5b24-9112-ab98de630012",
+      "sha256": "b14f91fb864a0249a84fb4ba6ab37e3f3a2834effab2d901622c0fb2aeb244a5"
+    },
+    {
+      "family": "C2",
+      "item_id": "710e5a39-0e39-549c-9991-ca7af2a99e45",
+      "sha256": "ce593f1d02bd24451c7f4e68664799573528c2d6c881527a3f70dfa6b8c6c4cd"
+    },
+    {
+      "family": "C2",
+      "item_id": "650dc11d-b573-5509-85f2-4aa5e03b9c92",
+      "sha256": "e46a7f2521daf3f41e79d5b6ae956ba676ba878e2ce919d3885674f963d445d5"
+    },
+    {
+      "family": "C2",
+      "item_id": "2c61a1b1-9fa9-51f7-b228-fa82539a0efa",
+      "sha256": "ec53461cb8b6c9a60d41eec082ea02dde805bcc24c0e5747003c4fe3396fd332"
+    },
+    {
+      "family": "C2",
+      "item_id": "91b3236d-8fea-5f1f-aa14-66a144bc5f9d",
+      "sha256": "1697ca74baffcd7464c6376776251dae156a4291725e6357e200c4a42bec8dcf"
+    },
+    {
+      "family": "C2",
+      "item_id": "3138cdb7-0204-5513-8000-946bd747215c",
+      "sha256": "4342f82fb103f7c7054b5e97d49497aebc8dd03f9fb366ae2037c0190e664ff9"
+    },
+    {
+      "family": "C2",
+      "item_id": "9be30ec9-8063-597a-8a0c-ea00fad2ce49",
+      "sha256": "7adb8ee0332d634e5616e3c394ea12b873f49698ca83b23b1fb4e6e47dd45229"
+    },
+    {
+      "family": "C2",
+      "item_id": "4513198d-e78c-51a2-a601-e732f5a4fabf",
+      "sha256": "631a20afa3ccb8289c36ab35bd595a2c1f1b23db8935fccee89fb0b900de8743"
+    },
+    {
+      "family": "C2",
+      "item_id": "64b9f501-49e7-5db8-9f55-76fbbb8ec230",
+      "sha256": "d7361a7d9e28290ff8a791317e16bf88a285e5141bd11191946bf5b40cd081b3"
+    },
+    {
+      "family": "C2",
+      "item_id": "4a3dd033-184f-59e5-b1b1-1915844f1e97",
+      "sha256": "c81b01bb6c66b2d4b2314bd69a578aad8d6182aae0ba5e0d72786493eac95287"
+    },
+    {
+      "family": "C2",
+      "item_id": "8d447c3c-5236-50e0-ad5b-325cbf5fc353",
+      "sha256": "1dff382cb3446cda596084b5a02c76f59b43cb14ebeee05890554ce6bc33062e"
+    },
+    {
+      "family": "C2",
+      "item_id": "025329a1-8d8e-53cd-bd93-984c67d4de61",
+      "sha256": "acc8429fee29e02a6379609bb56aa8213c23081bbc3ba4f5c36586782eaf54da"
+    },
+    {
+      "family": "C2",
+      "item_id": "131e3cfe-1a15-54ea-9c3c-515cb91b36da",
+      "sha256": "178c0fe218ed29123bf2effeb415134dfe20f98d0721fcfec4451e2c488d7966"
+    },
+    {
+      "family": "C2",
+      "item_id": "0bfce8ad-19f3-5fc1-a662-5e20a49d65e0",
+      "sha256": "da9580f4593fae3fd67db86951f5e28248224fd67d0bd9c170ae1deb4adc586d"
+    },
+    {
+      "family": "C2",
+      "item_id": "79b81b46-fe71-540d-9717-665ea2eb3805",
+      "sha256": "183fe30d96edf3f0bc50135912f2eecaed0ed2ab488cea5df6e66ed301e07703"
+    },
+    {
+      "family": "C2",
+      "item_id": "50109815-7713-544f-b2a1-8ab6c1742dcb",
+      "sha256": "c2ad5c76cd56adff81e01feaecfd744d5ce0eb21c7d3c0b9aa7bb05c6bedce7a"
+    },
+    {
+      "family": "C2",
+      "item_id": "cb908eb9-459a-56f9-a71d-a9af3b9b9fc1",
+      "sha256": "5372c70c39a6e607ee924df39cf43e3f2c2c6a624d50c6227f4680f68dfafbb8"
+    },
+    {
+      "family": "C2",
+      "item_id": "6bdd6f46-bc69-55e7-b13d-ff7a43ca0329",
+      "sha256": "7511e936add29e4e14b2811abc35b9c0e4d17555da293c63cbefbb1bc82d872a"
+    },
+    {
+      "family": "C2",
+      "item_id": "52e57ef5-2565-5093-af1c-ea2c17897e58",
+      "sha256": "48a0a45f030d43deab48c5007cb43f667bab1547a00a3bcc5e1afa6453f78d2c"
+    },
+    {
+      "family": "C2",
+      "item_id": "5a107ee7-0c81-5a01-8f28-023b6ef9b212",
+      "sha256": "729098e5a6480cd47852b63fa77ac4a3a7e97f431a3897145c4a41b5899eb683"
+    },
+    {
+      "family": "C2",
+      "item_id": "74196494-6688-51d7-84e4-ae5c60d490bc",
+      "sha256": "d6fe082e8075f12c5f045d405b05b1556514662a66bb9aadc35d6f238a81221d"
+    },
+    {
+      "family": "C2",
+      "item_id": "db497888-9598-5350-aa94-7912276cd851",
+      "sha256": "aaf741abb7cb67540484b1157054432748bccf8ba014dca51054d81d3f78e4ae"
+    },
+    {
+      "family": "C2",
+      "item_id": "1febe67f-9af7-508c-8ac4-04220d8b231d",
+      "sha256": "0facdb3d9d6288cd17b496a29b657766dec87801220f3f30c004c01b28777279"
+    },
+    {
+      "family": "C2",
+      "item_id": "e939fc7c-cf1d-5e68-9ae2-febf1a854342",
+      "sha256": "72784ea13eedf1b9ecd79c39e21a77a3b2315d3eff2825764dffcb5dabc67942"
+    },
+    {
+      "family": "C2",
+      "item_id": "865c190f-1229-5984-a2be-1da97382b3af",
+      "sha256": "a3d425e049dd0438cb03bc5177759af2f02fd6a29b0267e4a532a6864e3ec28e"
+    },
+    {
+      "family": "C2",
+      "item_id": "70a75be4-0799-5406-adab-57ff342aa0b6",
+      "sha256": "53fc7902978df3a4c165fd89e6e83d23a062afa0d007b13f640f531055528400"
+    },
+    {
+      "family": "C2",
+      "item_id": "870c2505-b8f2-5dc6-857f-f43186a06720",
+      "sha256": "1f9a99b043674fe4841f82c53f3a263e06be31dc095f567dfadcd3184748f8ab"
+    },
+    {
+      "family": "C2",
+      "item_id": "78e9c3aa-d42f-5f74-b1f3-b5fef46d95c5",
+      "sha256": "f05137120b51d8421cd13800b8ef5309d6bc3b7ab1cfbf6188eabcb174dbec2c"
+    },
+    {
+      "family": "C2",
+      "item_id": "36fc202d-c8d5-5f87-934f-5c3c8869507e",
+      "sha256": "be8d75663308958c0c041dd2d31cc4daa899fdaee4a05294568ca068b18f257e"
+    },
+    {
+      "family": "C2",
+      "item_id": "77ee05f2-526a-50d7-847d-d975a9f7f6a3",
+      "sha256": "a6a2c3bd1520d390824e05a95b81753006f66de301df7278247f9c481973a149"
+    },
+    {
+      "family": "C2",
+      "item_id": "2ef75850-905e-57ce-a482-8f2b4d39b6a8",
+      "sha256": "d659c2d0f97ebc6ff9f903b61e865a04c4a6c034ff10988e8c314cbc08ee555c"
+    },
+    {
+      "family": "C2",
+      "item_id": "d30362fb-09c3-5be1-a5f8-ba8523f843f5",
+      "sha256": "5b15a80b222b238348ac298b2eb0f97a57780cdec6eb5c5de1db41be9937547c"
+    },
+    {
+      "family": "C2",
+      "item_id": "5e34ef40-ce5a-53d6-93e7-a966f474bde8",
+      "sha256": "ae5f5f76ca8dfd9c331dcafd1d4db38ef6870c8bf596e500004c83fc68325eef"
+    },
+    {
+      "family": "C2",
+      "item_id": "e7d6bdbd-4e1f-5e85-bdc1-71910c2dd78c",
+      "sha256": "b1d7f0c66c90ddbe865049d638c58218e49188f368c7c03b7007ba12682d1f1c"
+    },
+    {
+      "family": "C2",
+      "item_id": "7491060d-5270-53e8-951c-8e683b5672c4",
+      "sha256": "ebfef7bdc6e57e8686b07770e2c6f3d112e80c16f1b00b803c01cf697c59892e"
+    },
+    {
+      "family": "C2",
+      "item_id": "18dbf738-5b4a-50a7-9147-24cc1e37fa34",
+      "sha256": "792773c5d6996595654c16fc025d4b549aca8eed9cbab26dc8becd069005d34a"
+    },
+    {
+      "family": "C2",
+      "item_id": "b2ae9cbc-ea68-5fe1-9e62-986bbe74c1e6",
+      "sha256": "3abd5e56dfb2556429944efb91e0728ebbbf27a3dd906e03ae2e2a52a55fa4f5"
+    },
+    {
+      "family": "C2",
+      "item_id": "df2c1b5a-131f-5950-a3d2-c1792e9d11b8",
+      "sha256": "e271167806b830b7458b788ae2aa08c2c7cf6cae9080c88ad32d35318aa069d3"
+    },
+    {
+      "family": "C2",
+      "item_id": "1e0e950a-91aa-593e-9f6f-a88e8e26c2c8",
+      "sha256": "ace3ebc348137bb77a9f36b83641b069921e64c71a37db36dc763dc1e02a6b3d"
+    },
+    {
+      "family": "C2",
+      "item_id": "1278247c-d606-5481-b39c-d8df702bf1cb",
+      "sha256": "0722485dc4e5905097e91505b07e5f2813077f10ad0b95e4c9c5b2810d30abac"
+    },
+    {
+      "family": "C2",
+      "item_id": "f83ab450-6fa4-5e5c-bef0-663169c4775a",
+      "sha256": "fc4ae4639a62076ef265c5b98ba9658fdb848cc650b966fc1659ec2d895971d6"
+    },
+    {
+      "family": "C2",
+      "item_id": "fe997379-1345-5dd3-ad97-4a65f9219f25",
+      "sha256": "1093f1d0a002c25345b1c572f6622f1992dc8b4b7272ba1a41a7bd3861a99ced"
+    },
+    {
+      "family": "C2",
+      "item_id": "713d5e19-9cbb-50c0-9bed-84c0f74fcc80",
+      "sha256": "24ff8cd927f715c592be8db552a59d13567785a2a7647d48453aa36d6638f55a"
+    },
+    {
+      "family": "C2",
+      "item_id": "5eaf43e6-1f25-54df-bfc1-76db2d804f07",
+      "sha256": "1eb059126129ecee74937b23a82f0090f7222852898119281e96a200dbef97f6"
+    },
+    {
+      "family": "C2",
+      "item_id": "d792f4e9-46c6-5bfa-8aa5-3453253aa843",
+      "sha256": "47e196910d250b806cddf8b554e574fd2df53f4ad3e6288628a08489f037380b"
+    },
+    {
+      "family": "C2",
+      "item_id": "e9c400f9-a522-5b01-9ece-2179035043e6",
+      "sha256": "cfc838468c3214591a31382415a2646360352f7175f76952ef0f9f194aa3d64d"
+    },
+    {
+      "family": "C2",
+      "item_id": "80631eca-e981-505e-b0e3-2cdcb8aa6a0e",
+      "sha256": "81c70d45b65604bc9d49db5ed298d39e8d86b4529e9c696f984d7f5f49ec3a68"
+    },
+    {
+      "family": "C2",
+      "item_id": "993c456e-7fa4-5108-8905-9ac4ab89187b",
+      "sha256": "ccea2d2a67b8ff606ae099bd1cbf393dd5c5f31f13187cdb71bd9c6255450642"
+    },
+    {
+      "family": "C2",
+      "item_id": "e54c6889-cf33-55f8-8def-beb23d5a3e2a",
+      "sha256": "bdb9970a7c3cd8386158c706299b2e5fd4fc4228063058549af44f977e458427"
+    },
+    {
+      "family": "C2",
+      "item_id": "1aeae373-ec61-5651-87e8-7bf02a3723a2",
+      "sha256": "7cfb2e5d14c19eaa62452de9944bd7236439e1dd6a1f0b88f759ddc6b1b96431"
+    },
+    {
+      "family": "C2",
+      "item_id": "e909a1c0-2448-5699-9109-45beb9bb5dd7",
+      "sha256": "35f6674e55b26ae4c5876bbab9b0663d8842bfc91aa2183f19485d64cdbd75e6"
+    },
+    {
+      "family": "C2",
+      "item_id": "6a7b0fd3-4a93-54a5-b4e9-d0ff845588c8",
+      "sha256": "dfe45e28f7f48b7f3cf4bec89c9f7462a54bb5999cd94bd3e9b366aeb7327d5e"
+    },
+    {
+      "family": "C2",
+      "item_id": "7032d1ef-24ad-5534-b810-eb3012803715",
+      "sha256": "fb490c08d5f196052c343a5f640cad7a6c986d0f550f7a59e9e4d2d4dc63127c"
+    },
+    {
+      "family": "C2",
+      "item_id": "8be86fec-8169-5d9c-b3ab-31a4a14ef26c",
+      "sha256": "f0392baddf4d16756fb93ff6a3ea2d02433582fe9b6ec3ea2d9e5a0db507175c"
+    },
+    {
+      "family": "C2",
+      "item_id": "ca356435-d3ad-5530-ba64-3fc6a35c5cce",
+      "sha256": "aaddda258be049e3ff45f471dfee94c2f56d756efc0489f570a479e891ff99ae"
+    },
+    {
+      "family": "C2",
+      "item_id": "1c3c665d-9d85-5dd5-bd1a-a545a83840f6",
+      "sha256": "c2daf87c7940ac68656f186d9f2fca94d0cfa17bf3e0cc978ec7a8844d5347f0"
+    },
+    {
+      "family": "C2",
+      "item_id": "9ea717cb-7d91-5f74-bee7-febe391c8b1c",
+      "sha256": "274e8107335ecf2ce5b0c7d60b80f3dde1fd522017af67ef601368fc9a50c2c0"
+    },
+    {
+      "family": "C2",
+      "item_id": "4cbdc285-7b52-53a5-a528-5418257376d3",
+      "sha256": "699fb10f60cf4aae67c25f95649ead89a8ee2006c7af0daa09aa479f11665d95"
+    },
+    {
+      "family": "C2",
+      "item_id": "1cea121d-0d95-5aff-a801-163baa0e1eb1",
+      "sha256": "cb642f178a9fd73a979addf3fc907cafd9aff44100769880a090404686141132"
+    },
+    {
+      "family": "C2",
+      "item_id": "c6bf992f-f8f9-5331-a54d-8b6b3f86af21",
+      "sha256": "3cddfba42a71117136cff44c166e0ef6affeb19045f459b0a16751c253eb27dc"
+    },
+    {
+      "family": "C2",
+      "item_id": "ee446fe0-2537-55c7-bd65-51fe1f1c4c73",
+      "sha256": "cfc33cbffe8ede969304b45815e15cbf97fe0c059fa9c2eba9e2caa55b0064a0"
+    },
+    {
+      "family": "C2",
+      "item_id": "e35144e5-5ed1-5160-b7cc-b7302699fba3",
+      "sha256": "36b1f04896652ce658156a9403b3dced5a9a86a2c0b6297721b68a7a1e8e2d6b"
+    },
+    {
+      "family": "C2",
+      "item_id": "4d3c65f9-93d9-5ff8-9bf3-20cb90927b25",
+      "sha256": "debb735b4a9acb80e4daff012b4a55574165edf95904b614603f7cf1684dd62c"
+    },
+    {
+      "family": "C2",
+      "item_id": "c5e5a2bf-3bd5-542c-bf0a-60edc4d9596f",
+      "sha256": "08ebbae233e3a3242fffa0aca6b13a5a2189363d34931822da33f2fe364938f0"
+    },
+    {
+      "family": "C2",
+      "item_id": "31105e63-1893-51fc-b355-0c5d6cd6e611",
+      "sha256": "35ecc7805e9d2811698486a2ee1743b95f535636833d683dae901f25eec94a22"
+    },
+    {
+      "family": "C2",
+      "item_id": "ec0207a2-ec04-5640-bfa8-2372d3c05d27",
+      "sha256": "0f74bb1a6e1cc35164b2915febf7bf294452fb97f7c783cf1ef5e81759d68575"
+    },
+    {
+      "family": "C2",
+      "item_id": "cb88d6fc-d0c5-5211-a764-e502668f007a",
+      "sha256": "7714ec12639bc2b56d3acb10678d8986eaff31b423d624173f66a903dee3b5ce"
+    },
+    {
+      "family": "C2",
+      "item_id": "d7fb09f9-a5ea-5657-a0f8-d8fb533c34da",
+      "sha256": "5bd4bc26de1fa48a72d88ec91849301d037d3096c467997e905acb7946ffc786"
+    },
+    {
+      "family": "C2",
+      "item_id": "c245842d-4d4a-5b06-be66-8db8465c568d",
+      "sha256": "82de113bcd0791b6707ea2f41d7f91991fd95a7d2fd2441ebcbb83067208060b"
+    },
+    {
+      "family": "C2",
+      "item_id": "699d2991-6a7b-52d5-a6ae-1a90025ffe69",
+      "sha256": "51307cd047d740afdf5f98e5fced263d8a31a183d8d7b8c26f7c2bec5aa3dede"
+    },
+    {
+      "family": "C2",
+      "item_id": "5269d742-b3ee-55ef-93e5-548cb552bd3b",
+      "sha256": "b4c1ab413cf4be17295fac302c758d66b4a9d50356b91e7828a8df61c2819060"
+    },
+    {
+      "family": "C2",
+      "item_id": "dfde3daa-71f7-5c4d-8aaa-2634d6eba1a0",
+      "sha256": "715b9f47c3341270796ffb31087d72fae39f1e2a1c6924ad6951a1dce62e4995"
+    },
+    {
+      "family": "C2",
+      "item_id": "48d99f0c-8d97-5434-891c-1a049f70dddc",
+      "sha256": "5729441bad37e9b4dbee804e2f53cf5011ca17670d927edfea865d618f4686be"
+    },
+    {
+      "family": "C2",
+      "item_id": "b705dcd5-9a74-5ce3-ba65-ac0bb7cfaef3",
+      "sha256": "457de555336d79e139c69193f2a65e865fb0c447ad0b717829755c94a422911f"
+    },
+    {
+      "family": "C2",
+      "item_id": "6ef835f4-a18e-593f-8a13-2f9a57d0e574",
+      "sha256": "736ae8e3781f1b9a976ab84ee28de2a6200ce94a342582bbe6b1ba1865aee3e1"
+    },
+    {
+      "family": "C2",
+      "item_id": "3c9413b9-28dc-5d40-ba07-977e89600dab",
+      "sha256": "4642c5e55e7e3037f20fbbbce619db1717428c33de1d051d2d10cca3bcf514ae"
+    },
+    {
+      "family": "C2",
+      "item_id": "b61d49f8-6909-597b-8fae-ec7c46063378",
+      "sha256": "1b029a6d58cdd1c45c04e10787068acd9893151c432c1fb6b2fa789e9b2febd3"
+    },
+    {
+      "family": "C2",
+      "item_id": "d8e6bdce-6570-533b-b91f-1579a5f3caa7",
+      "sha256": "daa1b5122d42a070baa538322bab7caa07ebde1484b4348b6713b2b1c358bcf7"
+    },
+    {
+      "family": "C2",
+      "item_id": "97421e1d-efdd-501d-92eb-56e1129100fc",
+      "sha256": "60a763c5a720e336204a89e82850a3a27b2842cfb30e2da220337219dc7d69d6"
+    },
+    {
+      "family": "C2",
+      "item_id": "b8b051ae-55fb-53a9-8ab7-fdc7aa145714",
+      "sha256": "436a30aaa04aa07e0df7a8a16b7098a1658e8d063fe75935f90c80c7ef96e3de"
+    },
+    {
+      "family": "C2",
+      "item_id": "cc9c3970-51d7-5c7d-829f-f11de10775a2",
+      "sha256": "d01dbaa54d0c43a13afbf07dfd276dd89afab7b673581790f011501e22ca41a3"
+    },
+    {
+      "family": "C2",
+      "item_id": "59c52fa0-7905-52b7-9cbb-e26b32de369e",
+      "sha256": "a2b3ebe1c18d262b887520320ae7ce480232a434d169b625f73e12d23f230629"
+    },
+    {
+      "family": "C2",
+      "item_id": "16dd7a6c-cd11-5872-a67a-c93ddf3df34b",
+      "sha256": "3a7f9bfaabe93dafef8610cf3f2fc6f430958067ab45ad4b9033211a64557f21"
+    },
+    {
+      "family": "C2",
+      "item_id": "3fb6d0ef-4da2-57e5-91fd-e97bb2988699",
+      "sha256": "2abefece32c9b04d5505dde3c6295a47d17e17193aaa470dbd4e5325837ec71f"
+    },
+    {
+      "family": "C2",
+      "item_id": "698feb86-b713-50b1-bdb6-75a74122f0a0",
+      "sha256": "01f5ede7b7124419897a1beffd66246311e85969f49177646cdee7930e7d1ccd"
+    },
+    {
+      "family": "C2",
+      "item_id": "81f9374d-afa3-56e8-bbae-2c371aa14b70",
+      "sha256": "3ed3f47749b529a785a411d159367a8f54fb80e74b0082ff34c58ddfa9a41c08"
+    },
+    {
+      "family": "C2",
+      "item_id": "39af0fd7-55dc-5c1d-a08a-83b668e2aa78",
+      "sha256": "57d6ed7764ed698e9a60a33de2d7601018cf30b9929f1fff13ef76c3b9df3c79"
+    },
+    {
+      "family": "C2",
+      "item_id": "c97f0bdb-fb0f-5493-8e52-f9c6eaadd474",
+      "sha256": "53efb88369acc7fa9fc92e3ab3897c9c79637d123cc9640a2f77fb8a34045f13"
+    },
+    {
+      "family": "C2",
+      "item_id": "f60251a5-7af0-5843-b9a3-04581a4d8e21",
+      "sha256": "453f878a0f81b93cab858c948bfe9b02bdd01c3595383d6e5f8baa95a6aa6b26"
+    },
+    {
+      "family": "C2",
+      "item_id": "d5411a5c-bae8-5208-880e-5f2078430bd7",
+      "sha256": "85dfe62a848d4301aec08cf1cbaa0c5f1a66a27030ae2118cb7a80fb152bfee7"
+    }
+  ],
+  "manifest_version": "0.1-exploratory",
+  "release_tier": "exploratory",
+  "source_items_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/_expanded_n100_staging/c2_items.jsonl"
+}
