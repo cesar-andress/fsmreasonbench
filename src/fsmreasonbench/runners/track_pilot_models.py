@@ -40,6 +40,7 @@ from fsmreasonbench.runners.ollama_batch import GenerateFn, OllamaBatchConfig
 from fsmreasonbench.runners.ollama_track_batch import run_ollama_track_batch
 from fsmreasonbench.runners.pilot_models import model_dir_name
 from fsmreasonbench.runners.providers.base import (
+    API_PROVIDERS_WITH_MAX_TOKENS,
     estimate_frontier_run,
     validate_provider_tracks,
     write_provider_dry_run_diagnostic,
@@ -490,7 +491,11 @@ def _run_cell_batch(
             resume_items=config.resume_items,
             force_cell=config.force_cell or config.effective_force_all,
             provider=config.provider,
-            max_tokens=config.max_tokens if config.provider == "anthropic" else None,
+            max_tokens=(
+                config.max_tokens
+                if config.provider in API_PROVIDERS_WITH_MAX_TOKENS
+                else None
+            ),
         ),
         track=track,
         out_dir=run_dir,
@@ -648,7 +653,11 @@ def finalize_matrix_run(
         "timeout": config.timeout,
         "cohort_ids": cohort_ids,
         "provider": config.provider,
-        "max_tokens": config.max_tokens if config.provider == "anthropic" else None,
+        "max_tokens": (
+            config.max_tokens
+            if config.provider in API_PROVIDERS_WITH_MAX_TOKENS
+            else None
+        ),
         "cell_status_counts": status_counts,
         "cell_inventory": inventory,
         "track_rows": track_rows,

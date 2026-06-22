@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Literal
@@ -18,16 +17,32 @@ from fsmreasonbench.runners.providers.anthropic import (
     require_anthropic_api_key,
     resolve_anthropic_model,
 )
+from fsmreasonbench.runners.providers.gemini import (
+    GeminiConfig,
+    HttpGeminiClient,
+    build_gemini_generate_content_request,
+    gemini_generate_content_url,
+    require_gemini_api_key,
+    resolve_gemini_model,
+)
 from fsmreasonbench.runners.providers.ollama import build_ollama_generate
 from fsmreasonbench.runners.prompts import render_prompt
 from fsmreasonbench.runners.track_prompts import render_track_prompt
 from fsmreasonbench.tracks.models import TrackId
 
-ProviderId = Literal["ollama", "anthropic"]
+ProviderId = Literal["ollama", "anthropic", "gemini"]
 TOOL_TRACKS = frozenset({"R1", "R2"})
 ANTHROPIC_SUPPORTED_TRACKS = frozenset({"R0"})
+GEMINI_SUPPORTED_TRACKS = frozenset({"R0"})
+API_R0_ONLY_PROVIDERS = frozenset({"anthropic", "gemini"})
+API_PROVIDERS_WITH_MAX_TOKENS = frozenset({"anthropic", "gemini"})
+
 ANTHROPIC_COST_WARNING = (
     "WARNING: provider=anthropic uses the paid Anthropic API. "
+    "Respect --max-items and --max-cells; review --estimate-only before large runs."
+)
+GEMINI_COST_WARNING = (
+    "WARNING: provider=gemini uses the paid Google Gemini API. "
     "Respect --max-items and --max-cells; review --estimate-only before large runs."
 )
 
@@ -44,16 +59,37 @@ class GenerateBackendConfig:
     provider_dry_run: bool = False
 
 
+def _provider_cost_warning(provider: str) -> str | None:
+    if provider == "anthropic":
+        return ANTHROPIC_COST_WARNING
+    if provider == "gemini":
+        return GEMINI_COST_WARNING
+    return None
+
+
+def resolve_provider_model(provider: str, model: str) -> str:
+    if provider == "anthropic":
+        return resolve_anthropic_model(model)
+    if provider == "gemini":
+        return resolve_gemini_model(model)
+    return model
+
+
 def validate_provider_tracks(provider: str, tracks: tuple[str, ...]) -> None:
-    if provider != "anthropic":
+    if provider not in API_R0_ONLY_PROVIDERS:
         return
     unsupported = [track for track in tracks if track in TOOL_TRACKS]
-    if unsupported:
+    if not unsupported:
+        return
+    if provider == "gemini":
         raise ValueError(
-            "provider=anthropic does not implement native tool calling for tracks "
-            f"{unsupported}. Supported tracks: {sorted(ANTHROPIC_SUPPORTED_TRACKS)}. "
-            "Use provider=ollama for R1/R2, or restrict --tracks to R0."
+            "Gemini provider currently supports R0 only; tool tracks are not implemented."
         )
+    raise ValueError(
+        "provider=anthropic does not implement native tool calling for tracks "
+        f"{unsupported}. Supported tracks: {sorted(ANTHROPIC_SUPPORTED_TRACKS)}. "
+        "Use provider=ollama for R1/R2, or restrict --tracks to R0."
+    )
 
 
 def build_generate_factory(backend: GenerateBackendConfig) -> GenerateFactory:
@@ -69,7 +105,7 @@ def build_generate_factory(backend: GenerateBackendConfig) -> GenerateFactory:
             raise ValueError("provider_dry_run must not invoke build_generate_factory")
         api_key = require_anthropic_api_key()
 
-        def factory(model: str, temperature: float) -> GenerateFn:
+        def anthropic_factory(model: str, temperature: float) -> GenerateFn:
             resolved_model = resolve_anthropic_model(model)
             client = HttpAnthropicClient(
                 AnthropicConfig(
@@ -82,7 +118,26 @@ def build_generate_factory(backend: GenerateBackendConfig) -> GenerateFactory:
             )
             return client.generate
 
-        return factory
+        return anthropic_factory
+    if backend.provider == "gemini":
+        if backend.provider_dry_run:
+            raise ValueError("provider_dry_run must not invoke build_generate_factory")
+        api_key = require_gemini_api_key()
+
+        def gemini_factory(model: str, temperature: float) -> GenerateFn:
+            resolved_model = resolve_gemini_model(model)
+            client = HttpGeminiClient(
+                GeminiConfig(
+                    api_key=api_key,
+                    model=resolved_model,
+                    temperature=temperature,
+                    timeout=backend.timeout,
+                    max_tokens=backend.max_tokens,
+                )
+            )
+            return client.generate
+
+        return gemini_factory
     raise ValueError(f"unsupported provider: {backend.provider!r}")
 
 
@@ -103,6 +158,40 @@ def _sample_prompt(item: BenchmarkItem, track: str) -> str:
     return render_track_prompt(item, track_id, phase="initial")
 
 
+def _build_provider_request_payload(
+    *,
+    provider: str,
+    prompt: str,
+    model: str,
+    resolved_model: str,
+    max_tokens: int,
+    temperature: float,
+    api_key_placeholder: str = "<redacted>",
+) -> dict[str, Any]:
+    if provider == "anthropic":
+        return build_anthropic_messages_request(
+            prompt=prompt,
+            model=resolved_model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
+    if provider == "gemini":
+        return {
+            "endpoint": gemini_generate_content_url(resolved_model, api_key_placeholder),
+            "body": build_gemini_generate_content_request(
+                prompt=prompt,
+                max_tokens=max_tokens,
+                temperature=temperature,
+            ),
+        }
+    return {
+        "endpoint": "ollama:/api/generate",
+        "model": model,
+        "temperature": temperature,
+        "prompt_preview": prompt[:500],
+    }
+
+
 def write_provider_dry_run_diagnostic(
     *,
     out_dir: str | Path,
@@ -118,7 +207,7 @@ def write_provider_dry_run_diagnostic(
     """Build sample API payloads without calling remote providers."""
     cells: list[dict[str, Any]] = []
     for model in models:
-        resolved_model = resolve_anthropic_model(model) if provider == "anthropic" else model
+        resolved_model = resolve_provider_model(provider, model)
         for family in families:
             item = _sample_item(family_items, family)
             for temperature in temperatures:
@@ -134,26 +223,21 @@ def write_provider_dry_run_diagnostic(
                         "max_items": max_items,
                         "sample_item_id": item.item_id,
                     }
-                    if provider == "anthropic":
+                    if provider in API_PROVIDERS_WITH_MAX_TOKENS:
                         entry["max_tokens"] = max_tokens
-                        entry["request"] = build_anthropic_messages_request(
-                            prompt=prompt,
-                            model=resolved_model,
-                            max_tokens=max_tokens,
-                            temperature=temperature,
-                        )
-                    else:
-                        entry["request"] = {
-                            "endpoint": "ollama:/api/generate",
-                            "model": model,
-                            "temperature": temperature,
-                            "prompt_preview": prompt[:500],
-                        }
+                    entry["request"] = _build_provider_request_payload(
+                        provider=provider,
+                        prompt=prompt,
+                        model=model,
+                        resolved_model=resolved_model,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                    )
                     cells.append(entry)
 
     payload = {
         "provider": provider,
-        "warning": ANTHROPIC_COST_WARNING if provider == "anthropic" else None,
+        "warning": _provider_cost_warning(provider),
         "cell_count": len(cells),
         "cells": cells,
     }
@@ -175,11 +259,21 @@ def estimate_frontier_run(
 ) -> dict[str, Any]:
     planned_cells = len(models) * len(families) * len(tracks) * len(temperatures)
     executable_cells = min(planned_cells, max_cells) if max_cells is not None else planned_cells
-    api_calls_per_item = 1 if provider == "anthropic" else max(
-        2 if track in TOOL_TRACKS else 1 for track in tracks
-    )
+    if provider in API_R0_ONLY_PROVIDERS:
+        api_calls_per_item = 1
+    else:
+        api_calls_per_item = max(2 if track in TOOL_TRACKS else 1 for track in tracks)
     total_items = executable_cells * max_items
     estimated_api_calls = total_items * api_calls_per_item
+    if provider == "gemini":
+        note = (
+            "Estimate only; actual billed usage depends on prompt/output token lengths "
+            "and current Google Gemini pricing."
+        )
+    elif provider == "anthropic":
+        note = "Estimate only; actual billed usage depends on prompt/output token counts."
+    else:
+        note = "Ollama runs are local; no API billing."
     return {
         "provider": provider,
         "models": list(models),
@@ -188,17 +282,13 @@ def estimate_frontier_run(
         "temperatures": list(temperatures),
         "max_items": max_items,
         "max_cells": max_cells,
-        "max_tokens": max_tokens if provider == "anthropic" else None,
+        "max_tokens": max_tokens if provider in API_PROVIDERS_WITH_MAX_TOKENS else None,
         "planned_cells": planned_cells,
         "executable_cells": executable_cells,
         "estimated_items_scored": total_items,
         "estimated_api_calls": estimated_api_calls,
-        "warning": ANTHROPIC_COST_WARNING if provider == "anthropic" else None,
-        "note": (
-            "Estimate only; actual billed usage depends on prompt/output token counts."
-            if provider == "anthropic"
-            else "Ollama runs are local; no API billing."
-        ),
+        "warning": _provider_cost_warning(provider),
+        "note": note,
     }
 
 

@@ -12,6 +12,7 @@ from fsmreasonbench.dev.doc_consistency import find_repo_root
 from fsmreasonbench.runners.experiment_cells import DEFAULT_STALE_RUNNING_SECONDS
 from fsmreasonbench.runners.providers.base import (
     ANTHROPIC_COST_WARNING,
+    GEMINI_COST_WARNING,
     GenerateBackendConfig,
     build_generate_factory,
 )
@@ -52,11 +53,11 @@ def _add_bool_flag(parser: argparse.ArgumentParser, name: str, default: bool, he
 def main(argv: list[str] | None = None) -> int:
     repo_root = find_repo_root()
     parser = argparse.ArgumentParser(
-        description="Run R0/R1/R2 track pilot across Ollama or Anthropic model backends",
+        description="Run R0/R1/R2 track pilot across Ollama, Anthropic, or Gemini backends",
     )
     parser.add_argument(
         "--provider",
-        choices=("ollama", "anthropic"),
+        choices=("ollama", "anthropic", "gemini"),
         default="ollama",
         help="Model backend (default: ollama)",
     )
@@ -251,6 +252,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--provider-dry-run cannot be combined with --report-only")
     if args.provider == "anthropic" and not args.report_only:
         print(ANTHROPIC_COST_WARNING, file=sys.stderr)
+    if args.provider == "gemini" and not args.report_only:
+        print(GEMINI_COST_WARNING, file=sys.stderr)
 
     try:
         models = _parse_csv(args.models)
