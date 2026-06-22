@@ -140,6 +140,35 @@ def main(argv: list[str] | None = None) -> int:
         help="Per-cell timeout in seconds (default: no cell-level timeout)",
     )
     parser.add_argument(
+        "--ollama-retries",
+        type=int,
+        default=0,
+        help="Retry count after per-item timeout when using Ollama (default: 0)",
+    )
+    _add_bool_flag(
+        parser,
+        "ollama-restart-on-timeout",
+        default=False,
+        help_text="Run `ollama stop <model>` and wait before retrying a timed-out item",
+    )
+    _add_bool_flag(
+        parser,
+        "skip-item-on-timeout",
+        default=True,
+        help_text="Mark timed-out items as infrastructure failures and continue the cell (default: true)",
+    )
+    parser.add_argument(
+        "--ollama-stop-delay",
+        type=float,
+        default=5.0,
+        help="Seconds to wait after `ollama stop` before retry (default: 5)",
+    )
+    parser.add_argument(
+        "--fail-cell-after-item-failures",
+        type=int,
+        help="Fail the cell after N item infrastructure failures (default: unlimited)",
+    )
+    parser.add_argument(
         "--max-cells",
         type=int,
         help="Stop after executing N cells (default: unlimited)",
@@ -246,6 +275,12 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--max-items must be >= 1")
     if args.max_tokens < 1:
         parser.error("--max-tokens must be >= 1")
+    if args.ollama_retries < 0:
+        parser.error("--ollama-retries must be >= 0")
+    if args.ollama_stop_delay < 0:
+        parser.error("--ollama-stop-delay must be >= 0")
+    if args.fail_cell_after_item_failures is not None and args.fail_cell_after_item_failures < 1:
+        parser.error("--fail-cell-after-item-failures must be >= 1")
     if args.estimate_only and args.report_only:
         parser.error("--estimate-only cannot be combined with --report-only")
     if args.provider_dry_run and args.report_only:
@@ -323,6 +358,11 @@ def main(argv: list[str] | None = None) -> int:
             max_cells=args.max_cells,
             cell_timeout=args.cell_timeout,
             item_timeout=args.item_timeout,
+            ollama_retries=args.ollama_retries,
+            ollama_restart_on_timeout=args.ollama_restart_on_timeout,
+            skip_item_on_timeout=args.skip_item_on_timeout,
+            ollama_stop_delay_seconds=args.ollama_stop_delay,
+            fail_cell_after_item_failures=args.fail_cell_after_item_failures,
             sleep_between_cells=args.sleep_between_cells,
             stop_after_failures=args.stop_after_failures,
             stale_running_seconds=args.stale_running_seconds,

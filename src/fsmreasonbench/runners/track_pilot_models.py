@@ -27,6 +27,7 @@ from fsmreasonbench.runners.experiment_cells import (
     build_cell_plans,
     build_incomplete_from_status,
     classify_cell,
+    completed_item_ids,
     compute_config_hash,
     detect_cell_status,
     mark_cell_completed,
@@ -36,7 +37,8 @@ from fsmreasonbench.runners.experiment_cells import (
     should_run_cell,
     summarize_extended_inventory,
 )
-from fsmreasonbench.runners.ollama_batch import GenerateFn, OllamaBatchConfig
+from fsmreasonbench.runners.item_watchdog import CellItemFailureLimitExceeded
+from fsmreasonbench.runners.ollama_batch import GenerateFn, OllamaBatchConfig, OllamaBatchResult
 from fsmreasonbench.runners.ollama_track_batch import run_ollama_track_batch
 from fsmreasonbench.runners.pilot_models import model_dir_name
 from fsmreasonbench.runners.providers.base import (
@@ -132,6 +134,11 @@ class TrackPilotModelsConfig:
     max_cells: int | None = None
     cell_timeout: float | None = None
     item_timeout: float | None = None
+    ollama_retries: int = 0
+    ollama_restart_on_timeout: bool = False
+    skip_item_on_timeout: bool = True
+    ollama_stop_delay_seconds: float = 5.0
+    fail_cell_after_item_failures: int | None = None
     sleep_between_cells: float = 5.0
     stop_after_failures: int = 3
     stale_running_seconds: float = DEFAULT_STALE_RUNNING_SECONDS
@@ -291,6 +298,7 @@ def build_track_row(
         "average_tool_calls_per_item": summary.get("average_tool_calls_per_item", 0.0),
         "failure_stage_counts": summary.get("failure_stage_counts", {}),
         "track_failure_counts": summary.get("track_failure_counts", {}),
+        "infrastructure_failure_count": summary.get("infrastructure_failure_count", 0),
         "run_dir": str(run_dir),
         "status": status,
     }
@@ -478,8 +486,8 @@ def _run_cell_batch(
     temperature: float,
     config: TrackPilotModelsConfig,
     item_timeout: float | None,
-) -> None:
-    run_ollama_track_batch(
+) -> OllamaBatchResult:
+    return run_ollama_track_batch(
         items,
         generate,
         run_dir / "results.jsonl",
@@ -496,6 +504,12 @@ def _run_cell_batch(
                 if config.provider in API_PROVIDERS_WITH_MAX_TOKENS
                 else None
             ),
+            ollama_retries=config.ollama_retries,
+            ollama_restart_on_timeout=config.ollama_restart_on_timeout,
+            skip_item_on_timeout=config.skip_item_on_timeout,
+            ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
+            ollama_base_url=config.ollama_base_url,
+            fail_cell_after_item_failures=config.fail_cell_after_item_failures,
         ),
         track=track,
         out_dir=run_dir,
@@ -651,6 +665,7 @@ def finalize_matrix_run(
         "temperatures": list(config.temperatures),
         "max_items": config.max_items,
         "timeout": config.timeout,
+        "item_timeout": resolved_item_timeout(config),
         "cohort_ids": cohort_ids,
         "provider": config.provider,
         "max_tokens": (
@@ -835,9 +850,11 @@ def run_track_pilot_models(
 
         generate = generate_factory(plan.model, plan.temperature)
         items = family_items[plan.family]
+        batch_result: OllamaBatchResult | None = None
 
-        def _execute_cell() -> None:
-            _run_cell_batch(
+        def _execute_cell() -> OllamaBatchResult:
+            nonlocal batch_result
+            batch_result = _run_cell_batch(
                 items=items,
                 generate=generate,
                 run_dir=run_dir,
@@ -847,6 +864,15 @@ def run_track_pilot_models(
                 temperature=plan.temperature,
                 config=config,
                 item_timeout=item_timeout,
+            )
+            return batch_result
+
+        def _finalize_cell_success() -> None:
+            items_completed = len(completed_item_ids(run_dir))
+            mark_cell_completed(
+                run_dir,
+                started_at=started_at,
+                items_completed=items_completed,
             )
 
         try:
@@ -875,21 +901,13 @@ def run_track_pilot_models(
                     )
                     consecutive_failures += 1
                 else:
-                    mark_cell_completed(
-                        run_dir,
-                        started_at=started_at,
-                        items_completed=config.max_items,
-                    )
+                    _finalize_cell_success()
                     consecutive_failures = 0
                 finally:
                     pool.shutdown(wait=False, cancel_futures=True)
             else:
                 _execute_cell()
-                mark_cell_completed(
-                    run_dir,
-                    started_at=started_at,
-                    items_completed=config.max_items,
-                )
+                _finalize_cell_success()
                 consecutive_failures = 0
         except KeyboardInterrupt:
             mark_cell_failed(
@@ -908,6 +926,21 @@ def run_track_pilot_models(
             inventory = scan_matrix_inventory(root, config, cohort_ids=cohort_ids)
             finalize_matrix_run(root, config, inventory, cohort_ids=cohort_ids)
             raise
+        except CellItemFailureLimitExceeded as exc:
+            mark_cell_failed(
+                run_dir,
+                error_type="internal_runner_error",
+                error_message=str(exc),
+                model=plan.model,
+                model_dir=plan.model_dir,
+                family=plan.family,
+                track=plan.track,
+                temperature=plan.temperature,
+                out_dir=run_dir,
+                started_at=started_at,
+                exc_type=type(exc).__name__,
+            )
+            consecutive_failures += 1
         except TimeoutError:
             mark_cell_failed(
                 run_dir,
@@ -1145,6 +1178,7 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
         f"- **Temperatures:** {', '.join(str(t) for t in temperatures)}",
         f"- **Items per cell:** n={payload['max_items']}",
         f"- **Timeout (s):** {payload.get('timeout') if payload.get('timeout') is not None else 'none (disabled)'}",
+        f"- **Item timeout (s):** {payload.get('item_timeout') if payload.get('item_timeout') is not None else 'inherit --timeout'}",
         "",
         "### Cohort IDs",
         "",
@@ -1173,8 +1207,8 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
                 "",
                 "### Incomplete cells (failed / missing / partial / running / stale-running)",
                 "",
-                "| Model | Family | Track | Temp | Status | error_type | Message |",
-                "|-------|--------|-------|-----:|--------|------------|---------|",
+                "| Model | Family | Track | Temp | Status | Progress | error_type | Message |",
+                "|-------|--------|-------|-----:|--------|----------|------------|---------|",
             ]
         )
         for cell in incomplete_cells:
@@ -1182,14 +1216,16 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
             if len(msg) > 80:
                 msg = msg[:77] + "..."
             ext = cell.get("extended_status", cell.get("cell_status", cell.get("status", "failed")))
+            progress = cell.get("item_progress", "—")
             lines.append(
-                "| `{model}` | {family} | {track} | {temp:g} | {status} | "
+                "| `{model}` | {family} | {track} | {temp:g} | {status} | {progress} | "
                 "{error_type} | {msg} |".format(
                     model=cell["model"],
                     family=cell["family"],
                     track=cell["track"],
                     temp=float(cell.get("temperature", 0.0)),
                     status=ext,
+                    progress=progress,
                     error_type=cell.get("error_type", "unknown"),
                     msg=msg,
                 )
@@ -1260,6 +1296,9 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
             "- **fully_correct_rate:** fully correct items / total n",
             "- **not_extractable** (failure-stage table): includes tool-phase failures on R1/R2 "
             "as well as final submission parse failures",
+            "- **infrastructure_failure_count** (per-cell summary): runner/Ollama timeouts "
+            "recorded as not_extractable with infrastructure_failure=true; these are "
+            "infrastructure errors, not model capability scores",
         ]
     )
 

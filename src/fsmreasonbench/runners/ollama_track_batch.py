@@ -18,12 +18,22 @@ from fsmreasonbench.evaluator.track_failure_taxonomy import (
 )
 from fsmreasonbench.items.assembly import BenchmarkItem
 from fsmreasonbench.runners.cell_failure import SCORES_JSONL
-from fsmreasonbench.runners.experiment_cells import RESULTS_JSONL, completed_item_ids
+from fsmreasonbench.runners.experiment_cells import (
+    RESULTS_JSONL,
+    completed_item_ids,
+    update_cell_item_progress,
+)
+from fsmreasonbench.runners.item_watchdog import (
+    ItemInfrastructureError,
+    ItemWatchdogConfig,
+    call_generate_with_watchdog,
+)
 from fsmreasonbench.runners.ollama_batch import (
     GenerateFn,
     OllamaBatchConfig,
     OllamaBatchResult,
     _build_summary_from_scores,
+    _maybe_raise_item_failure_limit,
     run_ollama_batch,
 )
 from fsmreasonbench.runners.prompts import prompt_metadata
@@ -137,6 +147,17 @@ def run_ollama_track_batch(
 
     new_results: list[dict[str, Any]] = []
     item_records: list[dict[str, Any]] = []
+    infrastructure_failures = 0
+    watchdog = ItemWatchdogConfig(
+        item_timeout=config.timeout,
+        ollama_retries=config.ollama_retries,
+        ollama_restart_on_timeout=config.ollama_restart_on_timeout,
+        skip_item_on_timeout=config.skip_item_on_timeout,
+        ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
+        provider=config.provider,
+        ollama_base_url=config.ollama_base_url,
+    )
+    max_items = config.max_items if config.max_items is not None else len(selected)
 
     for item in selected:
         if item.item_id in done_ids:
@@ -148,7 +169,19 @@ def run_ollama_track_batch(
                 config,
                 resolved,
                 timestamp=utc_timestamp(),
+                watchdog=watchdog,
             )
+        except ItemInfrastructureError as exc:
+            infrastructure_failures += 1
+            run = _failed_item_run(
+                item,
+                config,
+                resolved,
+                timestamp=utc_timestamp(),
+                error=str(exc),
+                infrastructure_failure=True,
+            )
+            _maybe_raise_item_failure_limit(infrastructure_failures, config)
         except Exception as exc:  # noqa: BLE001 — continue batch after per-item failure
             run = _failed_item_run(
                 item,
@@ -167,6 +200,8 @@ def run_ollama_track_batch(
             "tool_invocation_count"
         ]
         scoring_dict["track_failure_class"] = run["track_failure_class"]
+        if run.get("infrastructure_failure"):
+            scoring_dict["infrastructure_failure"] = True
         item_records.append(
             {
                 "track_failure_class": run["track_failure_class"],
@@ -194,6 +229,13 @@ def run_ollama_track_batch(
         append_jsonl(results_path, run_record)
         append_jsonl(scores_path, scoring_dict)
         new_results.append(run_record)
+        completed = len(completed_item_ids(root))
+        update_cell_item_progress(
+            root,
+            items_completed=completed,
+            max_items=max_items,
+            last_item_id=item.item_id,
+        )
 
     scoring_rows = read_jsonl(scores_path) if scores_path.exists() else []
     summary = _build_summary_from_scores(
@@ -209,7 +251,12 @@ def run_ollama_track_batch(
         dump_json(root / "track_summary.json", summary)
 
     all_results = read_jsonl(results_path) if results_path.exists() else new_results
-    return OllamaBatchResult(results=all_results, summary=summary, out_dir=root)
+    return OllamaBatchResult(
+        results=all_results,
+        summary=summary,
+        out_dir=root,
+        infrastructure_failures=infrastructure_failures,
+    )
 
 
 def _evaluate_item_with_tools(
@@ -219,17 +266,20 @@ def _evaluate_item_with_tools(
     track: TrackId,
     *,
     timestamp: str,
+    watchdog: ItemWatchdogConfig,
 ) -> dict[str, Any]:
     audit = AuditLogBuilder(track)
     messages: list[dict[str, Any]] = []
     protocol_errors: list[str] = []
 
     plan_prompt = render_track_prompt(item, track, phase="initial")
-    plan_text = generate(
-        plan_prompt,
+    plan_text = call_generate_with_watchdog(
+        generate,
+        prompt=plan_prompt,
         model=config.model,
         temperature=config.temperature,
         timeout=config.timeout,
+        config=watchdog,
     )
     messages.append({"role": "user", "phase": "tool_plan", "content": plan_prompt})
     messages.append({"role": "assistant", "phase": "tool_plan", "content": plan_text})
@@ -258,11 +308,13 @@ def _evaluate_item_with_tools(
         phase="tool_results",
         tool_results=tool_outputs,
     )
-    final_text = generate(
-        results_prompt,
+    final_text = call_generate_with_watchdog(
+        generate,
+        prompt=results_prompt,
         model=config.model,
         temperature=config.temperature,
         timeout=config.timeout,
+        config=watchdog,
     )
     messages.append({"role": "user", "phase": "final_submission", "content": results_prompt})
     messages.append(
@@ -331,6 +383,7 @@ def _failed_item_run(
     *,
     timestamp: str,
     error: str,
+    infrastructure_failure: bool = False,
 ) -> dict[str, Any]:
     """Record a per-item runner failure without aborting the batch."""
     scoring_record = ScoringRecord(
@@ -345,6 +398,8 @@ def _failed_item_run(
     )
     audit = AuditLogBuilder(track)
     audit.scratchpad("runner_error", error)
+    if infrastructure_failure:
+        audit.scratchpad("infrastructure_failure", "true")
     transcript = LLMTrackTranscript(
         transcript_version="1.1",
         tracks_version=TRACKS_VERSION,
@@ -374,4 +429,5 @@ def _failed_item_run(
             tool_plan_valid=False,
             tool_execution_error=error,
         ),
+        "infrastructure_failure": infrastructure_failure,
     }

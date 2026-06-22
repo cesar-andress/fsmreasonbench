@@ -170,13 +170,15 @@ def test_stale_running_detection(tmp_path: Path) -> None:
     run_dir.mkdir()
     status_path = run_dir / CELL_STATUS_JSON
     status_path.write_text(
-        json.dumps({"status": "running", "started_at": "2020-01-01T00:00:00+00:00"}),
+        json.dumps(
+            {
+                "status": "running",
+                "started_at": "2020-01-01T00:00:00+00:00",
+                "updated_at": "2020-01-01T00:00:00+00:00",
+            }
+        ),
         encoding="utf-8",
     )
-    old = time.time() - 7200
-    import os
-
-    os.utime(status_path, (old, old))
     assert is_stale_running(run_dir, threshold_seconds=60.0)
     assert detect_cell_status(run_dir, stale_threshold_seconds=60.0) == "stale-running"
 

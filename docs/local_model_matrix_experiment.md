@@ -198,7 +198,12 @@ Key flags:
 | `--retry-failed` | off | Retry failed / stale-running; always resume partial |
 | `--max-cells N` | unlimited | Cap cells per invocation |
 | `--cell-timeout SECONDS` | none | Abort hung cells; write `error.json` |
-| `--item-timeout SECONDS` | `--timeout` | Per-item generate timeout |
+| `--item-timeout SECONDS` | `--timeout` | Per-item wall-clock + HTTP timeout |
+| `--ollama-retries N` | 0 | Retry timed-out items after optional `ollama stop` |
+| `--ollama-restart-on-timeout` | off | Run `ollama stop <model>` before retry |
+| `--skip-item-on-timeout` / `--no-skip-item-on-timeout` | skip on | Record infra failure and continue cell |
+| `--ollama-stop-delay SECONDS` | 5 | Wait after `ollama stop` before retry |
+| `--fail-cell-after-item-failures N` | unlimited | Fail cell after N item infrastructure errors |
 | `--stop-after-failures N` | 3 | Stop after N consecutive cell failures |
 | `--sleep-between-cells SECONDS` | 5 | Cool-down between cells |
 | `--incremental-safe` | off | Resume partial cells; `stop-after-failures=1`, sleep=10 (use `--max-cells` to cap) |
@@ -209,6 +214,60 @@ Regenerate `report.md` from persisted artifacts without model calls:
 PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
   --report-only --out-dir runs/local_matrix_v1 --temperatures 0,0.2,0.7
 ```
+
+### Robust n=100 local matrix (recommended)
+
+Use per-item watchdog + Ollama recovery so one stuck request does not block the campaign.
+`cell_status.json` is updated after every item (`items_completed/max_items`) for live progress.
+
+```bash
+PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
+  --models qwen2.5-coder:7b,llama3.1:8b,mistral-nemo:12b,gemma2:9b \
+  --families C2,F1 \
+  --tracks R0,R1,R2 \
+  --temperatures 0.2 \
+  --max-items 100 \
+  --item-timeout 300 \
+  --ollama-retries 1 \
+  --ollama-restart-on-timeout \
+  --skip-item-on-timeout \
+  --timeout 7200 \
+  --cohort-root cohorts/v0.1-expanded-n100 \
+  --out-dir runs/local_matrix_n100_t02_v2 \
+  --retry-failed \
+  --incremental-safe
+```
+
+Resume a partially stuck matrix (example: `mistral-nemo:12b` / C2 / R1 / T=0.2 at 29/100):
+
+```bash
+PYTHONPATH=src python -m fsmreasonbench.cli.experiment_status \
+  --root runs/local_matrix_n100_t02_v2 \
+  --models mistral-nemo:12b \
+  --families C2 \
+  --tracks R1 \
+  --temperatures 0.2
+
+PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
+  --models mistral-nemo:12b \
+  --families C2 \
+  --tracks R1 \
+  --temperatures 0.2 \
+  --max-items 100 \
+  --item-timeout 300 \
+  --ollama-retries 1 \
+  --ollama-restart-on-timeout \
+  --skip-item-on-timeout \
+  --timeout 7200 \
+  --cohort-root cohorts/v0.1-expanded-n100 \
+  --out-dir runs/local_matrix_n100_t02_v2 \
+  --retry-failed \
+  --incremental-safe
+```
+
+Infrastructure timeouts appear in `scores.jsonl` as `failure_stage=not_extractable` with
+`infrastructure_failure=true` and `parse_errors` containing `infrastructure_timeout: ...`.
+Per-cell `summary.json` includes `infrastructure_failure_count` and an explicit note.
 
 ---
 

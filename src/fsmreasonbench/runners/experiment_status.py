@@ -135,19 +135,21 @@ def format_experiment_status_report(result: ExperimentStatusResult) -> str:
             [
                 "## Incomplete cells",
                 "",
-                "| Model | Family | Track | Temp | Status |",
-                "|-------|--------|-------|-----:|--------|",
+                "| Model | Family | Track | Temp | Status | Progress |",
+                "|-------|--------|-------|-----:|--------|----------|",
             ]
         )
         for cell in result.incomplete_cells:
             status = cell.get("extended_status", cell.get("cell_status", "unknown"))
+            progress = cell.get("item_progress", "—")
             lines.append(
-                "| `{model}` | {family} | {track} | {temp:g} | {status} |".format(
+                "| `{model}` | {family} | {track} | {temp:g} | {status} | {progress} |".format(
                     model=cell["model"],
                     family=cell["family"],
                     track=cell["track"],
                     temp=float(cell.get("temperature", 0.0)),
                     status=status,
+                    progress=progress,
                 )
             )
         lines.append("")

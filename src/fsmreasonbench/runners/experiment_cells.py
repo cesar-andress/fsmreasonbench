@@ -76,6 +76,83 @@ def cell_status_mtime(run_dir: Path) -> float | None:
     return path.stat().st_mtime
 
 
+def _parse_utc_timestamp(value: str) -> float | None:
+    try:
+        normalized = value.replace("Z", "+00:00")
+        return datetime.fromisoformat(normalized).timestamp()
+    except ValueError:
+        return None
+
+
+def cell_status_heartbeat_age(
+    run_dir: Path,
+    *,
+    payload: dict[str, Any] | None = None,
+) -> float | None:
+    """Return seconds since the last cell_status heartbeat, if known."""
+    status_payload = payload if payload is not None else read_cell_status(run_dir)
+    if status_payload is None:
+        return None
+    updated_at = status_payload.get("updated_at")
+    if isinstance(updated_at, str):
+        timestamp = _parse_utc_timestamp(updated_at)
+        if timestamp is not None:
+            return datetime.now(timezone.utc).timestamp() - timestamp
+    mtime = cell_status_mtime(run_dir)
+    if mtime is None:
+        return None
+    return datetime.now(timezone.utc).timestamp() - mtime
+
+
+def update_cell_item_progress(
+    run_dir: Path,
+    *,
+    items_completed: int,
+    max_items: int,
+    last_item_id: str,
+) -> None:
+    """Refresh running-cell heartbeat after each scored item."""
+    payload = read_cell_status(run_dir)
+    if payload is None or payload.get("status") != "running":
+        return
+    write_cell_status(
+        run_dir,
+        status="running",
+        model=payload.get("model"),
+        model_dir=payload.get("model_dir"),
+        family=payload.get("family"),
+        track=payload.get("track"),
+        temperature=payload.get("temperature"),
+        item_source=payload.get("item_source"),
+        config_hash=payload.get("config_hash"),
+        max_items=max_items,
+        started_at=payload.get("started_at"),
+        items_completed=items_completed,
+        last_item_id=last_item_id,
+    )
+
+
+def format_cell_progress(
+    run_dir: Path,
+    *,
+    max_items: int | None = None,
+    payload: dict[str, Any] | None = None,
+) -> str | None:
+    """Return ``items_completed/max_items`` progress text when available."""
+    status_payload = payload if payload is not None else read_cell_status(run_dir)
+    completed = status_payload.get("items_completed") if status_payload else None
+    cap = None
+    if status_payload is not None:
+        cap = status_payload.get("max_items")
+    if cap is None:
+        cap = max_items
+    if completed is None:
+        completed = len(completed_item_ids(run_dir))
+    if cap is None:
+        return f"{completed}" if completed else None
+    return f"{completed}/{cap}"
+
+
 def is_stale_running(
     run_dir: Path,
     *,
@@ -84,10 +161,9 @@ def is_stale_running(
     payload = read_cell_status(run_dir)
     if payload is None or payload.get("status") != "running":
         return False
-    mtime = cell_status_mtime(run_dir)
-    if mtime is None:
+    age = cell_status_heartbeat_age(run_dir, payload=payload)
+    if age is None:
         return False
-    age = datetime.now(timezone.utc).timestamp() - mtime
     return age > threshold_seconds
 
 
@@ -193,6 +269,8 @@ def mark_cell_completed(
         started_at=started_at,
         ended_at=utc_timestamp(),
         items_completed=items_completed,
+        max_items=payload.get("max_items"),
+        last_item_id=payload.get("last_item_id"),
         model=payload.get("model"),
         model_dir=payload.get("model_dir"),
         family=payload.get("family"),
@@ -358,17 +436,26 @@ def build_incomplete_from_status(
         }
     record["extended_status"] = status
     record["cell_status"] = legacy if legacy != "running" else "partial"
+    status_payload = read_cell_status(run_dir)
     if status == "stale-running":
         record["error_type"] = "internal_runner_error"
-        record["error_message"] = "cell_status.json stuck in running (stale)"
+        record["error_message"] = "cell heartbeat stale (no recent item progress)"
         record["error"] = record["error_message"]
     elif status == "running":
         record["error_type"] = "unknown"
-        record["error_message"] = "cell currently running"
+        progress = format_cell_progress(run_dir, payload=status_payload)
+        if progress:
+            record["error_message"] = f"cell currently running ({progress})"
+        else:
+            record["error_message"] = "cell currently running"
         record["error"] = record["error_message"]
-    status_payload = read_cell_status(run_dir)
     if status_payload is not None:
         record["cell_status_started_at"] = status_payload.get("started_at")
+        progress = format_cell_progress(run_dir, payload=status_payload)
+        if progress:
+            record["item_progress"] = progress
+            record["items_completed"] = status_payload.get("items_completed")
+            record["max_items"] = status_payload.get("max_items")
     error_payload = read_cell_error(run_dir)
     if error_payload is not None:
         record["error_type"] = error_payload.get("error_type", "unknown")
