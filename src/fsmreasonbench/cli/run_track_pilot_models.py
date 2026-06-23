@@ -140,10 +140,15 @@ def main(argv: list[str] | None = None) -> int:
         help="Per-cell timeout in seconds (default: no cell-level timeout)",
     )
     parser.add_argument(
+        "--provider-retries",
+        type=int,
+        help="Per-item retry count for transient provider errors or Ollama timeouts (default: inherit --ollama-retries or 0)",
+    )
+    parser.add_argument(
         "--ollama-retries",
         type=int,
         default=0,
-        help="Retry count after per-item timeout when using Ollama (default: 0)",
+        help="Alias for --provider-retries on Ollama timeout recovery (default: 0)",
     )
     _add_bool_flag(
         parser,
@@ -156,6 +161,12 @@ def main(argv: list[str] | None = None) -> int:
         "skip-item-on-timeout",
         default=True,
         help_text="Mark timed-out items as infrastructure failures and continue the cell (default: true)",
+    )
+    parser.add_argument(
+        "--provider-retry-backoff",
+        type=float,
+        default=5.0,
+        help="Base seconds for exponential provider retry backoff with jitter (default: 5)",
     )
     parser.add_argument(
         "--ollama-stop-delay",
@@ -277,6 +288,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--max-tokens must be >= 1")
     if args.ollama_retries < 0:
         parser.error("--ollama-retries must be >= 0")
+    if args.provider_retries is not None and args.provider_retries < 0:
+        parser.error("--provider-retries must be >= 0")
+    if args.provider_retry_backoff < 0:
+        parser.error("--provider-retry-backoff must be >= 0")
     if args.ollama_stop_delay < 0:
         parser.error("--ollama-stop-delay must be >= 0")
     if args.fail_cell_after_item_failures is not None and args.fail_cell_after_item_failures < 1:
@@ -335,6 +350,12 @@ def main(argv: list[str] | None = None) -> int:
             args.cohort_root
         )
 
+    resolved_provider_retries = (
+        args.provider_retries
+        if args.provider_retries is not None
+        else args.ollama_retries
+    )
+
     config = apply_incremental_safe(
         TrackPilotModelsConfig(
             models=models,
@@ -358,10 +379,12 @@ def main(argv: list[str] | None = None) -> int:
             max_cells=args.max_cells,
             cell_timeout=args.cell_timeout,
             item_timeout=args.item_timeout,
-            ollama_retries=args.ollama_retries,
+            ollama_retries=resolved_provider_retries,
+            provider_retries=resolved_provider_retries,
             ollama_restart_on_timeout=args.ollama_restart_on_timeout,
             skip_item_on_timeout=args.skip_item_on_timeout,
             ollama_stop_delay_seconds=args.ollama_stop_delay,
+            provider_retry_backoff_seconds=args.provider_retry_backoff,
             fail_cell_after_item_failures=args.fail_cell_after_item_failures,
             sleep_between_cells=args.sleep_between_cells,
             stop_after_failures=args.stop_after_failures,

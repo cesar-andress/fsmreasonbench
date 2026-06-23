@@ -10,6 +10,8 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any
 
+from fsmreasonbench.runners.provider_errors import classify_http_error
+
 DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta"
 
@@ -130,10 +132,7 @@ class HttpGeminiClient:
                 f"gemini request exceeded timeout of {resolved_timeout:g}s"
             ) from exc
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(
-                f"gemini request failed with HTTP {exc.code}: {detail}"
-            ) from exc
+            raise classify_http_error(provider="gemini", exc=exc) from exc
         except urllib.error.URLError as exc:
             reason = exc.reason
             if isinstance(reason, TimeoutError):

@@ -34,6 +34,7 @@ from fsmreasonbench.runners.ollama_batch import (
     OllamaBatchResult,
     _build_summary_from_scores,
     _maybe_raise_item_failure_limit,
+    _watchdog_config,
     run_ollama_batch,
 )
 from fsmreasonbench.runners.prompts import prompt_metadata
@@ -148,15 +149,7 @@ def run_ollama_track_batch(
     new_results: list[dict[str, Any]] = []
     item_records: list[dict[str, Any]] = []
     infrastructure_failures = 0
-    watchdog = ItemWatchdogConfig(
-        item_timeout=config.timeout,
-        ollama_retries=config.ollama_retries,
-        ollama_restart_on_timeout=config.ollama_restart_on_timeout,
-        skip_item_on_timeout=config.skip_item_on_timeout,
-        ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
-        provider=config.provider,
-        ollama_base_url=config.ollama_base_url,
-    )
+    watchdog = _watchdog_config(config)
     max_items = config.max_items if config.max_items is not None else len(selected)
 
     for item in selected:

@@ -44,9 +44,11 @@ class OllamaBatchConfig:
     provider: str = "ollama"
     max_tokens: int | None = None
     ollama_retries: int = 0
+    provider_retries: int = 0
     ollama_restart_on_timeout: bool = False
     skip_item_on_timeout: bool = True
     ollama_stop_delay_seconds: float = 5.0
+    provider_retry_backoff_seconds: float = 5.0
     ollama_base_url: str = "http://localhost:11434"
     fail_cell_after_item_failures: int | None = None
 
@@ -69,10 +71,12 @@ def _load_scoring_rows(run_dir: Path) -> list[dict[str, Any]]:
 def _watchdog_config(config: OllamaBatchConfig) -> ItemWatchdogConfig:
     return ItemWatchdogConfig(
         item_timeout=config.timeout,
+        provider_retries=config.provider_retries,
         ollama_retries=config.ollama_retries,
         ollama_restart_on_timeout=config.ollama_restart_on_timeout,
         skip_item_on_timeout=config.skip_item_on_timeout,
         ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
+        provider_retry_backoff_seconds=config.provider_retry_backoff_seconds,
         provider=config.provider,
         ollama_base_url=config.ollama_base_url,
     )

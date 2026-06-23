@@ -135,9 +135,11 @@ class TrackPilotModelsConfig:
     cell_timeout: float | None = None
     item_timeout: float | None = None
     ollama_retries: int = 0
+    provider_retries: int = 0
     ollama_restart_on_timeout: bool = False
     skip_item_on_timeout: bool = True
     ollama_stop_delay_seconds: float = 5.0
+    provider_retry_backoff_seconds: float = 5.0
     fail_cell_after_item_failures: int | None = None
     sleep_between_cells: float = 5.0
     stop_after_failures: int = 3
@@ -505,9 +507,11 @@ def _run_cell_batch(
                 else None
             ),
             ollama_retries=config.ollama_retries,
+            provider_retries=config.provider_retries,
             ollama_restart_on_timeout=config.ollama_restart_on_timeout,
             skip_item_on_timeout=config.skip_item_on_timeout,
             ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
+            provider_retry_backoff_seconds=config.provider_retry_backoff_seconds,
             ollama_base_url=config.ollama_base_url,
             fail_cell_after_item_failures=config.fail_cell_after_item_failures,
         ),
