@@ -113,6 +113,17 @@ PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
 
 Scale up `--max-items` after smoke passes; keep the same retry/backoff flags.
 
+Regenerate `report.md` from existing artifacts (no API calls):
+
+```bash
+PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
+  --provider gemini \
+  --out-dir runs/frontier_gemini_flash_smoke_v1 \
+  --report-only
+```
+
+`--report-only` loads models/families/tracks/temperatures from `combined_summary.json` when present, so you do not need to repeat `--tracks R0` or cohort flags.
+
 Dry run (no API key):
 
 ```bash

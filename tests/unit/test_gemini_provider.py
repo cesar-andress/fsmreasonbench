@@ -211,3 +211,46 @@ def test_build_generate_factory_ollama_unchanged(
         0.0,
     )
     assert callable(generate)
+
+
+def test_gemini_report_only_hydrates_tracks_from_combined_summary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    out_dir = tmp_path / "frontier"
+    out_dir.mkdir()
+    (out_dir / "combined_summary.json").write_text(
+        json.dumps(
+            {
+                "experiment": "local_matrix",
+                "models": ["gemini-flash"],
+                "families": ["C2", "F1"],
+                "tracks": ["R0"],
+                "temperatures": [0.2],
+                "max_items": 5,
+                "provider": "gemini",
+                "cohort_ids": {"C2": "c2-test", "F1": "f1-test"},
+                "track_rows": [],
+                "delegation_rows": [],
+                "cell_status_counts": {"completed": 0, "expected": 2},
+            }
+        ),
+        encoding="utf-8",
+    )
+    config = TrackPilotModelsConfig(
+        models=("qwen2.5-coder:7b",),
+        families=("C2",),
+        tracks=("R0", "R1", "R2"),
+        c2_items_path=".",
+        f1_items_path=".",
+        out_dir=out_dir,
+        provider="gemini",
+        report_only=True,
+    )
+    run_track_pilot_models(
+        config,
+        lambda _m, _t: (_ for _ in ()).throw(AssertionError("API must not be called")),
+    )
+    assert (out_dir / "report.md").exists()

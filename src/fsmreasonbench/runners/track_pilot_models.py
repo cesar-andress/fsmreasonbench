@@ -256,6 +256,7 @@ __all__ = [
     "format_cell_timeout_message",
     "format_item_timeout_message",
     "resolved_item_timeout",
+    "hydrate_report_only_config",
     "infer_matrix_layout",
     "is_cell_complete",
     "load_cell_summary",
@@ -433,6 +434,114 @@ def apply_incremental_safe(config: TrackPilotModelsConfig) -> TrackPilotModelsCo
         sleep_between_cells=10.0,
         resume_items=True,
     )
+
+
+def hydrate_report_only_config(
+    root: Path,
+    config: TrackPilotModelsConfig,
+) -> TrackPilotModelsConfig:
+    """Load matrix axes from on-disk artifacts so --report-only matches the original run."""
+    disk_axes = _discover_report_axes_from_disk(root)
+    updates: dict[str, Any] = {
+        "matrix_layout": disk_axes.get("matrix_layout", infer_matrix_layout(root)),
+    }
+    for field in ("models", "families", "tracks", "temperatures"):
+        disk_value = disk_axes.get(field)
+        if disk_value:
+            updates[field] = disk_value
+
+    summary_path = root / "combined_summary.json"
+    if summary_path.exists():
+        payload = json.loads(summary_path.read_text(encoding="utf-8"))
+        for field in ("models", "families", "tracks", "temperatures"):
+            if field in updates:
+                continue
+            raw = payload.get(field)
+            if raw:
+                updates[field] = tuple(raw)
+        if payload.get("max_items") is not None:
+            updates["max_items"] = int(payload["max_items"])
+        if "timeout" in payload:
+            updates["timeout"] = payload["timeout"]
+        if "item_timeout" in payload:
+            updates["item_timeout"] = payload["item_timeout"]
+        if payload.get("max_tokens") is not None:
+            updates["max_tokens"] = int(payload["max_tokens"])
+        if payload.get("provider"):
+            updates["provider"] = payload["provider"]
+        cohort_ids = payload.get("cohort_ids") or {}
+        if cohort_ids.get("C2"):
+            updates["c2_cohort_id"] = cohort_ids["C2"]
+        if cohort_ids.get("F1"):
+            updates["f1_cohort_id"] = cohort_ids["F1"]
+    return replace(config, **updates)
+
+
+def _discover_report_axes_from_disk(root: Path) -> dict[str, Any]:
+    from fsmreasonbench.runners.local_matrix_paths import infer_model_from_artifacts
+
+    matrix_layout = infer_matrix_layout(root)
+    models: list[str] = []
+    seen_models: set[str] = set()
+    families: set[str] = set()
+    tracks: set[str] = set()
+    temperatures: set[float] = set()
+
+    for model_path in sorted(root.iterdir()):
+        if not model_path.is_dir() or model_path.name in {"plots"}:
+            continue
+        for family in ("C2", "F1"):
+            family_path = model_path / family
+            if not family_path.is_dir():
+                continue
+            families.add(family)
+            if matrix_layout:
+                for temp_path in sorted(family_path.iterdir()):
+                    if not temp_path.is_dir() or not temp_path.name.startswith("temp_"):
+                        continue
+                    temperatures.add(float(temp_path.name.removeprefix("temp_")))
+                    for track_path in sorted(temp_path.iterdir()):
+                        if not track_path.is_dir():
+                            continue
+                        try:
+                            TrackId(track_path.name)
+                        except ValueError:
+                            continue
+                        tracks.add(track_path.name)
+                        model = infer_model_from_artifacts(
+                            track_path,
+                            model_dir=model_path.name,
+                        )
+                        if model and model not in seen_models:
+                            seen_models.add(model)
+                            models.append(model)
+            else:
+                for track_path in sorted(family_path.iterdir()):
+                    if not track_path.is_dir():
+                        continue
+                    try:
+                        TrackId(track_path.name)
+                    except ValueError:
+                        continue
+                    tracks.add(track_path.name)
+                    model = infer_model_from_artifacts(
+                        track_path,
+                        model_dir=model_path.name,
+                    )
+                    if model and model not in seen_models:
+                        seen_models.add(model)
+                        models.append(model)
+
+    result: dict[str, Any] = {"matrix_layout": matrix_layout}
+    if models:
+        result["models"] = tuple(models)
+    if families:
+        result["families"] = tuple(sorted(families))
+    if tracks:
+        result["tracks"] = tuple(sorted(tracks, key=lambda track: TRACK_IDS.index(track)))
+    if temperatures:
+        result["temperatures"] = tuple(sorted(temperatures))
+    return result
 
 
 def _item_sources(config: TrackPilotModelsConfig) -> dict[str, str]:
@@ -746,10 +855,13 @@ def run_track_pilot_models(
     for track in config.tracks:
         TrackId(track)
 
-    validate_provider_tracks(config.provider, config.tracks)
-
     root = Path(config.out_dir)
     root.mkdir(parents=True, exist_ok=True)
+    if config.report_only:
+        config = hydrate_report_only_config(root, config)
+    else:
+        validate_provider_tracks(config.provider, config.tracks)
+
     config = apply_incremental_safe(config)
     cohort_ids = {"C2": config.c2_cohort_id, "F1": config.f1_cohort_id}
     item_sources = _item_sources(config)
