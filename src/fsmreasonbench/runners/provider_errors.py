@@ -8,6 +8,8 @@ import urllib.error
 
 TRANSIENT_HTTP_STATUSES = frozenset({429, 500, 502, 503, 504})
 QUOTA_KEYWORDS = ("quota", "billing", "resource_exhausted", "exceeded your current quota")
+NON_RETRYABLE_PROVIDER_ERROR_TYPES = frozenset({"quota_exceeded"})
+DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS = 120.0
 
 
 class ProviderTransientError(Exception):
@@ -54,6 +56,11 @@ def infer_provider_error_type(status_code: int, detail: str) -> str:
     return "unavailable"
 
 
+def is_retryable_provider_error(error_type: str) -> bool:
+    """Quota exhaustion will not recover during a single run; do not backoff-retry it."""
+    return error_type not in NON_RETRYABLE_PROVIDER_ERROR_TYPES
+
+
 def parse_retry_after_seconds(headers: Any | None) -> float | None:
     if headers is None:
         return None
@@ -97,11 +104,12 @@ def resolve_provider_retry_delay_seconds(
     base_seconds: float,
     *,
     retry_after_seconds: float | None = None,
+    max_delay_seconds: float = DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS,
 ) -> float:
-    """Exponential backoff with jitter, honoring Retry-After when present."""
+    """Exponential backoff with jitter, honoring Retry-After up to a cap."""
     from fsmreasonbench.runners.item_watchdog import provider_retry_delay_seconds
 
-    backoff = provider_retry_delay_seconds(attempt, base_seconds)
+    backoff = min(provider_retry_delay_seconds(attempt, base_seconds), max_delay_seconds)
     if retry_after_seconds is None:
         return backoff
-    return max(backoff, retry_after_seconds)
+    return min(max(backoff, retry_after_seconds), max_delay_seconds)

@@ -75,7 +75,7 @@ def test_resolve_provider_retry_delay_honors_retry_after() -> None:
     assert delay == 30.0
 
 
-def test_watchdog_429_retry_after_triggers_sleep_before_retry() -> None:
+def test_watchdog_rate_limit_retry_after_triggers_sleep_before_retry() -> None:
     calls = {"n": 0}
 
     def generate(*_args, **_kwargs) -> str:
@@ -83,9 +83,9 @@ def test_watchdog_429_retry_after_triggers_sleep_before_retry() -> None:
         if calls["n"] == 1:
             raise ProviderTransientError(
                 http_status=429,
-                detail="Quota exceeded",
+                detail="Rate limit exceeded",
                 provider="gemini",
-                error_type="quota_exceeded",
+                error_type="rate_limit",
                 retry_after_seconds=7.0,
             )
         return '{"item_id":"x","verdict":true,"certificate":{}}'
@@ -107,6 +107,53 @@ def test_watchdog_429_retry_after_triggers_sleep_before_retry() -> None:
     )
     assert "verdict" in text
     assert sleeps == [7.0]
+
+
+def test_quota_exceeded_fails_fast_without_retry() -> None:
+    calls = {"n": 0}
+
+    def generate(*_args, **_kwargs) -> str:
+        calls["n"] += 1
+        raise ProviderTransientError(
+            http_status=429,
+            detail="You exceeded your current quota",
+            provider="gemini",
+            error_type="quota_exceeded",
+            retry_after_seconds=3600.0,
+        )
+
+    sleeps: list[float] = []
+    with pytest.raises(ItemInfrastructureError, match="provider_http_429"):
+        call_generate_with_watchdog(
+            generate,
+            prompt="hello",
+            model="gemini-flash",
+            temperature=0.0,
+            timeout=30.0,
+            config=ItemWatchdogConfig(
+                item_timeout=30.0,
+                provider_retries=8,
+                provider_retry_backoff_seconds=20.0,
+                provider="gemini",
+            ),
+            sleep_fn=lambda seconds: sleeps.append(seconds),
+        )
+    assert calls["n"] == 1
+    assert sleeps == []
+
+
+def test_retry_delay_is_capped() -> None:
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            "fsmreasonbench.runners.item_watchdog.random.uniform",
+            lambda _a, _b: 0.0,
+        )
+        delay = resolve_provider_retry_delay_seconds(
+            5,
+            20.0,
+            max_delay_seconds=120.0,
+        )
+    assert delay == 120.0
 
 
 def test_exhausted_429_recorded_as_provider_error_not_model_parse(

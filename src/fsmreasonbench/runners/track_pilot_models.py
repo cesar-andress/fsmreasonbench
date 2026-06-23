@@ -47,6 +47,7 @@ from fsmreasonbench.runners.providers.base import (
     validate_provider_tracks,
     write_provider_dry_run_diagnostic,
 )
+from fsmreasonbench.runners.provider_errors import DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS
 from fsmreasonbench.tracks.delegation import DELEGATION_GAP_METRICS, compute_delegation_gap
 from fsmreasonbench.tracks.models import TrackId
 
@@ -140,6 +141,7 @@ class TrackPilotModelsConfig:
     skip_item_on_timeout: bool = True
     ollama_stop_delay_seconds: float = 5.0
     provider_retry_backoff_seconds: float = 5.0
+    provider_max_retry_delay_seconds: float = DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS
     provider_sleep_between_items: float = 0.0
     fail_cell_after_item_failures: int | None = None
     sleep_between_cells: float = 5.0
@@ -518,6 +520,7 @@ def _run_cell_batch(
             skip_item_on_timeout=config.skip_item_on_timeout,
             ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
             provider_retry_backoff_seconds=config.provider_retry_backoff_seconds,
+            provider_max_retry_delay_seconds=config.provider_max_retry_delay_seconds,
             provider_sleep_between_items=config.provider_sleep_between_items,
             ollama_base_url=config.ollama_base_url,
             fail_cell_after_item_failures=config.fail_cell_after_item_failures,

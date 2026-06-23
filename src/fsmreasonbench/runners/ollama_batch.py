@@ -34,6 +34,7 @@ from fsmreasonbench.runners.infrastructure_failure import (
     enrich_infrastructure_scoring_dict,
     summarize_provider_errors,
 )
+from fsmreasonbench.runners.provider_errors import DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS
 from fsmreasonbench.runners.prompts import prompt_metadata, render_prompt
 from fsmreasonbench.runners.response_extract import extract_submission_payload
 
@@ -54,6 +55,7 @@ class OllamaBatchConfig:
     skip_item_on_timeout: bool = True
     ollama_stop_delay_seconds: float = 5.0
     provider_retry_backoff_seconds: float = 5.0
+    provider_max_retry_delay_seconds: float = DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS
     provider_sleep_between_items: float = 0.0
     ollama_base_url: str = "http://localhost:11434"
     fail_cell_after_item_failures: int | None = None
@@ -83,6 +85,7 @@ def _watchdog_config(config: OllamaBatchConfig) -> ItemWatchdogConfig:
         skip_item_on_timeout=config.skip_item_on_timeout,
         ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
         provider_retry_backoff_seconds=config.provider_retry_backoff_seconds,
+        provider_max_retry_delay_seconds=config.provider_max_retry_delay_seconds,
         provider_sleep_between_items=config.provider_sleep_between_items,
         provider=config.provider,
         ollama_base_url=config.ollama_base_url,

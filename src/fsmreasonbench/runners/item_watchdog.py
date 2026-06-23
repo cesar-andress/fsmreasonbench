@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import random
+import sys
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from dataclasses import dataclass
 from typing import Callable
@@ -10,7 +11,9 @@ from typing import Callable
 from fsmreasonbench.runners.generate_fn import GenerateFn
 from fsmreasonbench.runners.ollama_recovery import stop_ollama_model
 from fsmreasonbench.runners.provider_errors import (
+    DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS,
     ProviderTransientError,
+    is_retryable_provider_error,
     resolve_provider_retry_delay_seconds,
 )
 
@@ -62,6 +65,7 @@ class ItemWatchdogConfig:
     skip_item_on_timeout: bool = True
     ollama_stop_delay_seconds: float = 5.0
     provider_retry_backoff_seconds: float = 5.0
+    provider_max_retry_delay_seconds: float = DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS
     provider_sleep_between_items: float = 0.0
     provider: str = "ollama"
     ollama_base_url: str = "http://localhost:11434"
@@ -163,20 +167,56 @@ def call_generate_with_watchdog(
             _raise_skip_or_propagate(config, exc)
         except ProviderTransientError as exc:
             last_error = exc
+            if not is_retryable_provider_error(exc.error_type):
+                _log_provider_skip(config, exc, retrying=False)
+                _raise_skip_or_propagate(config, exc)
             if attempt + 1 < max_attempts:
-                sleep(
-                    resolve_provider_retry_delay_seconds(
-                        attempt,
-                        config.provider_retry_backoff_seconds,
-                        retry_after_seconds=exc.retry_after_seconds,
-                    )
+                delay = resolve_provider_retry_delay_seconds(
+                    attempt,
+                    config.provider_retry_backoff_seconds,
+                    retry_after_seconds=exc.retry_after_seconds,
+                    max_delay_seconds=config.provider_max_retry_delay_seconds,
                 )
+                _log_provider_skip(
+                    config,
+                    exc,
+                    retrying=True,
+                    attempt=attempt + 1,
+                    max_attempts=max_attempts - 1,
+                    delay_seconds=delay,
+                )
+                sleep(delay)
                 continue
             _raise_skip_or_propagate(config, exc)
 
     if last_error is not None:
         _raise_skip_or_propagate(config, last_error)
     raise RuntimeError("generate watchdog exited without result")
+
+
+def _log_provider_skip(
+    config: ItemWatchdogConfig,
+    exc: ProviderTransientError,
+    *,
+    retrying: bool,
+    attempt: int = 0,
+    max_attempts: int = 0,
+    delay_seconds: float = 0.0,
+) -> None:
+    if not retrying:
+        print(
+            f"WARNING: {config.provider} HTTP {exc.http_status} ({exc.error_type}) "
+            "is not retryable during this run; skipping item.",
+            file=sys.stderr,
+            flush=True,
+        )
+        return
+    print(
+        f"WARNING: {config.provider} HTTP {exc.http_status} ({exc.error_type}); "
+        f"retry {attempt}/{max_attempts} in {delay_seconds:.0f}s",
+        file=sys.stderr,
+        flush=True,
+    )
 
 
 def _default_sleep(seconds: float) -> None:

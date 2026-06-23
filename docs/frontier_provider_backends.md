@@ -34,9 +34,12 @@ Use provider throttling on cheap Gemini smokes:
 | `--provider-sleep-between-items SECONDS` | `0` | Pause between items to avoid burst rate limits |
 | `--provider-retries N` | `0` (or `--ollama-retries`) | Per-item retries after transient HTTP or Ollama timeout |
 | `--provider-backoff-base SECONDS` | `5` | Base delay for exponential backoff (alias: `--provider-retry-backoff`) |
+| `--provider-max-retry-delay SECONDS` | `120` | Cap per-retry sleep (prevents hour-long backoff) |
 | `--skip-item-on-timeout` | on | Record `infrastructure_failure=true` and continue cell |
 
-**Recommended low-cost Gemini smoke:** `--max-items 10 --provider-sleep-between-items 10 --provider-retries 5 --provider-backoff-base 15`
+**Quota exhausted (`429 quota_exceeded`):** not retried during a run — the item is skipped immediately with a stderr warning. Retries apply only to transient rate limits and 503 unavailable errors.
+
+**Recommended low-cost Gemini smoke:** `--max-items 10 --provider-sleep-between-items 10 --provider-retries 3 --provider-backoff-base 15 --provider-max-retry-delay 120`
 
 Missing API keys and non-retryable HTTP errors (4xx except 429) still fail immediately.
 

@@ -177,6 +177,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Seconds to sleep after each scored item (Gemini throttling; default: 0)",
     )
     parser.add_argument(
+        "--provider-max-retry-delay",
+        type=float,
+        default=120.0,
+        help="Cap seconds for a single provider retry sleep (default: 120)",
+    )
+    parser.add_argument(
         "--ollama-stop-delay",
         type=float,
         default=5.0,
@@ -300,6 +306,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--provider-retries must be >= 0")
     if args.provider_retry_backoff < 0:
         parser.error("--provider-retry-backoff must be >= 0")
+    if args.provider_max_retry_delay < 0:
+        parser.error("--provider-max-retry-delay must be >= 0")
+    if args.provider_sleep_between_items < 0:
+        parser.error("--provider-sleep-between-items must be >= 0")
     if args.ollama_stop_delay < 0:
         parser.error("--ollama-stop-delay must be >= 0")
     if args.fail_cell_after_item_failures is not None and args.fail_cell_after_item_failures < 1:
@@ -393,6 +403,7 @@ def main(argv: list[str] | None = None) -> int:
             skip_item_on_timeout=args.skip_item_on_timeout,
             ollama_stop_delay_seconds=args.ollama_stop_delay,
             provider_retry_backoff_seconds=args.provider_retry_backoff,
+            provider_max_retry_delay_seconds=args.provider_max_retry_delay,
             provider_sleep_between_items=args.provider_sleep_between_items,
             fail_cell_after_item_failures=args.fail_cell_after_item_failures,
             sleep_between_cells=args.sleep_between_cells,
