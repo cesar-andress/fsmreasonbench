@@ -31,6 +31,7 @@ def _sample_payload() -> dict:
                 "average_tool_calls_per_item": 0.0,
                 "failure_stage_counts": {
                     "not_extractable": 0,
+                    "provider_error": 0,
                     "verdict_wrong": 10,
                     "certificate_invalid": 5,
                     "correct": 5,
@@ -52,11 +53,13 @@ def _sample_payload() -> dict:
                 "average_tool_calls_per_item": 3.0,
                 "failure_stage_counts": {
                     "not_extractable": 20,
+                    "provider_error": 0,
                     "verdict_wrong": 0,
                     "certificate_invalid": 0,
                     "correct": 0,
                 },
                 "track_failure_counts": {
+                    "provider_error": 0,
                     "tool_execution_error": 18,
                     "final_submission_not_extractable": 0,
                     "verdict_wrong": 0,
@@ -84,18 +87,49 @@ def test_per_track_metrics_table_is_populated() -> None:
 def test_failure_movement_uses_failure_stage_not_extractable() -> None:
     report = render_track_pilot_report(_sample_payload())
     assert "## C2 — failure movement (failure_stage_counts)" in report
-    assert "| `mock` | 0 | R1 | 20 | 0 | 0 | 0 |" in report
+    assert "| `mock` | 0 | R1 | 20 | 0 | 0 | 0 | 0 |" in report
 
 
 def test_zero_extractable_shows_undefined_rates() -> None:
     report = render_track_pilot_report(_sample_payload())
     assert "undefined (0 extractable)" in report
-    assert "### Low-extractability cells (unsafe for reasoning comparisons)" in report
-    assert "UNSAFE (<50% extractable)" in report
+    assert "### Low model-extractability cells (unsafe for reasoning comparisons)" in report
+    assert "UNSAFE (<50% model-extractable)" in report
 
 
 def test_metric_denominators_documented() -> None:
     report = render_track_pilot_report(_sample_payload())
     assert "### Metric denominators" in report
-    assert "fully_correct_rate:** fully correct items / total n" in report
+    assert "model_extractability_rate" in report
+    assert "provider_error_count" in report
     assert "0.250 (5/20)" in report
+
+
+def test_provider_dominated_cell_warns_in_report() -> None:
+    payload = _sample_payload()
+    payload["track_rows"].append(
+        {
+            "model": "gemini-flash",
+            "family": "C2",
+            "track": "R0",
+            "temperature": 0.2,
+            "n": 30,
+            "extractability_rate": 8 / 30,
+            "model_extractability_rate": 1.0,
+            "model_scored_n": 8,
+            "provider_error_count": 22,
+            "provider_quota_error_count": 21,
+            "fully_correct_rate": 8 / 30,
+            "failure_stage_counts": {
+                "not_extractable": 0,
+                "provider_error": 22,
+                "verdict_wrong": 0,
+                "certificate_invalid": 0,
+                "correct": 8,
+            },
+            "status": "completed",
+        }
+    )
+    report = render_track_pilot_report(payload)
+    assert "### Provider failures dominate (metrics not interpretable)" in report
+    assert "quota/rate-limit=21" in report

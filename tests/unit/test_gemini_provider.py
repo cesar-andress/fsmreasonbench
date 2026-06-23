@@ -87,6 +87,7 @@ def test_build_gemini_generate_content_request_shape() -> None:
     assert body["contents"][0]["parts"][0]["text"] == "hello"
     assert body["generationConfig"]["maxOutputTokens"] == 1024
     assert body["generationConfig"]["temperature"] == 0.2
+    assert body["generationConfig"]["responseMimeType"] == "application/json"
 
 
 def test_provider_dry_run_writes_diagnostic_without_api_key(
@@ -128,6 +129,12 @@ def test_provider_dry_run_writes_diagnostic_without_api_key(
     request = diagnostic["cells"][0]["request"]
     assert "generateContent" in request["endpoint"]
     assert request["body"]["generationConfig"]["maxOutputTokens"] == 8192
+    assert (
+        request["body"]["generationConfig"]["responseMimeType"] == "application/json"
+    )
+    assert "Return ONLY one JSON object" in diagnostic["cells"][0]["request"]["body"][
+        "contents"
+    ][0]["parts"][0]["text"]
 
 
 def test_build_generate_factory_gemini_requires_api_key(

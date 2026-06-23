@@ -23,6 +23,10 @@ from fsmreasonbench.runners.experiment_cells import (
     completed_item_ids,
     update_cell_item_progress,
 )
+from fsmreasonbench.runners.infrastructure_failure import (
+    build_infrastructure_scoring_record,
+    enrich_infrastructure_scoring_dict,
+)
 from fsmreasonbench.runners.item_watchdog import (
     ItemInfrastructureError,
     ItemWatchdogConfig,
@@ -173,6 +177,8 @@ def run_ollama_track_batch(
                 timestamp=utc_timestamp(),
                 error=str(exc),
                 infrastructure_failure=True,
+                provider_error_type=exc.provider_error_type,
+                http_status=exc.http_status,
             )
             _maybe_raise_item_failure_limit(infrastructure_failures, config)
         except Exception as exc:  # noqa: BLE001 — continue batch after per-item failure
@@ -194,7 +200,11 @@ def run_ollama_track_batch(
         ]
         scoring_dict["track_failure_class"] = run["track_failure_class"]
         if run.get("infrastructure_failure"):
-            scoring_dict["infrastructure_failure"] = True
+            enrich_infrastructure_scoring_dict(
+                scoring_dict,
+                provider_error_type=run.get("provider_error_type", "timeout"),
+                http_status=run.get("provider_http_status"),
+            )
         item_records.append(
             {
                 "track_failure_class": run["track_failure_class"],
@@ -377,22 +387,32 @@ def _failed_item_run(
     timestamp: str,
     error: str,
     infrastructure_failure: bool = False,
+    provider_error_type: str = "timeout",
+    http_status: int | None = None,
 ) -> dict[str, Any]:
     """Record a per-item runner failure without aborting the batch."""
-    scoring_record = ScoringRecord(
-        item_id=item.item_id,
-        family=item.family,
-        extractable=False,
-        verdict_correct=None,
-        certificate_valid=None,
-        fully_correct=False,
-        failure_stage=FailureStage.NOT_EXTRACTABLE,
-        parse_errors=(error,),
-    )
+    if infrastructure_failure:
+        scoring_record = build_infrastructure_scoring_record(
+            item,
+            error=error,
+            provider_error_type=provider_error_type,
+        )
+    else:
+        scoring_record = ScoringRecord(
+            item_id=item.item_id,
+            family=item.family,
+            extractable=False,
+            verdict_correct=None,
+            certificate_valid=None,
+            fully_correct=False,
+            failure_stage=FailureStage.NOT_EXTRACTABLE,
+            parse_errors=(error,),
+        )
     audit = AuditLogBuilder(track)
     audit.scratchpad("runner_error", error)
     if infrastructure_failure:
         audit.scratchpad("infrastructure_failure", "true")
+        audit.scratchpad("provider_error_type", provider_error_type)
     transcript = LLMTrackTranscript(
         transcript_version="1.1",
         tracks_version=TRACKS_VERSION,
@@ -411,16 +431,25 @@ def _failed_item_run(
         audit_log=audit.build().to_dict(),
         protocol_errors=(error,),
     )
+    scoring_dict = scoring_record.to_dict()
+    if infrastructure_failure:
+        enrich_infrastructure_scoring_dict(
+            scoring_dict,
+            provider_error_type=provider_error_type,
+            http_status=http_status,
+        )
     return {
         "transcript": transcript,
         "raw_response_text": error,
         "track_failure_class": classify_track_failure(
             track=track.value,
-            scoring_record=scoring_record.to_dict(),
+            scoring_record=scoring_dict,
             tool_calls_requested=[],
             tool_outputs=[],
             tool_plan_valid=False,
-            tool_execution_error=error,
+            tool_execution_error=error if not infrastructure_failure else None,
         ),
         "infrastructure_failure": infrastructure_failure,
+        "provider_error_type": provider_error_type if infrastructure_failure else None,
+        "provider_http_status": http_status if infrastructure_failure else None,
     }

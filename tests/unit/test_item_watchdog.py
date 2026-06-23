@@ -143,8 +143,8 @@ def test_run_ollama_batch_skips_timed_out_item_and_continues(tmp_path: Path) -> 
     assert len(scores) == 3
     infra_rows = [json.loads(line) for line in scores if "infrastructure_timeout" in line]
     assert len(infra_rows) == 1
-    assert infra_rows[0]["failure_stage"] == "not_extractable"
-    assert infra_rows[0]["infrastructure_failure"] is True
+    assert infra_rows[0]["failure_stage"] == "provider_error"
+    assert infra_rows[0]["provider_error_type"] == "timeout"
     status = read_cell_status(run_dir)
     assert status is not None
     assert status["items_completed"] == 3

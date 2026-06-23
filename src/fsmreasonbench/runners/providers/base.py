@@ -151,10 +151,10 @@ def _sample_item(
     return items[0]
 
 
-def _sample_prompt(item: BenchmarkItem, track: str) -> str:
+def _sample_prompt(item: BenchmarkItem, track: str, *, provider: str) -> str:
     track_id = TrackId(track)
     if track_id == TrackId.R0:
-        return render_prompt(item)
+        return render_prompt(item, provider=provider)
     return render_track_prompt(item, track_id, phase="initial")
 
 
@@ -212,7 +212,7 @@ def write_provider_dry_run_diagnostic(
             item = _sample_item(family_items, family)
             for temperature in temperatures:
                 for track in tracks:
-                    prompt = _sample_prompt(item, track)
+                    prompt = _sample_prompt(item, track, provider=provider)
                     entry: dict[str, Any] = {
                         "provider": provider,
                         "model": resolved_model,

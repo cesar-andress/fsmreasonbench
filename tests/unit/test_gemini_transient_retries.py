@@ -72,6 +72,7 @@ def test_watchdog_retries_provider_503_then_succeeds() -> None:
                 http_status=503,
                 detail="high demand",
                 provider="gemini",
+                error_type="unavailable",
             )
         return '{"item_id":"x","verdict":true,"certificate":{}}'
 
@@ -105,6 +106,7 @@ def test_watchdog_exhausted_503_skips_item_when_policy_enabled() -> None:
             http_status=503,
             detail="still unavailable",
             provider="gemini",
+            error_type="unavailable",
         )
 
     with pytest.raises(ItemInfrastructureError, match="provider_http_503"):
@@ -137,6 +139,7 @@ def test_run_ollama_batch_skips_exhausted_provider_transient_item(
             http_status=503,
             detail="unavailable",
             provider="gemini",
+            error_type="unavailable",
         )
 
     result = run_ollama_batch(
@@ -154,8 +157,8 @@ def test_run_ollama_batch_skips_exhausted_provider_transient_item(
     assert result.infrastructure_failures == 1
     scores = json.loads((run_dir / "scores.jsonl").read_text(encoding="utf-8").strip())
     assert scores["infrastructure_failure"] is True
-    assert scores["failure_stage"] == "not_extractable"
-    assert "provider_http_503" in scores["parse_errors"][0]
+    assert scores["failure_stage"] == "provider_error"
+    assert scores["provider_error_type"] == "unavailable"
 
 
 def test_http_gemini_client_raises_provider_transient_on_503(

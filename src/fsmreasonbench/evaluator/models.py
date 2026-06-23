@@ -9,6 +9,7 @@ from typing import Any
 
 class FailureStage(str, Enum):
     NOT_EXTRACTABLE = "not_extractable"
+    PROVIDER_ERROR = "provider_error"
     VERDICT_WRONG = "verdict_wrong"
     CERTIFICATE_INVALID = "certificate_invalid"
     CORRECT = "correct"

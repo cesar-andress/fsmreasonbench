@@ -9,6 +9,7 @@ TRACK_FAILURE_CLASSES: tuple[str, ...] = (
     "invalid_tool_plan",
     "disallowed_tool",
     "tool_execution_error",
+    "provider_error",
     "final_submission_not_extractable",
     "verdict_wrong",
     "certificate_invalid",
@@ -36,6 +37,9 @@ def classify_track_failure(
     """
     if scoring_record.get("fully_correct"):
         return "correct"
+
+    if scoring_record.get("infrastructure_failure"):
+        return "provider_error"
 
     if track in {"R1", "R2"}:
         requested = tool_calls_requested or []

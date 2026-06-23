@@ -9,13 +9,27 @@ from typing import Callable
 
 from fsmreasonbench.runners.generate_fn import GenerateFn
 from fsmreasonbench.runners.ollama_recovery import stop_ollama_model
-from fsmreasonbench.runners.provider_errors import ProviderTransientError
+from fsmreasonbench.runners.provider_errors import (
+    ProviderTransientError,
+    resolve_provider_retry_delay_seconds,
+)
 
 SleepFn = Callable[[float], None]
 
 
 class ItemInfrastructureError(Exception):
     """Raised when an item exhausts watchdog retries and should be skipped."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        provider_error_type: str = "timeout",
+        http_status: int | None = None,
+    ) -> None:
+        self.provider_error_type = provider_error_type
+        self.http_status = http_status
+        super().__init__(message)
 
 
 class CellItemFailureLimitExceeded(Exception):
@@ -48,6 +62,7 @@ class ItemWatchdogConfig:
     skip_item_on_timeout: bool = True
     ollama_stop_delay_seconds: float = 5.0
     provider_retry_backoff_seconds: float = 5.0
+    provider_sleep_between_items: float = 0.0
     provider: str = "ollama"
     ollama_base_url: str = "http://localhost:11434"
 
@@ -90,9 +105,18 @@ def _generate_with_wall_clock_timeout(
 def _raise_skip_or_propagate(config: ItemWatchdogConfig, exc: Exception) -> None:
     if config.skip_item_on_timeout:
         message = str(exc)
+        if isinstance(exc, ProviderTransientError):
+            raise ItemInfrastructureError(
+                message,
+                provider_error_type=exc.error_type,
+                http_status=exc.http_status,
+            ) from exc
         if isinstance(exc, TimeoutError) and not message.startswith("infrastructure_timeout:"):
             message = format_infrastructure_timeout_message(config.item_timeout)
-        raise ItemInfrastructureError(message) from exc
+        raise ItemInfrastructureError(
+            message,
+            provider_error_type="timeout",
+        ) from exc
     raise exc
 
 
@@ -141,9 +165,10 @@ def call_generate_with_watchdog(
             last_error = exc
             if attempt + 1 < max_attempts:
                 sleep(
-                    provider_retry_delay_seconds(
+                    resolve_provider_retry_delay_seconds(
                         attempt,
                         config.provider_retry_backoff_seconds,
+                        retry_after_seconds=exc.retry_after_seconds,
                     )
                 )
                 continue

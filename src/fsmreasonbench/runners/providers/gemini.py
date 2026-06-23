@@ -57,6 +57,7 @@ def build_gemini_generate_content_request(
         "generationConfig": {
             "temperature": temperature,
             "maxOutputTokens": max_tokens,
+            "responseMimeType": "application/json",
         },
     }
 

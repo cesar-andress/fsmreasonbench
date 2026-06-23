@@ -140,6 +140,7 @@ class TrackPilotModelsConfig:
     skip_item_on_timeout: bool = True
     ollama_stop_delay_seconds: float = 5.0
     provider_retry_backoff_seconds: float = 5.0
+    provider_sleep_between_items: float = 0.0
     fail_cell_after_item_failures: int | None = None
     sleep_between_cells: float = 5.0
     stop_after_failures: int = 3
@@ -301,6 +302,11 @@ def build_track_row(
         "failure_stage_counts": summary.get("failure_stage_counts", {}),
         "track_failure_counts": summary.get("track_failure_counts", {}),
         "infrastructure_failure_count": summary.get("infrastructure_failure_count", 0),
+        "provider_error_count": summary.get("provider_error_count", 0),
+        "provider_quota_error_count": summary.get("provider_quota_error_count", 0),
+        "model_extractability_rate": summary.get("model_extractability_rate"),
+        "model_scored_n": summary.get("model_scored_n"),
+        "provider_failure_warning": summary.get("provider_failure_warning"),
         "run_dir": str(run_dir),
         "status": status,
     }
@@ -512,6 +518,7 @@ def _run_cell_batch(
             skip_item_on_timeout=config.skip_item_on_timeout,
             ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
             provider_retry_backoff_seconds=config.provider_retry_backoff_seconds,
+            provider_sleep_between_items=config.provider_sleep_between_items,
             ollama_base_url=config.ollama_base_url,
             fail_cell_after_item_failures=config.fail_cell_after_item_failures,
         ),
@@ -1080,7 +1087,13 @@ def write_track_pilot_csv(
 
 
 _EXTRACTABILITY_UNSAFE_THRESHOLD = 0.5
-_FAILURE_STAGE_LABELS = ("not_extractable", "verdict_wrong", "certificate_invalid", "correct")
+_FAILURE_STAGE_LABELS = (
+    "not_extractable",
+    "provider_error",
+    "verdict_wrong",
+    "certificate_invalid",
+    "correct",
+)
 
 
 def _failure_stage_counts(row: dict[str, Any]) -> dict[str, int]:
@@ -1096,11 +1109,26 @@ def _extractable_count(row: dict[str, Any]) -> int:
     counts = _failure_stage_counts(row)
     n = _row_item_count(row)
     if n:
-        return max(0, n - counts["not_extractable"])
+        return max(0, n - counts["not_extractable"] - counts["provider_error"])
     extract_rate = row.get("extractability_rate")
     if extract_rate is None:
         return 0
     return int(round(float(extract_rate) * n))
+
+
+def _provider_error_count(row: dict[str, Any]) -> int:
+    if row.get("provider_error_count") is not None:
+        return int(row["provider_error_count"])
+    counts = _failure_stage_counts(row)
+    return counts.get("provider_error", 0)
+
+
+def _provider_dominates_cell(row: dict[str, Any]) -> bool:
+    n = _row_item_count(row)
+    if n == 0:
+        return False
+    provider_errors = _provider_error_count(row)
+    return provider_errors >= max(1, n // 2)
 
 
 def _format_extractability(row: dict[str, Any]) -> str:
@@ -1109,7 +1137,15 @@ def _format_extractability(row: dict[str, Any]) -> str:
     rate = row.get("extractability_rate")
     if rate is None or n == 0:
         return "—"
-    return f"{float(rate):.3f} ({extractable}/{n})"
+    provider_errors = _provider_error_count(row)
+    model_rate = row.get("model_extractability_rate")
+    base = f"{float(rate):.3f} ({extractable}/{n})"
+    if provider_errors:
+        model_n = int(row.get("model_scored_n") or max(0, n - provider_errors))
+        if model_rate is not None and model_n > 0:
+            return f"{base}; model={float(model_rate):.3f} ({extractable}/{model_n})"
+        return f"{base}; provider_errors={provider_errors}"
+    return base
 
 
 def _format_verdict_accuracy(row: dict[str, Any]) -> str:
@@ -1149,11 +1185,15 @@ def _format_fully_correct_rate(row: dict[str, Any]) -> str:
 
 
 def _extractability_safety_flag(row: dict[str, Any]) -> str:
-    rate = row.get("extractability_rate")
+    if _provider_dominates_cell(row):
+        quota = int(row.get("provider_quota_error_count") or 0)
+        suffix = f", quota/rate-limit={quota}" if quota else ""
+        return f"UNSAFE (provider failures dominate{suffix})"
+    rate = row.get("model_extractability_rate", row.get("extractability_rate"))
     if rate is None:
         return ""
     if float(rate) < _EXTRACTABILITY_UNSAFE_THRESHOLD:
-        return "UNSAFE (<50% extractable)"
+        return "UNSAFE (<50% model-extractable)"
     return ""
 
 
@@ -1292,22 +1332,40 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
             "",
             "### Metric denominators",
             "",
-            "- **extractability_rate:** extractable items / total n",
+            "- **extractability_rate:** extractable items / total n (includes provider-skipped items in denominator)",
+            "- **model_extractability_rate:** extractable items / (n − provider_error_count); use when quota/rate-limit failures dominate",
             "- **verdict_accuracy:** correct verdict among extractable outputs "
-            "(denominator = n − not_extractable; undefined when extractable = 0)",
+            "(denominator = n − not_extractable − provider_error; undefined when extractable = 0)",
             "- **certificate_valid_rate:** valid certificate among extractable outputs "
             "(same denominator; undefined when extractable = 0)",
             "- **fully_correct_rate:** fully correct items / total n",
-            "- **not_extractable** (failure-stage table): includes tool-phase failures on R1/R2 "
-            "as well as final submission parse failures",
-            "- **infrastructure_failure_count** (per-cell summary): runner/Ollama timeouts "
-            "recorded as not_extractable with infrastructure_failure=true; these are "
-            "infrastructure errors, not model capability scores",
+            "- **not_extractable** (failure-stage table): model output parse/extraction failures only",
+            "- **provider_error** (failure-stage table): runner/provider quota, rate-limit, timeout, or unavailable errors",
+            "- **provider_error_count / provider_quota_error_count:** per-cell provider failure totals (429 quota/rate-limit vs other infra)",
+            "- **infrastructure_failure_count:** alias count of items with infrastructure_failure=true",
         ]
     )
 
+    provider_dominated = [row for row in track_rows if _provider_dominates_cell(row)]
+    if provider_dominated:
+        lines.extend(["", "### Provider failures dominate (metrics not interpretable)", ""])
+        for row in provider_dominated:
+            lines.append(
+                "- `{model}` / {family} / {track} / T={temp:g}: "
+                "provider_errors={provider}/{n}, quota/rate-limit={quota} — "
+                "use model_extractability_rate or rerun with throttling".format(
+                    model=row["model"],
+                    family=row["family"],
+                    track=row["track"],
+                    temp=float(row.get("temperature", 0.0)),
+                    provider=_provider_error_count(row),
+                    n=_row_item_count(row),
+                    quota=int(row.get("provider_quota_error_count") or 0),
+                )
+            )
+
     if unsafe_cells:
-        lines.extend(["", "### Low-extractability cells (unsafe for reasoning comparisons)", ""])
+        lines.extend(["", "### Low model-extractability cells (unsafe for reasoning comparisons)", ""])
         for row in unsafe_cells:
             extractable = _extractable_count(row)
             lines.append(

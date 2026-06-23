@@ -23,17 +23,28 @@ R1/R2 require native tool-calling support and are **not** implemented for Anthro
 
 ## Transient API errors (Gemini / Anthropic)
 
-Gemini can return **HTTP 429** (rate limit) or **503 UNAVAILABLE** under high demand. These are treated as **transient** and retried per item with exponential backoff (default base 5s → ~5s, 15s, 45s with jitter) before skipping the item.
+Gemini can return **HTTP 429** (quota/rate limit) or **503 UNAVAILABLE** under high demand. These are retried per item with exponential backoff and optional **Retry-After** honoring before skipping the item.
 
-Use provider-neutral retry flags (Ollama aliases remain supported):
+Provider failures are scored with `failure_stage=provider_error` and **`infrastructure_failure=true`** — they are **not** model extraction failures. Per-cell summaries expose `provider_error_count`, `provider_quota_error_count` (429 quota/rate-limit), and `model_extractability_rate` (extractable / items that received model output).
+
+Use provider throttling on cheap Gemini smokes:
 
 | Flag | Default | Purpose |
 |------|---------|---------|
+| `--provider-sleep-between-items SECONDS` | `0` | Pause between items to avoid burst rate limits |
 | `--provider-retries N` | `0` (or `--ollama-retries`) | Per-item retries after transient HTTP or Ollama timeout |
-| `--provider-retry-backoff SECONDS` | `5` | Base delay for exponential backoff |
+| `--provider-backoff-base SECONDS` | `5` | Base delay for exponential backoff (alias: `--provider-retry-backoff`) |
 | `--skip-item-on-timeout` | on | Record `infrastructure_failure=true` and continue cell |
 
+**Recommended low-cost Gemini smoke:** `--max-items 10 --provider-sleep-between-items 10 --provider-retries 5 --provider-backoff-base 15`
+
 Missing API keys and non-retryable HTTP errors (4xx except 429) still fail immediately.
+
+## Gemini JSON output contract
+
+For `provider=gemini`, R0 prompts append a strict JSON contract (single object, no markdown fences, `certificate` must be an object). The Gemini API request sets `generationConfig.responseMimeType` to `application/json` so responses are JSON-shaped. The runner still applies harmless extraction (fence stripping, first balanced object, JSON-object certificate strings) before the unchanged family parser runs.
+
+Use **`--provider-retries 2`** (or higher) on Gemini smokes; most v1 non-extractable items were transient **503** failures, not parse errors.
 
 ## Anthropic example (R0 smoke)
 
@@ -86,8 +97,9 @@ PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
   --temperatures 0.2 \
   --max-items 10 \
   --max-tokens 8192 \
-  --provider-retries 2 \
-  --provider-retry-backoff 5 \
+  --provider-sleep-between-items 10 \
+  --provider-retries 5 \
+  --provider-backoff-base 15 \
   --skip-item-on-timeout \
   --cohort-root cohorts/v0.1-expanded-n100 \
   --out-dir runs/frontier_gemini_flash_smoke_v1 \

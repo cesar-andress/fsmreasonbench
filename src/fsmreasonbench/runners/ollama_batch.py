@@ -8,7 +8,7 @@ from typing import Any
 
 from fsmreasonbench.evaluator.io import dump_json
 from fsmreasonbench.evaluator.jsonl import append_jsonl, read_jsonl, write_jsonl
-from fsmreasonbench.evaluator.models import FailureStage, ScoringRecord
+from fsmreasonbench.evaluator.models import ScoringRecord
 from fsmreasonbench.evaluator.summary import summarize_scoring_records
 from fsmreasonbench.evaluator.track_failure_taxonomy import (
     classify_track_failure,
@@ -28,6 +28,11 @@ from fsmreasonbench.runners.item_watchdog import (
     ItemInfrastructureError,
     ItemWatchdogConfig,
     call_generate_with_watchdog,
+)
+from fsmreasonbench.runners.infrastructure_failure import (
+    build_infrastructure_scoring_record,
+    enrich_infrastructure_scoring_dict,
+    summarize_provider_errors,
 )
 from fsmreasonbench.runners.prompts import prompt_metadata, render_prompt
 from fsmreasonbench.runners.response_extract import extract_submission_payload
@@ -49,6 +54,7 @@ class OllamaBatchConfig:
     skip_item_on_timeout: bool = True
     ollama_stop_delay_seconds: float = 5.0
     provider_retry_backoff_seconds: float = 5.0
+    provider_sleep_between_items: float = 0.0
     ollama_base_url: str = "http://localhost:11434"
     fail_cell_after_item_failures: int | None = None
 
@@ -77,6 +83,7 @@ def _watchdog_config(config: OllamaBatchConfig) -> ItemWatchdogConfig:
         skip_item_on_timeout=config.skip_item_on_timeout,
         ollama_stop_delay_seconds=config.ollama_stop_delay_seconds,
         provider_retry_backoff_seconds=config.provider_retry_backoff_seconds,
+        provider_sleep_between_items=config.provider_sleep_between_items,
         provider=config.provider,
         ollama_base_url=config.ollama_base_url,
     )
@@ -110,12 +117,19 @@ def _build_summary_from_scores(
     infrastructure_failure_count = sum(
         1 for row in scoring_rows if row.get("infrastructure_failure")
     )
+    provider_counts = summarize_provider_errors(scoring_rows)
+    extractable_count = sum(1 for record in parsed_records if record.extractable)
+    scored_n = len(parsed_records) - provider_counts["provider_error_count"]
     summary = {
         "model": model,
         "family": family,
         "track": track,
         "n": len(parsed_records),
         **summarize_scoring_records(parsed_records),
+        "model_extractability_rate": (
+            extractable_count / scored_n if scored_n > 0 else 0.0
+        ),
+        "model_scored_n": scored_n,
         "tool_invocation_rate": (
             sum(1 for count in tool_counts if count > 0) / len(tool_counts)
             if tool_counts
@@ -126,12 +140,19 @@ def _build_summary_from_scores(
         ),
         **summarize_track_failure_taxonomy(item_records),
         "infrastructure_failure_count": infrastructure_failure_count,
+        **provider_counts,
     }
     if infrastructure_failure_count:
         summary["infrastructure_failure_note"] = (
-            "Items marked infrastructure_failure=true are counted as not_extractable "
-            "due to runner/Ollama timeouts, not model submission quality."
+            "Items marked infrastructure_failure=true use failure_stage=provider_error "
+            "and are excluded from model extractability denominators; they are not model "
+            "submission failures."
         )
+        if provider_counts["provider_error_count"] >= len(parsed_records) / 2:
+            summary["provider_failure_warning"] = (
+                "Provider failures dominate this cell; headline extractability_rate is not "
+                "interpretable as model output quality."
+            )
     if provider is not None:
         summary["provider"] = provider
     if max_tokens is not None:
@@ -144,18 +165,15 @@ def _record_r0_infrastructure_failure(
     config: OllamaBatchConfig,
     *,
     error: str,
+    provider_error_type: str,
+    http_status: int | None = None,
     root: Path,
     transcript_dir: Path,
 ) -> dict[str, Any]:
-    scoring_record = ScoringRecord(
-        item_id=item.item_id,
-        family=item.family,
-        extractable=False,
-        verdict_correct=None,
-        certificate_valid=None,
-        fully_correct=False,
-        failure_stage=FailureStage.NOT_EXTRACTABLE,
-        parse_errors=(error,),
+    scoring_record = build_infrastructure_scoring_record(
+        item,
+        error=error,
+        provider_error_type=provider_error_type,
     )
     transcript_path = transcript_dir / f"{item.item_id}.json"
     transcript_payload = {
@@ -166,6 +184,7 @@ def _record_r0_infrastructure_failure(
         "parsed_submission": None,
         "scoring_record": scoring_record.to_dict(),
         "infrastructure_failure": True,
+        "provider_error_type": provider_error_type,
     }
     dump_json(transcript_path, transcript_payload)
 
@@ -173,7 +192,11 @@ def _record_r0_infrastructure_failure(
     scoring_dict["track"] = "R0"
     scoring_dict["model"] = config.model
     scoring_dict["tool_invocation_count"] = 0
-    scoring_dict["infrastructure_failure"] = True
+    enrich_infrastructure_scoring_dict(
+        scoring_dict,
+        provider_error_type=provider_error_type,
+        http_status=http_status,
+    )
     scoring_dict["track_failure_class"] = classify_track_failure(
         track="R0",
         scoring_record=scoring_dict,
@@ -190,6 +213,7 @@ def _record_r0_infrastructure_failure(
         "scoring_record": scoring_dict,
         "track_failure_class": scoring_dict["track_failure_class"],
         "infrastructure_failure": True,
+        "provider_error_type": provider_error_type,
     }
 
 
@@ -263,11 +287,13 @@ def run_ollama_batch(
     watchdog = _watchdog_config(config)
     max_items = config.max_items if config.max_items is not None else len(selected)
 
+    import time
+
     for item in selected:
         if item.item_id in done_ids:
             continue
 
-        prompt = render_prompt(item)
+        prompt = render_prompt(item, provider=config.provider)
         try:
             raw_text = call_generate_with_watchdog(
                 generate,
@@ -283,6 +309,8 @@ def run_ollama_batch(
                 item,
                 config,
                 error=str(exc),
+                provider_error_type=exc.provider_error_type,
+                http_status=exc.http_status,
                 root=root,
                 transcript_dir=transcript_dir,
             )
@@ -291,6 +319,8 @@ def run_ollama_batch(
             new_results.append(run_record)
             _after_item_written(root=root, item_id=item.item_id, max_items=max_items)
             _maybe_raise_item_failure_limit(infrastructure_failures, config)
+            if config.provider_sleep_between_items > 0:
+                time.sleep(config.provider_sleep_between_items)
             continue
 
         raw_response = extract_submission_payload(raw_text)
@@ -324,6 +354,8 @@ def run_ollama_batch(
         append_jsonl(scores_path, scoring_dict)
         new_results.append(run_record)
         _after_item_written(root=root, item_id=item.item_id, max_items=max_items)
+        if config.provider_sleep_between_items > 0:
+            time.sleep(config.provider_sleep_between_items)
 
     scoring_rows = _load_scoring_rows(root)
     summary = _build_summary_from_scores(

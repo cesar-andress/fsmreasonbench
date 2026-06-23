@@ -164,9 +164,17 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--provider-retry-backoff",
+        "--provider-backoff-base",
         type=float,
         default=5.0,
+        dest="provider_retry_backoff",
         help="Base seconds for exponential provider retry backoff with jitter (default: 5)",
+    )
+    parser.add_argument(
+        "--provider-sleep-between-items",
+        type=float,
+        default=0.0,
+        help="Seconds to sleep after each scored item (Gemini throttling; default: 0)",
     )
     parser.add_argument(
         "--ollama-stop-delay",
@@ -385,6 +393,7 @@ def main(argv: list[str] | None = None) -> int:
             skip_item_on_timeout=args.skip_item_on_timeout,
             ollama_stop_delay_seconds=args.ollama_stop_delay,
             provider_retry_backoff_seconds=args.provider_retry_backoff,
+            provider_sleep_between_items=args.provider_sleep_between_items,
             fail_cell_after_item_failures=args.fail_cell_after_item_failures,
             sleep_between_cells=args.sleep_between_cells,
             stop_after_failures=args.stop_after_failures,
