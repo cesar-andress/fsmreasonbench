@@ -107,18 +107,16 @@ def test_metric_denominators_documented() -> None:
 
 def test_provider_dominated_cell_warns_in_report() -> None:
     payload = _sample_payload()
-    payload["track_rows"].append(
+    payload["track_rows"][0].update(
         {
-            "model": "gemini-flash",
-            "family": "C2",
-            "track": "R0",
-            "temperature": 0.2,
-            "n": 30,
             "extractability_rate": 8 / 30,
             "model_extractability_rate": 1.0,
             "model_scored_n": 8,
+            "n": 30,
             "provider_error_count": 22,
             "provider_quota_error_count": 21,
+            "provider_rate_limit_count": 21,
+            "provider_insufficient_credit_count": 0,
             "fully_correct_rate": 8 / 30,
             "failure_stage_counts": {
                 "not_extractable": 0,
@@ -127,9 +125,44 @@ def test_provider_dominated_cell_warns_in_report() -> None:
                 "certificate_invalid": 0,
                 "correct": 8,
             },
-            "status": "completed",
         }
     )
     report = render_track_pilot_report(payload)
     assert "### Provider failures dominate (metrics not interpretable)" in report
-    assert "quota/rate-limit=21" in report
+    assert "rate-limit=21" in report
+    assert "UNSAFE (provider failures dominate, rate-limit=21)" in report
+    assert "gemini-flash" not in report
+
+
+def test_provider_dominated_insufficient_credit_safety_flag() -> None:
+    payload = _sample_payload()
+    payload["models"] = ["claude-sonnet"]
+    payload["track_rows"] = [
+        {
+            "model": "claude-sonnet",
+            "family": "C2",
+            "track": "R1",
+            "temperature": 0.0,
+            "n": 100,
+            "extractability_rate": 0.09,
+            "model_extractability_rate": 1.0,
+            "model_scored_n": 9,
+            "provider_error_count": 91,
+            "provider_quota_error_count": 91,
+            "provider_rate_limit_count": 0,
+            "provider_insufficient_credit_count": 91,
+            "fully_correct_rate": 0.08,
+            "failure_stage_counts": {
+                "not_extractable": 0,
+                "provider_error": 91,
+                "verdict_wrong": 0,
+                "certificate_invalid": 1,
+                "correct": 8,
+            },
+            "status": "completed",
+        }
+    ]
+    report = render_track_pilot_report(payload)
+    assert "UNSAFE (provider failures dominate, insufficient-credit=91)" in report
+    assert "insufficient-credit=91" in report
+    assert "### Low model-extractability cells (unsafe for reasoning comparisons)" not in report

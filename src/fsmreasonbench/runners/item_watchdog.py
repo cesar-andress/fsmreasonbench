@@ -188,6 +188,17 @@ def call_generate_with_watchdog(
                 sleep(delay)
                 continue
             _raise_skip_or_propagate(config, exc)
+        except RuntimeError as exc:
+            from fsmreasonbench.runners.provider_errors import infer_provider_error_from_message
+
+            classification = infer_provider_error_from_message(str(exc))
+            if classification is not None:
+                raise ItemInfrastructureError(
+                    classification.message,
+                    provider_error_type=classification.provider_error_type,
+                    http_status=classification.http_status,
+                ) from exc
+            raise
 
     if last_error is not None:
         _raise_skip_or_propagate(config, last_error)

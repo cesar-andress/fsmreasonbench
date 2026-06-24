@@ -222,6 +222,7 @@ def test_summarize_provider_errors_counts() -> None:
     counts = summarize_provider_errors(rows)
     assert counts["provider_error_count"] == 3
     assert counts["provider_quota_error_count"] == 2
+    assert counts["provider_rate_limit_count"] == 1
 
 
 def test_parse_retry_after_seconds() -> None:

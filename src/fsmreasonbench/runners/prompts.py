@@ -6,6 +6,10 @@ import json
 from typing import Any
 
 from fsmreasonbench.items.assembly import BenchmarkItem
+from fsmreasonbench.runners.track_prompt_schemas import (
+    F1_DISTINGUISHING_TRACE_EXAMPLE,
+    F1_EQUIVALENCE_WITNESS_EXAMPLE,
+)
 
 
 def render_prompt(item: BenchmarkItem, *, provider: str | None = None) -> str:
@@ -18,6 +22,8 @@ def render_prompt(item: BenchmarkItem, *, provider: str | None = None) -> str:
         raise ValueError(f"unsupported family for prompts: {item.family!r}")
     if provider == "gemini":
         prompt += _gemini_strict_output_contract(item)
+    elif provider == "anthropic" and item.family == "F1":
+        prompt += _anthropic_f1_strict_output_contract(item)
     return prompt
 
 
@@ -64,6 +70,71 @@ Required F1 schema:
 }}
 If verdict=true (DFAs ARE equivalent), certificate_type MUST be equivalence_witness with payload.equivalent=true and minimized_hash_A/minimized_hash_B.
 If verdict=false (NOT equivalent), certificate_type MUST be distinguishing_trace with payload.trace and payload.acceptance (A != B).
+"""
+    )
+
+
+_ANTHROPIC_F1_STRICT_HEADER = """
+Anthropic output contract (strict — violations make the submission unscorable):
+- Return ONLY one JSON object. No markdown code fences (no ```), no prose before or after the JSON.
+- Top-level keys must be exactly: item_id, verdict, certificate.
+- certificate MUST be a JSON object, never null, never a string, never an array.
+- Do NOT omit certificate when verdict=true; equivalence still requires a certificate object.
+"""
+
+
+def _anthropic_f1_strict_output_contract(item: BenchmarkItem) -> str:
+    if item.fsm_b is None:
+        raise ValueError("F1 item requires fsm_b")
+    return (
+        _ANTHROPIC_F1_STRICT_HEADER
+        + f"""
+Required F1 submission shape:
+{{
+  "item_id": "{item.item_id}",
+  "verdict": true or false,
+  "certificate": {{ ... certificate object per verdict ... }}
+}}
+
+If verdict=false (DFAs are NOT equivalent), use distinguishing_trace:
+{{
+  "item_id": "{item.item_id}",
+  "verdict": false,
+  "certificate": {{
+    "certificate_type": "distinguishing_trace",
+    "version": "1.0",
+    "fsm_ids": ["{item.fsm_a.fsm_id}", "{item.fsm_b.fsm_id}"],
+    "payload": {{
+      "trace": ["..."],
+      "acceptance": {{ "A": true or false, "B": true or false }}
+    }}
+  }}
+}}
+(payload.acceptance.A must differ from payload.acceptance.B)
+
+If verdict=true (DFAs ARE equivalent), use equivalence_witness — never null:
+{{
+  "item_id": "{item.item_id}",
+  "verdict": true,
+  "certificate": {{
+    "certificate_type": "equivalence_witness",
+    "version": "1.0",
+    "fsm_ids": ["{item.fsm_a.fsm_id}", "{item.fsm_b.fsm_id}"],
+    "payload": {{
+      "equivalent": true,
+      "minimized_hash_A": "<64-char hex string>",
+      "minimized_hash_B": "<64-char hex string>"
+    }}
+  }}
+}}
+Compute minimized_hash_A and minimized_hash_B from the minimized reachable DFA cores in the prompt.
+
+Reference certificate schemas (field names and types must match exactly):
+distinguishing_trace example:
+{F1_DISTINGUISHING_TRACE_EXAMPLE.strip()}
+
+equivalence_witness example:
+{F1_EQUIVALENCE_WITNESS_EXAMPLE.strip()}
 """
     )
 

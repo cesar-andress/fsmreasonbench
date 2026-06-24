@@ -10,22 +10,22 @@
 ## Campaign status
 
 - **Expected cells:** 24 (4 models × 2 families × 3 tracks × 1 temperature)
-- **Completed:** 19
-- **Missing / partial / failed:** 0 missing, 0 partial, 3 failed
+- **Completed:** 24
+- **Missing / partial / failed:** 0 missing, 0 partial, 0 failed
 
 - **Auto report:** `runs/local_matrix_n100_t02_v2/report.md`
 - **Extractability audit:** `docs/extractability_audit_n100_t02.md`
-- **Plots:** `runs/local_matrix_n100_t02_v2/plots/` (regenerate after campaign completes)
+- **Plots:** `runs/local_matrix_n100_t02_v2/plots/` (`fully_correct_by_track.png`, `certificate_valid_by_track.png`, `verdict_accuracy_by_track.png`, `delegation_gap_R2_minus_R0.png`)
 
 ## 1. Which n=20 findings replicate at n=100?
 
-Replication is assessed at **T=0.2** by comparing metric **direction** and delegation-gap sign between the n=20 pilot (`local_matrix_v1`) and this follow-up. Until all 24 cells complete, replication verdicts are **provisional**.
+Replication is assessed at **T=0.2** by comparing metric **direction** and delegation-gap sign between the n=20 pilot (`local_matrix_v1`) and this follow-up. All 24 cells are **complete**; replication verdicts below are final for this campaign.
 
 | Finding (n=20 @ T=0.2) | Pilot evidence | n=100 status | Replication |
 |--------------------------|----------------|--------------|-------------|
 | Qwen F1 R2 delegation win | Δfull=+0.400, R2 v=1.000, c=0.533, f=0.400, n_ext=15/20 | Δfull=+0.270, R2 v=1.000, c=0.455, f=0.300, n_ext=66/100 | **replicated with smaller effect** |
-| C2 verdict > certificate on R2 | qwen Δ(v−c)=+0.85; gemma Δ(v−c)=+0.90; mistral Δ(v−c)=+0.85 | qwen Δ(v−c)=+0.92; gemma Δ(v−c)=+0.83; mistral Δ(v−c)=+0.94 | **replicated for qwen, mistral, gemma; llama incomplete** |
-| Llama tool-track collapse | R1 v=1.000, c=0.000, f=0.000, n_ext=2/20; F1 R1 v=0.000, c=0.000, f=0.000, n_ext=0/20 | R1 —; F1 R1 — | **persistent operational/tool-track failure; not interpretable as reasoning** |
+| C2 verdict > certificate on R2 | qwen Δ(v−c)=+0.85; gemma Δ(v−c)=+0.90; mistral Δ(v−c)=+0.85 | qwen Δ(v−c)=+0.92; gemma Δ(v−c)=+0.83; mistral Δ(v−c)=+0.94; llama Δ(v−c)=+0.92 | **replicated for qwen, mistral, gemma, llama** |
+| Llama tool-track collapse | R1 v=1.000, c=0.000, f=0.000, n_ext=2/20; F1 R1 v=0.000, c=0.000, f=0.000, n_ext=0/20 | R1 v=0.333, c=0.056, f=0.010, n_ext=18/100; F1 R1 v=0.444, c=0.000, f=0.000, n_ext=34/100 | **persistent operational/tool-track failure; not interpretable as reasoning** |
 | Layered metrics diverge (verdict vs cert) | Multiple models show v≫c on extractable items (see §6) | Multiple models show v≫c on extractable items (see §6) | **replicated** |
 
 ## 2. Delegation gaps Δ(R2−R0) by model and family
@@ -37,11 +37,11 @@ Replication is assessed at **T=0.2** by comparing metric **direction** and deleg
 | Model | Family | Status | n_ext (R0/R2) | Δ verdict | Δ cert | Δ full |
 |-------|--------|--------|---------------:|----------:|-------:|-------:|
 | `gemma2:9b` | C2 | ok | 98/100 | +0.612 | +0.099 | +0.100 |
-| `llama3.1:8b` | C2 | incomplete | 100/None | — | — | — |
+| `llama3.1:8b` | C2 | ok | 100/96 | +0.340 | -0.027 | -0.030 |
 | `mistral-nemo:12b` | C2 | ok | 100/100 | +0.510 | -0.090 | -0.090 |
 | `qwen2.5-coder:7b` | C2 | ok | 98/100 | +0.409 | +0.030 | +0.030 |
 | `gemma2:9b` | F1 | ok | 100/54 | +0.470 | -0.184 | -0.210 |
-| `llama3.1:8b` | F1 | incomplete | 100/None | — | — | — |
+| `llama3.1:8b` | F1 | unsafe | 100/15 | — | — | — |
 | `mistral-nemo:12b` | F1 | unsafe | 100/6 | — | — | — |
 | `qwen2.5-coder:7b` | F1 | ok | 100/66 | +0.510 | +0.425 | +0.270 |
 
@@ -68,10 +68,10 @@ Safety tiers (scaled to observed n): **safe** ≥75% extractable, **marginal** 5
 | `gemma2:9b` | C2 | R1 | completed | 100 | 100 | **safe** | 0.290 | 0.000 | 0.000 |
 | `gemma2:9b` | C2 | R2 | completed | 100 | 100 | **safe** | 1.000 | 0.170 | 0.170 |
 | `llama3.1:8b` | C2 | R0 | completed | 100 | 100 | **safe** | 0.650 | 0.100 | 0.100 |
-| `llama3.1:8b` | C2 | R1 | stale-running | — | — | **partial** | — | — | — |
-| `llama3.1:8b` | C2 | R2 | failed | — | — | **incomplete** | — | — | — |
+| `llama3.1:8b` | C2 | R1 | completed | 100 | 18 | **unsafe** | 0.333 | 0.056 | 0.010 |
+| `llama3.1:8b` | C2 | R2 | completed | 100 | 96 | **safe** | 0.990 | 0.073 | 0.070 |
 | `mistral-nemo:12b` | C2 | R0 | completed | 100 | 100 | **safe** | 0.490 | 0.150 | 0.150 |
-| `mistral-nemo:12b` | C2 | R1 | failed | — | — | **incomplete** | — | — | — |
+| `mistral-nemo:12b` | C2 | R1 | completed | 100 | 95 | **safe** | 0.758 | 0.084 | 0.080 |
 | `mistral-nemo:12b` | C2 | R2 | completed | 100 | 100 | **safe** | 1.000 | 0.060 | 0.060 |
 | `qwen2.5-coder:7b` | C2 | R0 | completed | 100 | 98 | **safe** | 0.561 | 0.020 | 0.020 |
 | `qwen2.5-coder:7b` | C2 | R1 | completed | 100 | 100 | **safe** | 0.710 | 0.040 | 0.040 |
@@ -80,8 +80,8 @@ Safety tiers (scaled to observed n): **safe** ≥75% extractable, **marginal** 5
 | `gemma2:9b` | F1 | R1 | completed | 100 | 100 | **safe** | 0.850 | 0.000 | 0.000 |
 | `gemma2:9b` | F1 | R2 | completed | 100 | 54 | **marginal** | 1.000 | 0.056 | 0.030 |
 | `llama3.1:8b` | F1 | R0 | completed | 100 | 100 | **safe** | 0.490 | 0.200 | 0.200 |
-| `llama3.1:8b` | F1 | R1 | stale-running | — | — | **partial** | — | — | — |
-| `llama3.1:8b` | F1 | R2 | failed | — | — | **incomplete** | — | — | — |
+| `llama3.1:8b` | F1 | R1 | completed | 100 | 34 | **unsafe** | 0.444 | 0.000 | 0.000 |
+| `llama3.1:8b` | F1 | R2 | completed | 100 | 15 | **unsafe** | 1.000 | 0.143 | 0.010 |
 | `mistral-nemo:12b` | F1 | R0 | completed | 100 | 100 | **safe** | 0.490 | 0.100 | 0.100 |
 | `mistral-nemo:12b` | F1 | R1 | completed | 100 | 4 | **unsafe** | 1.000 | 0.000 | 0.000 |
 | `mistral-nemo:12b` | F1 | R2 | completed | 100 | 6 | **unsafe** | 1.000 | 0.000 | 0.000 |
@@ -100,9 +100,9 @@ Safety tiers (scaled to observed n): **safe** ≥75% extractable, **marginal** 5
 **Pilot pattern (T=0.2):** Llama R1/R2 often had near-zero extractability (C2 R1: 2/20; C2 R2: 0/20) or zero metrics on F1 tool tracks — tool-protocol / infra collapse rather than measured reasoning.
 
 - **Pilot:** C2/R1: ext=2/20, v=1.000, f=0.000 (unsafe); C2/R2: ext=0/20, v=0.000, f=0.000 (unsafe); F1/R1: ext=0/20, v=0.000, f=0.000 (unsafe); F1/R2: ext=0/20, v=0.000, f=0.000 (unsafe)
-- **Follow-up:** C2/R1: stale-running; C2/R2: failed; F1/R1: stale-running; F1/R2: failed
+- **Follow-up:** C2/R1: ext=18/100, v=0.333, f=0.010 (unsafe); C2/R2: ext=96/100, v=0.990, f=0.070 (safe); F1/R1: ext=34/100, v=0.444, f=0.000 (unsafe); F1/R2: ext=15/100, v=1.000, f=0.010 (unsafe)
 
-**Assessment:** Llama tool-track cells remain **failed or stale-running** at n=100. Treat as **persistent operational/tool-track failure; not interpretable as reasoning**, not as a measured delegation collapse.
+**Assessment:** Llama tool-track cells remain **operationally fragile** on F1 (R1/R2 extractability <50%; not safe for verdict/certificate comparisons). C2 R2 recovers extractability (96/100) and shows the same verdict–certificate decoupling as other models, but F1 tool tracks still collapse for Llama and Mistral — treat as **protocol/extractability failure**, not measured reasoning improvement.
 
 ## 6. Does C2 still show verdict improvement without certificate improvement?
 
@@ -111,18 +111,17 @@ On C2 R2, n=20 pilot at T=0.2 showed **high verdict_accuracy with low certificat
 | Model | Pilot v | Pilot c | Pilot v−c | Follow-up v | Follow-up c | Follow-up v−c |
 |-------|--------:|--------:|----------:|------------:|------------:|--------------:|
 | `qwen2.5-coder:7b` | 0.950 | 0.100 | +0.850 | 0.970 | 0.050 | +0.920 |
-| `llama3.1:8b` | — | — | — | — | — | — |
+| `llama3.1:8b` | — | — | — | 0.990 | 0.073 | +0.917 |
 | `mistral-nemo:12b` | 1.000 | 0.150 | +0.850 | 1.000 | 0.060 | +0.940 |
 | `gemma2:9b` | 1.000 | 0.100 | +0.900 | 1.000 | 0.170 | +0.830 |
 
 **Assessment:**
-C2 verdict–certificate decoupling is **replicated on completed safe local-model cells**; incomplete for llama.
+C2 verdict–certificate decoupling is **replicated on all four local models** at n=100.
 
 - **gemma:** v=1.000, c=0.170, v−c=+0.830
+- **llama:** v=0.990, c=0.073, v−c=+0.917
 - **mistral:** v=1.000, c=0.060, v−c=+0.940
 - **qwen:** v=0.970, c=0.050, v−c=+0.920
-
-- **llama:** remains incomplete/problematic (failed).
 
 ## 7. Temperature conclusions from n=20 at T=0.2 only?
 

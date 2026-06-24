@@ -7,6 +7,7 @@ from fsmreasonbench.runners.providers.base import (
     ProviderId,
     build_generate_factory,
     estimate_frontier_run,
+    estimated_api_calls_per_item,
     validate_provider_tracks,
     write_provider_dry_run_diagnostic,
 )
@@ -36,6 +37,7 @@ __all__ = [
     "build_gemini_generate_content_request",
     "build_generate_factory",
     "estimate_frontier_run",
+    "estimated_api_calls_per_item",
     "extract_anthropic_response_text",
     "extract_gemini_response_text",
     "require_anthropic_api_key",

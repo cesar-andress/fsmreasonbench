@@ -42,6 +42,7 @@ from fsmreasonbench.runners.ollama_batch import (
     run_ollama_batch,
 )
 from fsmreasonbench.runners.prompts import prompt_metadata
+from fsmreasonbench.runners.provider_errors import classify_generate_failure
 from fsmreasonbench.runners.response_extract import extract_submission_payload
 from fsmreasonbench.runners.tool_executor import execute_tool_plan
 from fsmreasonbench.runners.track_prompts import render_track_prompt
@@ -182,13 +183,28 @@ def run_ollama_track_batch(
             )
             _maybe_raise_item_failure_limit(infrastructure_failures, config)
         except Exception as exc:  # noqa: BLE001 — continue batch after per-item failure
-            run = _failed_item_run(
-                item,
-                config,
-                resolved,
-                timestamp=utc_timestamp(),
-                error=str(exc),
-            )
+            provider_failure = classify_generate_failure(exc)
+            if provider_failure is not None:
+                infrastructure_failures += 1
+                run = _failed_item_run(
+                    item,
+                    config,
+                    resolved,
+                    timestamp=utc_timestamp(),
+                    error=provider_failure.message,
+                    infrastructure_failure=True,
+                    provider_error_type=provider_failure.provider_error_type,
+                    http_status=provider_failure.http_status,
+                )
+                _maybe_raise_item_failure_limit(infrastructure_failures, config)
+            else:
+                run = _failed_item_run(
+                    item,
+                    config,
+                    resolved,
+                    timestamp=utc_timestamp(),
+                    error=str(exc),
+                )
         transcript_path = transcript_dir / f"{item.item_id}.json"
         dump_json(transcript_path, run["transcript"].to_dict())
 

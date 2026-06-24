@@ -167,6 +167,48 @@ def is_stale_running(
     return age > threshold_seconds
 
 
+def is_orphan_running(run_dir: Path) -> bool:
+    """Running cell with no scored/partial outputs — prior process likely exited early."""
+    payload = read_cell_status(run_dir)
+    if payload is None or payload.get("status") != "running":
+        return False
+    if has_scores(run_dir) or has_partial_outputs(run_dir):
+        return False
+    return True
+
+
+def finalize_abandoned_running_cell(
+    run_dir: Path,
+    *,
+    started_at: str,
+    model: str,
+    model_dir: str,
+    family: str,
+    track: str,
+    temperature: float,
+    out_dir: str | Path,
+    reason: str = "cell exited before completion",
+) -> bool:
+    """Mark a still-running cell as failed; returns True when a transition was applied."""
+    payload = read_cell_status(run_dir)
+    if payload is None or payload.get("status") != "running":
+        return False
+    mark_cell_failed(
+        run_dir,
+        error_type="internal_runner_error",
+        error_message=reason,
+        model=model,
+        model_dir=model_dir,
+        family=family,
+        track=track,
+        temperature=temperature,
+        out_dir=out_dir,
+        started_at=started_at,
+        exc_type="AbandonedRunningCell",
+    )
+    return True
+
+
 def detect_cell_status(
     run_dir: Path,
     *,
@@ -174,7 +216,10 @@ def detect_cell_status(
 ) -> ExtendedCellStatus:
     payload = read_cell_status(run_dir)
     if payload is not None and payload.get("status") == "running":
-        if is_stale_running(run_dir, threshold_seconds=stale_threshold_seconds):
+        if is_orphan_running(run_dir) or is_stale_running(
+            run_dir,
+            threshold_seconds=stale_threshold_seconds,
+        ):
             return "stale-running"
         return "running"
     if (run_dir / ERROR_JSON).exists():
@@ -348,6 +393,8 @@ def should_run_cell(
     if force_all or force_cell:
         return True
     if cell_status == "running":
+        if is_orphan_running(run_dir):
+            return retry_failed
         return False
     if cell_status == "completed" and skip_completed:
         return False

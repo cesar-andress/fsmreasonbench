@@ -15,12 +15,14 @@ from fsmreasonbench.runners.experiment_cells import (
     CELL_STATUS_JSON,
     completed_item_ids,
     detect_cell_status,
+    is_orphan_running,
     is_stale_running,
     mark_cell_running,
     prepare_cell_rerun,
     should_run_cell,
     write_cell_status,
 )
+from fsmreasonbench.runners.pilot_models import model_dir_name
 from fsmreasonbench.runners.experiment_status import (
     format_experiment_status_report,
     scan_experiment_status,
@@ -370,3 +372,76 @@ def test_mark_cell_running_writes_status(tmp_path: Path) -> None:
     payload = json.loads((run_dir / CELL_STATUS_JSON).read_text(encoding="utf-8"))
     assert payload["status"] == "running"
     assert payload["config_hash"] == "abc"
+
+
+def test_orphan_running_is_stale_and_retryable_with_retry_failed(tmp_path: Path) -> None:
+    run_dir = tmp_path / "orphan"
+    run_dir.mkdir()
+    mark_cell_running(
+        run_dir,
+        model="claude-sonnet-4-5-20250929",
+        model_dir="claude-sonnet-4-5-20250929",
+        family="C2",
+        track="R0",
+        temperature=0.2,
+        item_source="/items.jsonl",
+        config_hash="abc",
+        max_items=1,
+    )
+    assert is_orphan_running(run_dir)
+    assert detect_cell_status(run_dir, stale_threshold_seconds=3600.0) == "stale-running"
+    assert should_run_cell(
+        run_dir,
+        skip_completed=True,
+        retry_failed=True,
+        skip_failed=False,
+        force_all=False,
+        force_cell=False,
+    )
+    assert not should_run_cell(
+        run_dir,
+        skip_completed=True,
+        retry_failed=False,
+        skip_failed=False,
+        force_all=False,
+        force_cell=False,
+    )
+
+
+def test_c2_provider_startup_failure_before_first_item_leaves_failed_not_running(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    item = generate_reachability_item(9)
+
+    def failing_factory(_model: str, _temperature: float):
+        raise RuntimeError("anthropic provider init failed")
+
+    monkeypatch.setattr(
+        "fsmreasonbench.runners.track_pilot_models._load_family_items",
+        lambda _cfg: {"C2": [item]},
+    )
+    monkeypatch.setattr("fsmreasonbench.runners.track_pilot_models.time.sleep", lambda _s: None)
+
+    model = "claude-sonnet-4-5-20250929"
+    out_dir = tmp_path / "anthropic_c2"
+    config = TrackPilotModelsConfig(
+        models=(model,),
+        families=("C2",),
+        tracks=("R0",),
+        c2_items_path=".",
+        f1_items_path=".",
+        out_dir=out_dir,
+        max_items=1,
+        temperatures=(0.2,),
+        provider="anthropic",
+        skip_completed=False,
+        stop_after_failures=3,
+    )
+    run_track_pilot_models(config, failing_factory)
+    run_dir = out_dir / model_dir_name(model) / "C2" / "R0"
+    assert detect_cell_status(run_dir) == "failed"
+    assert (run_dir / ERROR_JSON).exists()
+    payload = json.loads((run_dir / CELL_STATUS_JSON).read_text(encoding="utf-8"))
+    assert payload["status"] == "failed"
+    assert "anthropic provider init failed" in (run_dir / ERROR_JSON).read_text(encoding="utf-8")

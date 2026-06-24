@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import sys
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
@@ -30,6 +31,7 @@ from fsmreasonbench.runners.experiment_cells import (
     completed_item_ids,
     compute_config_hash,
     detect_cell_status,
+    finalize_abandoned_running_cell,
     mark_cell_completed,
     mark_cell_failed,
     mark_cell_running,
@@ -307,6 +309,10 @@ def build_track_row(
         "infrastructure_failure_count": summary.get("infrastructure_failure_count", 0),
         "provider_error_count": summary.get("provider_error_count", 0),
         "provider_quota_error_count": summary.get("provider_quota_error_count", 0),
+        "provider_rate_limit_count": summary.get("provider_rate_limit_count", 0),
+        "provider_insufficient_credit_count": summary.get(
+            "provider_insufficient_credit_count", 0
+        ),
         "model_extractability_rate": summary.get("model_extractability_rate"),
         "model_scored_n": summary.get("model_scored_n"),
         "provider_failure_warning": summary.get("provider_failure_warning"),
@@ -565,6 +571,25 @@ def format_item_timeout_message(item_timeout: float | None) -> str:
     return f"item request exceeded timeout of {item_timeout:g}s"
 
 
+def _log_cell_startup(
+    *,
+    model: str,
+    family: str,
+    track: str,
+    temperature: float,
+    phase: str,
+    **details: Any,
+) -> None:
+    suffix = " ".join(f"{key}={value!r}" for key, value in details.items())
+    message = (
+        f"cell-startup: model={model!r} family={family} track={track} "
+        f"temp={temperature:g} phase={phase}"
+    )
+    if suffix:
+        message = f"{message} {suffix}"
+    print(message, file=sys.stderr, flush=True)
+
+
 def _cell_execution_config_hash(
     *,
     model: str,
@@ -606,6 +631,16 @@ def _run_cell_batch(
     config: TrackPilotModelsConfig,
     item_timeout: float | None,
 ) -> OllamaBatchResult:
+    _log_cell_startup(
+        model=model,
+        family=family,
+        track=track,
+        temperature=temperature,
+        phase="run_ollama_track_batch",
+        provider=config.provider,
+        item_count=len(items),
+        max_items=config.max_items,
+    )
     return run_ollama_track_batch(
         items,
         generate,
@@ -974,9 +1009,8 @@ def run_track_pilot_models(
             max_items=config.max_items,
         )
 
-        generate = generate_factory(plan.model, plan.temperature)
-        items = family_items[plan.family]
         batch_result: OllamaBatchResult | None = None
+        cell_succeeded = False
 
         def _execute_cell() -> OllamaBatchResult:
             nonlocal batch_result
@@ -1002,6 +1036,38 @@ def run_track_pilot_models(
             )
 
         try:
+            _log_cell_startup(
+                model=plan.model,
+                family=plan.family,
+                track=plan.track,
+                temperature=plan.temperature,
+                phase="provider_selected",
+                provider=config.provider,
+            )
+            generate = generate_factory(plan.model, plan.temperature)
+            items = family_items[plan.family]
+            _log_cell_startup(
+                model=plan.model,
+                family=plan.family,
+                track=plan.track,
+                temperature=plan.temperature,
+                phase="items_loaded",
+                item_count=len(items),
+                max_items=config.max_items,
+            )
+            if items:
+                from fsmreasonbench.runners.prompts import render_prompt
+
+                first_prompt = render_prompt(items[0], provider=config.provider)
+                _log_cell_startup(
+                    model=plan.model,
+                    family=plan.family,
+                    track=plan.track,
+                    temperature=plan.temperature,
+                    phase="first_prompt_built",
+                    prompt_chars=len(first_prompt),
+                )
+
             if config.cell_timeout is not None:
                 pool = ThreadPoolExecutor(max_workers=1)
                 future = pool.submit(_execute_cell)
@@ -1028,12 +1094,14 @@ def run_track_pilot_models(
                     consecutive_failures += 1
                 else:
                     _finalize_cell_success()
+                    cell_succeeded = True
                     consecutive_failures = 0
                 finally:
                     pool.shutdown(wait=False, cancel_futures=True)
             else:
                 _execute_cell()
                 _finalize_cell_success()
+                cell_succeeded = True
                 consecutive_failures = 0
         except KeyboardInterrupt:
             mark_cell_failed(
@@ -1107,6 +1175,19 @@ def run_track_pilot_models(
                 root_cause=root_cause,
             )
             consecutive_failures += 1
+        finally:
+            if not cell_succeeded:
+                finalize_abandoned_running_cell(
+                    run_dir,
+                    started_at=started_at,
+                    model=plan.model,
+                    model_dir=plan.model_dir,
+                    family=plan.family,
+                    track=plan.track,
+                    temperature=plan.temperature,
+                    out_dir=run_dir,
+                    reason="cell exited before first scored item",
+                )
 
         cells_executed += 1
         sleep_seconds = (
@@ -1301,6 +1382,19 @@ def _format_fully_correct_rate(row: dict[str, Any]) -> str:
 
 def _extractability_safety_flag(row: dict[str, Any]) -> str:
     if _provider_dominates_cell(row):
+        rate_limit = int(row.get("provider_rate_limit_count") or 0)
+        insufficient = int(row.get("provider_insufficient_credit_count") or 0)
+        detail_parts: list[str] = []
+        if rate_limit:
+            detail_parts.append(f"rate-limit={rate_limit}")
+        if insufficient:
+            detail_parts.append(f"insufficient-credit={insufficient}")
+        if detail_parts:
+            return (
+                "UNSAFE (provider failures dominate, "
+                + ", ".join(detail_parts)
+                + ")"
+            )
         quota = int(row.get("provider_quota_error_count") or 0)
         suffix = f", quota/rate-limit={quota}" if quota else ""
         return f"UNSAFE (provider failures dominate{suffix})"
@@ -1440,6 +1534,7 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
         row
         for row in track_rows
         if _extractability_safety_flag(row)
+        and not _provider_dominates_cell(row)
     ]
 
     lines.extend(
@@ -1465,9 +1560,12 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
     if provider_dominated:
         lines.extend(["", "### Provider failures dominate (metrics not interpretable)", ""])
         for row in provider_dominated:
+            rate_limit = int(row.get("provider_rate_limit_count") or 0)
+            insufficient = int(row.get("provider_insufficient_credit_count") or 0)
             lines.append(
                 "- `{model}` / {family} / {track} / T={temp:g}: "
-                "provider_errors={provider}/{n}, quota/rate-limit={quota} — "
+                "provider_errors={provider}/{n}, rate-limit={rate_limit}, "
+                "insufficient-credit={insufficient}, quota/rate-limit={quota} — "
                 "use model_extractability_rate or rerun with throttling".format(
                     model=row["model"],
                     family=row["family"],
@@ -1475,6 +1573,8 @@ def render_track_pilot_report(payload: dict[str, Any]) -> str:
                     temp=float(row.get("temperature", 0.0)),
                     provider=_provider_error_count(row),
                     n=_row_item_count(row),
+                    rate_limit=rate_limit,
+                    insufficient=insufficient,
                     quota=int(row.get("provider_quota_error_count") or 0),
                 )
             )

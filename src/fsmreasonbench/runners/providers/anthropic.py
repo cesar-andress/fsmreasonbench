@@ -1,4 +1,9 @@
-"""Anthropic Messages API backend for frontier R0 runs."""
+"""Anthropic Messages API backend for frontier R0/R1/R2 runs.
+
+R1/R2 use the same JSON two-phase track protocol as Ollama (tool_plan then
+final_submission); the runner executes registered tools locally between phases.
+This module does not use Anthropic native ``tool_use`` blocks.
+"""
 
 from __future__ import annotations
 
@@ -8,6 +13,8 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from typing import Any
+
+from fsmreasonbench.runners.provider_errors import classify_http_error
 
 ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_API_VERSION = "2023-06-01"
@@ -121,10 +128,7 @@ class HttpAnthropicClient:
                 f"anthropic request exceeded timeout of {resolved_timeout:g}s"
             ) from exc
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(
-                f"anthropic request failed with HTTP {exc.code}: {detail}"
-            ) from exc
+            raise classify_http_error(provider="anthropic", exc=exc) from exc
         except urllib.error.URLError as exc:
             reason = exc.reason
             if isinstance(reason, TimeoutError):

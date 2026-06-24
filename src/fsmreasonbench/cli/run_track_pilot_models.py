@@ -250,7 +250,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--retry-failed",
         action="store_true",
-        help="Retry failed, missing, partial, and stale-running cells; skip completed",
+        help="Retry failed, missing, partial, stale-running, and orphan running cells; skip completed",
     )
     parser.add_argument(
         "--skip-failed",

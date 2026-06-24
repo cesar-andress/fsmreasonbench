@@ -9,10 +9,10 @@ FSMReasonBench can run **R0** track pilots against paid API backends for cheap f
 | Provider | Tracks | API key env vars | Default model alias |
 |----------|--------|------------------|---------------------|
 | `ollama` | R0, R1, R2 | — (local) | model name as passed to Ollama |
-| `anthropic` | **R0 only** | `ANTHROPIC_API_KEY` | `opus` → `ANTHROPIC_MODEL` or `claude-opus-4-1` |
+| `anthropic` | **R0, R1, R2** | `ANTHROPIC_API_KEY` | `opus` → `ANTHROPIC_MODEL` or `claude-opus-4-1` |
 | `gemini` | **R0 only** | `GEMINI_API_KEY` or `GOOGLE_API_KEY` | `gemini-flash` → `GEMINI_MODEL` or `gemini-2.5-flash` |
 
-R1/R2 require native tool-calling support and are **not** implemented for Anthropic or Gemini. Validation fails explicitly if you pass `--tracks R1` or `R2` with those providers.
+Anthropic R1/R2 use the same JSON two-phase track protocol as Ollama (`tool_plan` → local tool execution → `final_submission`); the runner does **not** use Anthropic native `tool_use` API blocks. Gemini R1/R2 are **not** implemented. Validation fails explicitly if you pass `--tracks R1` or `R2` with `provider=gemini`.
 
 ## Cost safety
 
@@ -83,6 +83,27 @@ PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
   --cohort-root cohorts/v0.1-expanded-n100 \
   --out-dir runs/frontier_anthropic_opus_smoke_v1 \
   --provider-dry-run
+```
+
+## Anthropic example (R2 solver delegation)
+
+R2 cells issue **two** Messages API calls per item (tool plan + final submission). Use `--estimate-only` first.
+
+```bash
+export ANTHROPIC_API_KEY=...
+
+PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
+  --provider anthropic \
+  --models claude-sonnet-4-5-20250929 \
+  --families C2,F1 \
+  --tracks R2 \
+  --temperatures 0.2 \
+  --max-items 20 \
+  --max-tokens 8192 \
+  --cohort-root cohorts/v0.1-expanded-n100 \
+  --out-dir runs/frontier_anthropic_sonnet_r2_smoke_v1 \
+  --timeout 3600 \
+  --incremental-safe
 ```
 
 ## Gemini example (R0 smoke)

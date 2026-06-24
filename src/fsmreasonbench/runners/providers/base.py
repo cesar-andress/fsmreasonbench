@@ -32,9 +32,9 @@ from fsmreasonbench.tracks.models import TrackId
 
 ProviderId = Literal["ollama", "anthropic", "gemini"]
 TOOL_TRACKS = frozenset({"R1", "R2"})
-ANTHROPIC_SUPPORTED_TRACKS = frozenset({"R0"})
+ANTHROPIC_SUPPORTED_TRACKS = frozenset({"R0", "R1", "R2"})
 GEMINI_SUPPORTED_TRACKS = frozenset({"R0"})
-API_R0_ONLY_PROVIDERS = frozenset({"anthropic", "gemini"})
+API_R0_ONLY_PROVIDERS = frozenset({"gemini"})
 API_PROVIDERS_WITH_MAX_TOKENS = frozenset({"anthropic", "gemini"})
 
 ANTHROPIC_COST_WARNING = (
@@ -76,20 +76,32 @@ def resolve_provider_model(provider: str, model: str) -> str:
 
 
 def validate_provider_tracks(provider: str, tracks: tuple[str, ...]) -> None:
-    if provider not in API_R0_ONLY_PROVIDERS:
-        return
-    unsupported = [track for track in tracks if track in TOOL_TRACKS]
-    if not unsupported:
-        return
     if provider == "gemini":
-        raise ValueError(
-            "Gemini provider currently supports R0 only; tool tracks are not implemented."
-        )
-    raise ValueError(
-        "provider=anthropic does not implement native tool calling for tracks "
-        f"{unsupported}. Supported tracks: {sorted(ANTHROPIC_SUPPORTED_TRACKS)}. "
-        "Use provider=ollama for R1/R2, or restrict --tracks to R0."
-    )
+        unsupported = [track for track in tracks if track in TOOL_TRACKS]
+        if unsupported:
+            raise ValueError(
+                "Gemini provider currently supports R0 only; tool tracks are not implemented."
+            )
+        return
+    if provider == "anthropic":
+        unsupported = [
+            track for track in tracks if track not in ANTHROPIC_SUPPORTED_TRACKS
+        ]
+        if unsupported:
+            raise ValueError(
+                "provider=anthropic supports tracks "
+                f"{sorted(ANTHROPIC_SUPPORTED_TRACKS)}; unsupported: {unsupported}."
+            )
+        return
+
+
+def estimated_api_calls_per_item(provider: str, tracks: tuple[str, ...]) -> int:
+    """Upper-bound API calls per scored item for frontier cost estimates."""
+    if not tracks:
+        return 1
+    if provider == "gemini":
+        return 1
+    return max(2 if track in TOOL_TRACKS else 1 for track in tracks)
 
 
 def build_generate_factory(backend: GenerateBackendConfig) -> GenerateFactory:
@@ -259,10 +271,7 @@ def estimate_frontier_run(
 ) -> dict[str, Any]:
     planned_cells = len(models) * len(families) * len(tracks) * len(temperatures)
     executable_cells = min(planned_cells, max_cells) if max_cells is not None else planned_cells
-    if provider in API_R0_ONLY_PROVIDERS:
-        api_calls_per_item = 1
-    else:
-        api_calls_per_item = max(2 if track in TOOL_TRACKS else 1 for track in tracks)
+    api_calls_per_item = estimated_api_calls_per_item(provider, tracks)
     total_items = executable_cells * max_items
     estimated_api_calls = total_items * api_calls_per_item
     if provider == "gemini":
