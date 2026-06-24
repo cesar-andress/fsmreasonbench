@@ -133,6 +133,7 @@ def test_inspect_failures_counts_rates_and_samples(tmp_path: Path) -> None:
     assert payload["fully_correct_rate"] == 0.25
     assert payload["failure_stage_counts"] == {
         "not_extractable": 1,
+        "provider_error": 0,
         "verdict_wrong": 1,
         "certificate_invalid": 1,
         "correct": 1,

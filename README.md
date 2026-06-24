@@ -3,9 +3,8 @@
 **Evaluating Reasoning over Executable Finite-State Machines**
 
 This repository is the **canonical Zenodo artifact** for FSMReasonBench — not merely a
-GitHub source tree. The citable object will be:
-
-> **FSMReasonBench v1.0.0 (Zenodo DOI)**
+GitHub source tree. The citable release is **FSMReasonBench v1.0.0** on Zenodo
+([10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)).
 
 Git `main` is for development. **Cite the Zenodo DOI**, not the git URL.
 

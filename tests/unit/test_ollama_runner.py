@@ -82,7 +82,7 @@ def test_run_ollama_batch_with_mocked_client(tmp_path: Path) -> None:
         out_dir=tmp_path / "run",
     )
     assert result.summary["fully_correct_rate"] == 1.0
-    records = read_jsonl(out_path)
+    records = read_jsonl(tmp_path / "run" / "results.jsonl")
     assert len(records) == 1
     assert records[0]["scoring_record"]["fully_correct"] is True
     assert (tmp_path / "run" / "transcripts" / f"{item.item_id}.json").exists()
@@ -140,7 +140,7 @@ def test_run_ollama_batch_respects_max_items(tmp_path: Path) -> None:
         OllamaBatchConfig(model="mock-model", max_items=2),
         out_dir=tmp_path / "limited",
     )
-    assert len(read_jsonl(tmp_path / "limited.jsonl")) == 2
+    assert len(read_jsonl(tmp_path / "limited" / "results.jsonl")) == 2
 
 
 def test_cli_with_mocked_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -188,5 +188,5 @@ def test_cli_with_mocked_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     )
     loaded = load_items_jsonl(items_path)
     assert len(loaded) == 1
-    records = read_jsonl(out_path)
+    records = read_jsonl(tmp_path / "cli_run" / "results.jsonl")
     assert records[0]["scoring_record"]["fully_correct"] is True
