@@ -1,6 +1,8 @@
 # Local open-weight results (paper-facing)
 
-**Campaign:** `runs/local_matrix_n100_t02_v2` — **24/24 cells complete**  
+> **Canonical frozen results:** see [`paper_results.md`](paper_results.md) for the full local + Claude Sonnet n=100 freeze, excluded contaminated runs, and verdict-vs-certificate analysis. This file retains **local-only** detail.
+
+**Campaign:** `runs/local_matrix_n100_t02_v2` — **24/24 cells complete** *(frozen 2026-06-20)*  
 **Design:** 4 Ollama models × 2 families (C2, F1) × 3 tracks (R0, R1, R2) × T=0.2, **n=100** per cell  
 **Cohorts:** `c2-reachability-level3-v0.1-expanded-n100`, `f1-mixed-level3-v0.1-expanded-n100` (v0.1-exploratory; not `v1.0-public`)  
 **Artifacts:** `report.md`, `combined_summary.json`, plots under `plots/`, internal replication notes in `local_matrix_n100_t02_analysis.md`
@@ -150,6 +152,7 @@ PYTHONPATH=src python -m fsmreasonbench.cli.plot_local_matrix \
 
 ## Related internal docs
 
+- [`paper_results.md`](paper_results.md) — **frozen** local + Claude Sonnet n=100 results (canonical)
 - `docs/local_matrix_n100_t02_analysis.md` — pilot replication tables, safety tiers, claim guardrails
 - `docs/local_model_matrix_experiment.md` — runner design and matrix layout
 - `docs/frontier_provider_backends.md` — provider_error vs not_extractable (frontier runs; same reporting columns)

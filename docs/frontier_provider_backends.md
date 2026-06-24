@@ -178,3 +178,16 @@ PYTHONPATH=src python -m fsmreasonbench.cli.run_track_pilot_models \
 ```
 
 Explicit model override: pass the full Google model id via `--models`, or set `GEMINI_MODEL` in the environment.
+
+## Frozen paper results (2026-06-20)
+
+Citable frontier tools result for the manuscript:
+
+- **Use:** `runs/frontier_claude_sonnet_tools_n100_v2` — Claude Sonnet, C2+F1, R1+R2, n=100, 4/4 cells, no provider errors.
+
+**Do not cite as model performance:**
+
+- `runs/frontier_claude_sonnet_full_n100_v1` — provider failures (HTTP 400 credit / HTTP 429 rate limit) were initially mis-scored; audit/repair only.
+- Any `runs/frontier_gemini_*` run — quota contamination (HTTP 429).
+
+See [`paper_results.md`](paper_results.md) for full frozen local + frontier summary.

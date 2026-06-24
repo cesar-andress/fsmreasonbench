@@ -1,5 +1,7 @@
 # Local Matrix n=100 (T=0.2) Analysis
 
+> **Frozen (2026-06-20):** Local baseline is `runs/local_matrix_n100_t02_v2` (24/24). Paper-facing summary: [`paper_results.md`](paper_results.md). Do **not** use provider-contaminated frontier runs for citations.
+
 **Follow-up run:** `runs/local_matrix_n100_t02_v2`
 **Baseline pilot:** `runs/local_matrix_v1` at T=0.2 (n=20)
 **Configured items/cell:** 100
