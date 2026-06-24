@@ -1,9 +1,9 @@
-# NOTE: Update doi, url, and date-released immediately after Zenodo minting.
-
 cff-version: 1.2.0
 message: "If you use FSMReasonBench, please cite it as below."
 title: "FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines"
 version: "1.0.0"
+doi: 10.5281/zenodo.20836348
+url: https://doi.org/10.5281/zenodo.20836348
 license: Apache-2.0
 authors:
   - family-names: Andrés
@@ -24,4 +24,6 @@ preferred-citation:
     - family-names: Andrés
       given-names: César
   year: 2026
-  notes: "Cite benchmark_version, cohort_version, schema_version, and verifier_version from release_manifest.json. Add Zenodo DOI after minting."
+  doi: 10.5281/zenodo.20836348
+  url: https://doi.org/10.5281/zenodo.20836348
+  notes: "Cite benchmark_version, cohort_version, schema_version, and verifier_version from release_manifest.json."
