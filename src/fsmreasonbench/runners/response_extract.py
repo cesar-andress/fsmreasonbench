@@ -11,6 +11,20 @@ _FENCE_PATTERN = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 
+_SMART_QUOTE_TRANSLATION = str.maketrans(
+    {
+        "\u201c": '"',
+        "\u201d": '"',
+        "\u2018": "'",
+        "\u2019": "'",
+    }
+)
+
+
+def normalize_json_text(raw_text: str) -> str:
+    """Harmless formatting normalization before JSON extraction (quotes only)."""
+    return raw_text.translate(_SMART_QUOTE_TRANSLATION)
+
 
 def extract_submission_payload(raw_text: str) -> Any:
     """
@@ -43,6 +57,20 @@ def extract_submission_payload(raw_text: str) -> Any:
         return balanced
 
     return raw_text
+
+
+def extract_submission_payload_with_json_repair(raw_text: str) -> Any:
+    """
+    Extract submission after harmless JSON text repair (smart-quote normalization).
+
+    Does not alter semantic certificate fields; only improves parseability of wrappers.
+    """
+    normalized = normalize_json_text(raw_text)
+    if normalized != raw_text:
+        repaired = extract_submission_payload(normalized)
+        if not isinstance(repaired, str):
+            return repaired
+    return extract_submission_payload(raw_text)
 
 
 def _first_balanced_json_object(text: str) -> dict[str, Any] | None:

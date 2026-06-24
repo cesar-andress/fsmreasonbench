@@ -1,0 +1,172 @@
+{
+  "addendum_for": "docs/tmlr_empirical_package_v1",
+  "source_analysis": "docs/equivalence_hash_mismatch_decomposition.json",
+  "summary": {
+    "coverage": [
+      {
+        "condition": "R1",
+        "eq_witness_failures": 51,
+        "equivalence_items_expected": 51,
+        "missing_results_item_ids": [],
+        "missing_scores_item_ids": [],
+        "raw_response_available": 51,
+        "results_path": "runs/frontier_claude_sonnet_tools_n100_v2/claude-sonnet-4-5-20250929/F1/temp_0.2/R1/results.jsonl",
+        "results_rows_for_eq_items": 51,
+        "run_label": "R1 frozen",
+        "scores_path": "runs/frontier_claude_sonnet_tools_n100_v2/claude-sonnet-4-5-20250929/F1/temp_0.2/R1/scores.jsonl",
+        "scores_rows_for_eq_items": 51,
+        "transcripts_dir": "runs/frontier_claude_sonnet_tools_n100_v2/claude-sonnet-4-5-20250929/F1/temp_0.2/R1/transcripts",
+        "transcripts_present": 51
+      },
+      {
+        "condition": "Oracle+Format",
+        "eq_witness_failures": 51,
+        "equivalence_items_expected": 51,
+        "missing_results_item_ids": [],
+        "missing_scores_item_ids": [],
+        "raw_response_available": 51,
+        "results_path": "runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1/results.jsonl",
+        "results_rows_for_eq_items": 51,
+        "run_label": "Oracle+Format",
+        "scores_path": "runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1/scores.jsonl",
+        "scores_rows_for_eq_items": 51,
+        "transcripts_dir": "runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1/transcripts",
+        "transcripts_present": 51
+      }
+    ],
+    "research_answers": {
+      "justified_thesis_sentence": "Claude accepts equivalence verdicts but cannot synthesize verifier-identical minimized_dfa_hash witnesses under R1/Oracle; failures are dominated by wrong-hash emission patterns while semantic equivalence claims remain correct.",
+      "limitations_section": "Equivalence_witness verification accepts only minimized_dfa_hash strings; natural-language or step-simulation arguments in prose are not scored. This decomposition classifies hash-construction patterns from frozen parsed payloads plus raw_response_text in results.jsonl (transcripts present but not required). Subtype labels are heuristic; C6 requires substantive structured alternate-proof language and remains rare relative to wrong-hash emission (C5/C1/C2).",
+      "mostly_empty_or_fake_hashes": "No for R1 frozen: only 13/51 are empty/placeholder/non-hex (29/51 are equal-but-wrong-shared-hash with hash-like hex). Oracle+Format shows more placeholder/template behavior (49/51 C1; 2/51 C5).",
+      "semantically_plausible_noncanonical_proofs": "Prose contains language/step-replay arguments in many failures, but no certificate payload encodes an alternate machine-checkable witness. Primary C6 count (structured alternate proof as main failure mode): 8 across pooled failures.",
+      "too_strong_thesis_sentence": "Claiming Claude cannot reason about DFA equivalence at all, or that failures prove misunderstood non-equivalence, or that a generic universal-quantifier deficit explains F1.",
+      "zero_rate_interpretation": "102/102 pooled failures keep a semantically correct equivalence claim (verdict true, equivalent true, correct certificate type) yet fail verifier hash equality. The 0.000 cert rate primarily measures failure to emit verifier-identical minimized_dfa_hash strings, not rejection of valid alternate proof objects in the certificate schema."
+    },
+    "tables": {
+      "A_category_counts": {
+        "Oracle+Format": [
+          {
+            "category": "C1_EMPTY_OR_PLACEHOLDER",
+            "count": 49,
+            "percentage": 0.961
+          },
+          {
+            "category": "C5_EQUAL_BUT_WRONG_SHARED_HASH",
+            "count": 2,
+            "percentage": 0.039
+          }
+        ],
+        "R1": [
+          {
+            "category": "C1_EMPTY_OR_PLACEHOLDER",
+            "count": 13,
+            "percentage": 0.255
+          },
+          {
+            "category": "C2_RANDOM_OR_NONMATCHING_HASH",
+            "count": 1,
+            "percentage": 0.02
+          },
+          {
+            "category": "C5_EQUAL_BUT_WRONG_SHARED_HASH",
+            "count": 29,
+            "percentage": 0.569
+          },
+          {
+            "category": "C6_NONCANONICAL_STRUCTURAL_PROOF",
+            "count": 8,
+            "percentage": 0.157
+          }
+        ],
+        "pooled": [
+          {
+            "category": "C1_EMPTY_OR_PLACEHOLDER",
+            "count": 62,
+            "percentage": 0.608
+          },
+          {
+            "category": "C2_RANDOM_OR_NONMATCHING_HASH",
+            "count": 1,
+            "percentage": 0.01
+          },
+          {
+            "category": "C5_EQUAL_BUT_WRONG_SHARED_HASH",
+            "count": 31,
+            "percentage": 0.304
+          },
+          {
+            "category": "C6_NONCANONICAL_STRUCTURAL_PROOF",
+            "count": 8,
+            "percentage": 0.078
+          }
+        ]
+      },
+      "B_hash_pattern_analysis": {
+        "Oracle+Format": {
+          "equal_but_wrong_shared_hash_rate": 0.039,
+          "hash_like_but_wrong_rate": 0.039,
+          "hash_missing_or_placeholder_rate": 0.961,
+          "n_failures": 51,
+          "one_hash_correct_rate": 0.0,
+          "swapped_rate": 0.0
+        },
+        "R1": {
+          "equal_but_wrong_shared_hash_rate": 0.569,
+          "hash_like_but_wrong_rate": 0.745,
+          "hash_missing_or_placeholder_rate": 0.255,
+          "n_failures": 51,
+          "one_hash_correct_rate": 0.0,
+          "swapped_rate": 0.0
+        },
+        "pooled": {
+          "equal_but_wrong_shared_hash_rate": 0.304,
+          "hash_like_but_wrong_rate": 0.392,
+          "hash_missing_or_placeholder_rate": 0.608,
+          "n_failures": 102,
+          "one_hash_correct_rate": 0.0,
+          "swapped_rate": 0.0
+        }
+      },
+      "C_noncanonical_proof_evidence": {
+        "Oracle+Format": {
+          "language_argument_responses": 0,
+          "machine_checkable_under_broader_verifier": "No submitted response included a standalone machine-checkable alternate witness object (partition table, bisimulation relation, or mapping) in the certificate payload; prose arguments might support a richer verifier but were not encoded as checkable artifacts.",
+          "minimized_automaton_mentions": 0,
+          "partition_like_responses": 0,
+          "primary_c6_count": 0,
+          "semantic_claim_ok_count": 51,
+          "signal_counts": {},
+          "state_mapping_responses": 0
+        },
+        "R1": {
+          "language_argument_responses": 24,
+          "machine_checkable_under_broader_verifier": "No submitted response included a standalone machine-checkable alternate witness object (partition table, bisimulation relation, or mapping) in the certificate payload; prose arguments might support a richer verifier but were not encoded as checkable artifacts.",
+          "minimized_automaton_mentions": 11,
+          "partition_like_responses": 0,
+          "primary_c6_count": 8,
+          "semantic_claim_ok_count": 51,
+          "signal_counts": {
+            "language_argument": 24,
+            "minimized_automaton": 11,
+            "step_replay_argument": 4
+          },
+          "state_mapping_responses": 0
+        },
+        "pooled": {
+          "language_argument_responses": 24,
+          "machine_checkable_under_broader_verifier": "No submitted response included a standalone machine-checkable alternate witness object (partition table, bisimulation relation, or mapping) in the certificate payload; prose arguments might support a richer verifier but were not encoded as checkable artifacts.",
+          "minimized_automaton_mentions": 11,
+          "partition_like_responses": 0,
+          "primary_c6_count": 8,
+          "semantic_claim_ok_count": 102,
+          "signal_counts": {
+            "language_argument": 24,
+            "minimized_automaton": 11,
+            "step_replay_argument": 4
+          },
+          "state_mapping_responses": 0
+        }
+      }
+    }
+  }
+}

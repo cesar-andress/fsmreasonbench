@@ -1,0 +1,681 @@
+{
+  "excluded_runs": [
+    "Invalid Claude credit-exhaustion / infrastructure-failure cells (excluded from conclusions).",
+    "Invalid Gemini quota-failure runs (excluded from conclusions).",
+    "Contaminated legacy frontier run frontier_claude_sonnet_full_n100_v1 (never used).",
+    "Smoke-test duplicate score rows in C2 ablation were deduplicated to n=100 unique item_ids."
+  ],
+  "figures": [
+    "figures/figure1_complexity_vs_success.png",
+    "figures/figure1_complexity_vs_success.pdf",
+    "figures/figure2_f1_ablation_slopegraph.png",
+    "figures/figure2_f1_ablation_slopegraph.pdf",
+    "figures/figure3_c2_ablation_slopegraph.png",
+    "figures/figure3_c2_ablation_slopegraph.pdf",
+    "figures/figure4_local_f1_heatmap.png",
+    "figures/figure4_local_f1_heatmap.pdf"
+  ],
+  "output_dir": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/tmlr_empirical_package_v1",
+  "package_version": "v1",
+  "source_artifacts": {
+    "c2_ablation": "runs/ablations_c2_existential_universal_claude_n100_v1",
+    "docs_c2_stratified": "docs/c2_existential_universal_stratified_analysis.json",
+    "docs_complexity": "docs/certificate_class_complexity_analysis.json",
+    "docs_f1_audit": "docs/f1_equivalence_witness_verifier_audit.json",
+    "docs_f1_claude_stratified": "docs/f1_claude_ablation_stratified_analysis.json",
+    "docs_f1_local_stratified": "docs/f1_local_matrix_subtype_stratified_analysis.json",
+    "f1_oracle_ablation": "runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1",
+    "f1_r2_attribution": "runs/ablations_f1_r2_attribution_claude_n100_v1",
+    "frontier_claude": "runs/frontier_claude_sonnet_tools_n100_v2",
+    "local_matrix": "runs/local_matrix_n100_t02_v2"
+  },
+  "tables": {
+    "appendix": {
+      "failure_taxonomy_pooled": {
+        "distinguishing_trace": {
+          "mean_invalid_rate_across_runs": 0.183,
+          "semantic_vs_formatting": {
+            "formatting": 0,
+            "other": 0,
+            "semantic": 18
+          },
+          "top_failure_categories": [
+            {
+              "category": "acceptance_mismatch",
+              "count": 16,
+              "percentage": 0.889
+            },
+            {
+              "category": "replay_failure",
+              "count": 2,
+              "percentage": 0.111
+            }
+          ]
+        },
+        "equivalence_witness": {
+          "mean_invalid_rate_across_runs": 1.0,
+          "semantic_vs_formatting": {
+            "formatting": 0,
+            "other": 0,
+            "semantic": 102
+          },
+          "top_failure_categories": [
+            {
+              "category": "equivalence_hash_mismatch",
+              "count": 102,
+              "percentage": 1.0
+            }
+          ]
+        },
+        "trace_witness": {
+          "mean_invalid_rate_across_runs": 0.07,
+          "semantic_vs_formatting": {
+            "formatting": 6,
+            "other": 0,
+            "semantic": 1
+          },
+          "top_failure_categories": [
+            {
+              "category": "wrong_trace_format",
+              "count": 6,
+              "percentage": 0.857
+            },
+            {
+              "category": "replay_failure",
+              "count": 1,
+              "percentage": 0.143
+            }
+          ]
+        },
+        "unreachability_witness": {
+          "mean_invalid_rate_across_runs": 0.02,
+          "semantic_vs_formatting": {
+            "formatting": 0,
+            "other": 0,
+            "semantic": 2
+          },
+          "top_failure_categories": [
+            {
+              "category": "incomplete_reachability_set",
+              "count": 2,
+              "percentage": 1.0
+            }
+          ]
+        }
+      },
+      "verifier_audit": {
+        "checks_passed": 16,
+        "checks_total": 16,
+        "paper_validity_sentence": "An F1 equivalence_witness is valid iff the benchmark DFAs are semantically equivalent (independent BFS equivalence check) and the submitter supplies the exact minimized language-signature hashes recomputed by the verifier from those DFAs; hash mismatch rejects the witness format but is not, by itself, evidence of non-equivalence when the semantic check succeeds.",
+        "single_canonical_witness_form": true
+      }
+    },
+    "table1": [
+      {
+        "Claude_R1_cert": 0.939,
+        "canonical_hashing": false,
+        "certificate_type": "distinguishing_trace",
+        "complexity_score": 4.5,
+        "family": "F1",
+        "multiple_valid_forms": true,
+        "required_fields": 8
+      },
+      {
+        "Claude_R1_cert": 0.0,
+        "canonical_hashing": true,
+        "certificate_type": "equivalence_witness",
+        "complexity_score": 9.5,
+        "family": "F1",
+        "multiple_valid_forms": false,
+        "required_fields": 9
+      },
+      {
+        "Claude_R1_cert": 0.96,
+        "canonical_hashing": false,
+        "certificate_type": "trace_witness",
+        "complexity_score": 3.5,
+        "family": "C2",
+        "multiple_valid_forms": true,
+        "required_fields": 7
+      },
+      {
+        "Claude_R1_cert": 1.0,
+        "canonical_hashing": false,
+        "certificate_type": "unreachability_witness",
+        "complexity_score": 5.0,
+        "family": "C2",
+        "multiple_valid_forms": false,
+        "required_fields": 7
+      }
+    ],
+    "table2": [
+      {
+        "condition": "R1",
+        "distinguishing_trace_cert": 0.939,
+        "distinguishing_trace_full": 0.939,
+        "equivalence_witness_cert": 0.0,
+        "equivalence_witness_full": 0.0,
+        "overall_cert": 0.46,
+        "overall_full": 0.46
+      },
+      {
+        "condition": "Oracle+Format",
+        "distinguishing_trace_cert": 0.694,
+        "distinguishing_trace_full": 0.694,
+        "equivalence_witness_cert": 0.0,
+        "equivalence_witness_full": 0.0,
+        "overall_cert": 0.34,
+        "overall_full": 0.34
+      },
+      {
+        "condition": "R2A verify-only",
+        "distinguishing_trace_cert": 1.0,
+        "distinguishing_trace_full": 1.0,
+        "equivalence_witness_cert": 0.0,
+        "equivalence_witness_full": 0.0,
+        "overall_cert": 0.49,
+        "overall_full": 0.49
+      },
+      {
+        "condition": "R2B repair-only",
+        "distinguishing_trace_cert": 0.98,
+        "distinguishing_trace_full": 0.98,
+        "equivalence_witness_cert": 0.0,
+        "equivalence_witness_full": 0.0,
+        "overall_cert": 0.48,
+        "overall_full": 0.48
+      },
+      {
+        "condition": "R2C generator-assisted",
+        "distinguishing_trace_cert": 1.0,
+        "distinguishing_trace_full": 1.0,
+        "equivalence_witness_cert": 0.98,
+        "equivalence_witness_full": 0.98,
+        "overall_cert": 0.99,
+        "overall_full": 0.99
+      }
+    ],
+    "table3": [
+      {
+        "condition": "R1",
+        "overall_cert": 0.98,
+        "overall_full": 0.98,
+        "trace_witness_cert": 0.96,
+        "trace_witness_full": 0.96,
+        "unreachability_witness_cert": 1.0,
+        "unreachability_witness_full": 1.0
+      },
+      {
+        "condition": "Oracle+Format",
+        "overall_cert": 0.93,
+        "overall_full": 0.93,
+        "trace_witness_cert": 0.9,
+        "trace_witness_full": 0.9,
+        "unreachability_witness_cert": 0.96,
+        "unreachability_witness_full": 0.96
+      },
+      {
+        "condition": "R2A verify-only",
+        "overall_cert": 1.0,
+        "overall_full": 1.0,
+        "trace_witness_cert": 1.0,
+        "trace_witness_full": 1.0,
+        "unreachability_witness_cert": 1.0,
+        "unreachability_witness_full": 1.0
+      },
+      {
+        "condition": "R2B repair-only",
+        "overall_cert": 0.98,
+        "overall_full": 0.98,
+        "trace_witness_cert": 1.0,
+        "trace_witness_full": 1.0,
+        "unreachability_witness_cert": 0.96,
+        "unreachability_witness_full": 0.96
+      },
+      {
+        "condition": "R2C generator-assisted",
+        "overall_cert": 1.0,
+        "overall_full": 1.0,
+        "trace_witness_cert": 1.0,
+        "trace_witness_full": 1.0,
+        "unreachability_witness_cert": 1.0,
+        "unreachability_witness_full": 1.0
+      }
+    ],
+    "table4": [
+      {
+        "distinguishing_trace_full": 0.49,
+        "equivalence_witness_full": 0.0,
+        "extract": 1.0,
+        "model": "gemma2_9b",
+        "overall_full": 0.24,
+        "track": "R0",
+        "verdict": 0.53
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "extract": 1.0,
+        "model": "gemma2_9b",
+        "overall_full": 0.0,
+        "track": "R1",
+        "verdict": 0.85
+      },
+      {
+        "distinguishing_trace_full": 0.061,
+        "equivalence_witness_full": 0.0,
+        "extract": 0.54,
+        "model": "gemma2_9b",
+        "overall_full": 0.03,
+        "track": "R2",
+        "verdict": 1.0
+      },
+      {
+        "distinguishing_trace_full": 0.408,
+        "equivalence_witness_full": 0.0,
+        "extract": 1.0,
+        "model": "llama3.1_8b",
+        "overall_full": 0.2,
+        "track": "R0",
+        "verdict": 0.49
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "extract": 0.09,
+        "model": "llama3.1_8b",
+        "overall_full": 0.0,
+        "track": "R1",
+        "verdict": 0.444
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.02,
+        "extract": 0.07,
+        "model": "llama3.1_8b",
+        "overall_full": 0.01,
+        "track": "R2",
+        "verdict": 1.0
+      },
+      {
+        "distinguishing_trace_full": 0.204,
+        "equivalence_witness_full": 0.0,
+        "extract": 1.0,
+        "model": "mistral-nemo_12b",
+        "overall_full": 0.1,
+        "track": "R0",
+        "verdict": 0.49
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "extract": 0.04,
+        "model": "mistral-nemo_12b",
+        "overall_full": 0.0,
+        "track": "R1",
+        "verdict": 1.0
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "extract": 0.06,
+        "model": "mistral-nemo_12b",
+        "overall_full": 0.0,
+        "track": "R2",
+        "verdict": 1.0
+      },
+      {
+        "distinguishing_trace_full": 0.061,
+        "equivalence_witness_full": 0.0,
+        "extract": 1.0,
+        "model": "qwen2.5-coder_7b",
+        "overall_full": 0.03,
+        "track": "R0",
+        "verdict": 0.49
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "extract": 0.65,
+        "model": "qwen2.5-coder_7b",
+        "overall_full": 0.0,
+        "track": "R1",
+        "verdict": 0.985
+      },
+      {
+        "distinguishing_trace_full": 0.612,
+        "equivalence_witness_full": 0.0,
+        "extract": 0.66,
+        "model": "qwen2.5-coder_7b",
+        "overall_full": 0.3,
+        "track": "R2",
+        "verdict": 1.0
+      }
+    ]
+  },
+  "uncertainty": {
+    "bootstrap_settings": {
+      "alpha": 0.05,
+      "method": "percentile_bootstrap",
+      "n_resamples": 1000
+    },
+    "c2_r1_subtype_comparison": {
+      "note": "trace_witness and unreachability_witness are disjoint balanced subsets (50+50); independent bootstrap CIs (descriptive).",
+      "trace_witness_cert": {
+        "ci_high": 1.0,
+        "ci_low": 0.9,
+        "n": 50,
+        "note": "",
+        "rate": 0.96,
+        "successes": 48
+      },
+      "unreachability_witness_cert": {
+        "ci_high": 1.0,
+        "ci_low": 1.0,
+        "n": 50,
+        "note": "",
+        "rate": 1.0,
+        "successes": 50
+      }
+    },
+    "f1_r1_subtype_comparison": {
+      "descriptive_gap_dist_minus_eq": 0.9388,
+      "distinguishing_trace_cert": {
+        "ci_high": 1.0,
+        "ci_low": 0.8571,
+        "n": 49,
+        "note": "",
+        "rate": 0.9388,
+        "successes": 46
+      },
+      "equivalence_witness_cert": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "n": 51,
+        "note": "",
+        "rate": 0.0,
+        "successes": 0
+      },
+      "note": "distinguishing_trace (n=49) and equivalence_witness (n=51) are disjoint item subsets; rates are reported with independent bootstrap CIs (descriptive)."
+    },
+    "local_f1_r1_subtype_gaps_descriptive": [
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "gap_dist_minus_eq": 0.0,
+        "model": "gemma2_9b",
+        "note": "Descriptive subtype gap on disjoint item subsets (49 dist + 51 eq); not a paired same-item test.",
+        "track": "R1"
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "gap_dist_minus_eq": 0.0,
+        "model": "llama3.1_8b",
+        "note": "Descriptive subtype gap on disjoint item subsets (49 dist + 51 eq); not a paired same-item test.",
+        "track": "R1"
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "gap_dist_minus_eq": 0.0,
+        "model": "mistral-nemo_12b",
+        "note": "Descriptive subtype gap on disjoint item subsets (49 dist + 51 eq); not a paired same-item test.",
+        "track": "R1"
+      },
+      {
+        "distinguishing_trace_full": 0.0,
+        "equivalence_witness_full": 0.0,
+        "gap_dist_minus_eq": 0.0,
+        "model": "qwen2.5-coder_7b",
+        "note": "Descriptive subtype gap on disjoint item subsets (49 dist + 51 eq); not a paired same-item test.",
+        "track": "R1"
+      }
+    ],
+    "paired_comparisons_from_f1_stratified_export": [
+      {
+        "both_correct": 32,
+        "both_incorrect": 52,
+        "cert_diff_first_minus_second": {
+          "ci_high": 0.2,
+          "ci_low": 0.04,
+          "point_diff": 0.12
+        },
+        "comparison": "R1 vs Oracle+Format",
+        "first_condition": "R1",
+        "first_only_correct": 14,
+        "full_diff_first_minus_second": {
+          "ci_high": 0.19,
+          "ci_low": 0.05,
+          "point_diff": 0.12
+        },
+        "item_id_alignment": "perfect",
+        "mcnemar_first_only": 14,
+        "mcnemar_p_value": 0.004180908203125,
+        "mcnemar_second_only": 2,
+        "mismatch_details": null,
+        "second_condition": "Oracle+Format",
+        "second_only_correct": 2,
+        "shared_items": 100
+      },
+      {
+        "both_correct": 46,
+        "both_incorrect": 51,
+        "cert_diff_first_minus_second": {
+          "ci_high": 0.0,
+          "ci_low": -0.0603,
+          "point_diff": -0.03
+        },
+        "comparison": "R1 vs R2A",
+        "first_condition": "R1",
+        "first_only_correct": 0,
+        "full_diff_first_minus_second": {
+          "ci_high": 0.0,
+          "ci_low": -0.07,
+          "point_diff": -0.03
+        },
+        "item_id_alignment": "perfect",
+        "mcnemar_first_only": 0,
+        "mcnemar_p_value": 0.25,
+        "mcnemar_second_only": 3,
+        "mismatch_details": null,
+        "second_condition": "R2A",
+        "second_only_correct": 3,
+        "shared_items": 100
+      },
+      {
+        "both_correct": 45,
+        "both_incorrect": 51,
+        "cert_diff_first_minus_second": {
+          "ci_high": 0.02,
+          "ci_low": -0.06,
+          "point_diff": -0.02
+        },
+        "comparison": "R1 vs R2B",
+        "first_condition": "R1",
+        "first_only_correct": 1,
+        "full_diff_first_minus_second": {
+          "ci_high": 0.02,
+          "ci_low": -0.06,
+          "point_diff": -0.02
+        },
+        "item_id_alignment": "perfect",
+        "mcnemar_first_only": 1,
+        "mcnemar_p_value": 0.625,
+        "mcnemar_second_only": 3,
+        "mismatch_details": null,
+        "second_condition": "R2B",
+        "second_only_correct": 3,
+        "shared_items": 100
+      },
+      {
+        "both_correct": 49,
+        "both_incorrect": 1,
+        "cert_diff_first_minus_second": {
+          "ci_high": -0.39,
+          "ci_low": -0.6,
+          "point_diff": -0.5
+        },
+        "comparison": "R2A vs R2C",
+        "first_condition": "R2A",
+        "first_only_correct": 0,
+        "full_diff_first_minus_second": {
+          "ci_high": -0.4,
+          "ci_low": -0.6,
+          "point_diff": -0.5
+        },
+        "item_id_alignment": "perfect",
+        "mcnemar_first_only": 0,
+        "mcnemar_p_value": 1.7763568394002505e-15,
+        "mcnemar_second_only": 50,
+        "mismatch_details": null,
+        "second_condition": "R2C",
+        "second_only_correct": 50,
+        "shared_items": 100
+      },
+      {
+        "both_correct": 48,
+        "both_incorrect": 1,
+        "cert_diff_first_minus_second": {
+          "ci_high": -0.4098,
+          "ci_low": -0.61,
+          "point_diff": -0.51
+        },
+        "comparison": "R2B vs R2C",
+        "first_condition": "R2B",
+        "first_only_correct": 0,
+        "full_diff_first_minus_second": {
+          "ci_high": -0.41,
+          "ci_low": -0.62,
+          "point_diff": -0.51
+        },
+        "item_id_alignment": "perfect",
+        "mcnemar_first_only": 0,
+        "mcnemar_p_value": 8.881784197001252e-16,
+        "mcnemar_second_only": 51,
+        "mismatch_details": null,
+        "second_condition": "R2C",
+        "second_only_correct": 51,
+        "shared_items": 100
+      }
+    ],
+    "paired_condition_comparisons": [
+      {
+        "cert_diff_first_minus_second": {
+          "ci_high": -0.43,
+          "ci_low": -0.63,
+          "point_diff": -0.53
+        },
+        "comparison": "F1 R1 vs R2C (overall, n=100)",
+        "first_cert_rate": {
+          "ci_high": 0.56,
+          "ci_low": 0.36,
+          "n": 100,
+          "note": "",
+          "rate": 0.46,
+          "successes": 46
+        },
+        "mcnemar_first_only": 0,
+        "mcnemar_p_value": 2.220446049250313e-16,
+        "mcnemar_second_only": 53,
+        "paired_items": 100,
+        "second_cert_rate": {
+          "ci_high": 1.0,
+          "ci_low": 0.97,
+          "n": 100,
+          "note": "",
+          "rate": 0.99,
+          "successes": 99
+        },
+        "test_type": "paired_mcnemar_on_same_item_ids"
+      },
+      {
+        "cert_diff_first_minus_second": {
+          "ci_high": -0.4,
+          "ci_low": -0.6002,
+          "point_diff": -0.5
+        },
+        "comparison": "F1 R2A vs R2C (overall, n=100)",
+        "first_cert_rate": {
+          "ci_high": 0.59,
+          "ci_low": 0.39,
+          "n": 100,
+          "note": "",
+          "rate": 0.49,
+          "successes": 49
+        },
+        "mcnemar_first_only": 0,
+        "mcnemar_p_value": 1.7763568394002505e-15,
+        "mcnemar_second_only": 50,
+        "paired_items": 100,
+        "second_cert_rate": {
+          "ci_high": 1.0,
+          "ci_low": 0.97,
+          "n": 100,
+          "note": "",
+          "rate": 0.99,
+          "successes": 99
+        },
+        "test_type": "paired_mcnemar_on_same_item_ids"
+      },
+      {
+        "cert_diff_first_minus_second": {
+          "ci_high": -0.4198,
+          "ci_low": -0.62,
+          "point_diff": -0.51
+        },
+        "comparison": "F1 R2B vs R2C (overall, n=100)",
+        "first_cert_rate": {
+          "ci_high": 0.58,
+          "ci_low": 0.37,
+          "n": 100,
+          "note": "",
+          "rate": 0.48,
+          "successes": 48
+        },
+        "mcnemar_first_only": 0,
+        "mcnemar_p_value": 8.881784197001252e-16,
+        "mcnemar_second_only": 51,
+        "paired_items": 100,
+        "second_cert_rate": {
+          "ci_high": 1.0,
+          "ci_low": 0.97,
+          "n": 100,
+          "note": "",
+          "rate": 0.99,
+          "successes": 99
+        },
+        "test_type": "paired_mcnemar_on_same_item_ids"
+      },
+      {
+        "cert_diff_first_minus_second": {
+          "ci_high": -0.9412,
+          "ci_low": -1.0,
+          "point_diff": -0.9804
+        },
+        "comparison": "F1 eq-witness R1 vs R2C (n=51 paired items)",
+        "first_cert_rate": {
+          "ci_high": 0.0,
+          "ci_low": 0.0,
+          "n": 51,
+          "note": "",
+          "rate": 0.0,
+          "successes": 0
+        },
+        "mcnemar_first_only": 0,
+        "mcnemar_p_value": 1.7763568394002505e-15,
+        "mcnemar_second_only": 50,
+        "paired_items": 51,
+        "second_cert_rate": {
+          "ci_high": 1.0,
+          "ci_low": 0.9412,
+          "n": 51,
+          "note": "",
+          "rate": 0.9804,
+          "successes": 50
+        },
+        "test_type": "paired_mcnemar_on_same_item_ids"
+      }
+    ]
+  }
+}

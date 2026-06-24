@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{F1 Claude ablations by condition and certificate subtype (cert/full rates).}
+\label{tab:f1-ablations}
+\begin{tabular}{lccc}
+\toprule
+condition & dist\_cert/full & eq\_cert/full & overall\_cert/full \\
+\midrule
+R1 & 0.939 / 0.939 & 0.000 / 0.000 & 0.460 / 0.460 \\
+Oracle+Format & 0.694 / 0.694 & 0.000 / 0.000 & 0.340 / 0.340 \\
+R2A verify-only & 1.000 / 1.000 & 0.000 / 0.000 & 0.490 / 0.490 \\
+R2B repair-only & 0.980 / 0.980 & 0.000 / 0.000 & 0.480 / 0.480 \\
+R2C generator-assisted & 1.000 / 1.000 & 0.980 / 0.980 & 0.990 / 0.990 \\
+\bottomrule
+\end{tabular}
+\end{table}

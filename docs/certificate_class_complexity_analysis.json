@@ -1,0 +1,656 @@
+{
+  "analysis": "certificate_class_complexity",
+  "certificate_specs": {
+    "distinguishing_trace": {
+      "canonical_fields": [],
+      "canonicalization_required": false,
+      "certificate_type": "distinguishing_trace",
+      "code_paths": {
+        "builder": "certificates/separation.py::build_distinguishing_trace_certificate",
+        "oracle": "oracle/separation.py::shortest_distinguishing_trace",
+        "parser": "evaluator/parser.py::_validate_distinguishing_trace_payload",
+        "verifier": "verifier/separation.py::verify_distinguishing_trace_certificate"
+      },
+      "envelope_fields": [
+        "certificate_type",
+        "version",
+        "fsm_ids",
+        "verdict_supported"
+      ],
+      "estimated_complexity_score": 4.5,
+      "estimated_information_content": "O(|trace|) alphabet symbols plus 2 acceptance bits; verifier does not require shortest trace.",
+      "exact_match_fields": [
+        "fsm_ids (ordered pair)"
+      ],
+      "family": "F1",
+      "local_reasoning_sufficient": false,
+      "multiple_valid_certificates": true,
+      "optional_payload_fields": [],
+      "payload_fields": [
+        "trace",
+        "acceptance"
+      ],
+      "required_fields": 8,
+      "requires_canonical_hashing": false,
+      "requires_exact_set_reconstruction": false,
+      "requires_minimization": false,
+      "requires_replay_verification": true,
+      "requires_state_space_closure": false,
+      "requires_symbolic_search": true,
+      "semantic_fields": 3,
+      "symbolic_synthesis_required": true,
+      "synthesis_notes": "Witness found by BFS product-graph search (oracle/separation.py); model must propose trace + acceptance matching replay.",
+      "verdict_polarity": "false (non-equivalent)",
+      "verifier_accepts_multiple_forms": true,
+      "verifier_recomputes": [
+        "acceptance.A via accepts_trace(fsm_a, trace)",
+        "acceptance.B via accepts_trace(fsm_b, trace)",
+        "distinguishing property (acceptance_A != acceptance_B)"
+      ],
+      "verifier_strictness_notes": "Semantic replay checks only; any distinguishing trace accepted. Shortest trace is oracle metadata, not enforced."
+    },
+    "equivalence_witness": {
+      "canonical_fields": [
+        "minimized_hash_A",
+        "minimized_hash_B"
+      ],
+      "canonicalization_required": true,
+      "certificate_type": "equivalence_witness",
+      "code_paths": {
+        "builder": "certificates/separation.py::build_equivalence_witness_certificate",
+        "equivalence": "runtime/dfa_minimize.py::are_equivalent_dfas",
+        "hash": "runtime/dfa_minimize.py::minimized_dfa_hash",
+        "parser": "evaluator/parser.py::_validate_equivalence_witness_payload",
+        "verifier": "verifier/separation.py::verify_equivalence_witness_certificate"
+      },
+      "envelope_fields": [
+        "certificate_type",
+        "version",
+        "fsm_ids",
+        "verdict_supported"
+      ],
+      "estimated_complexity_score": 9.5,
+      "estimated_information_content": "Two fixed 64-char hex hashes encoding a bounded language bitvector (trace lengths 0..min(|Q|,12) over completed reachable DFA).",
+      "exact_match_fields": [
+        "payload.equivalent == true",
+        "payload.minimized_hash_A",
+        "payload.minimized_hash_B",
+        "fsm_ids (ordered pair)"
+      ],
+      "family": "F1",
+      "local_reasoning_sufficient": false,
+      "multiple_valid_certificates": false,
+      "optional_payload_fields": [],
+      "payload_fields": [
+        "equivalent",
+        "minimized_hash_A",
+        "minimized_hash_B"
+      ],
+      "required_fields": 9,
+      "requires_canonical_hashing": true,
+      "requires_exact_set_reconstruction": false,
+      "requires_minimization": true,
+      "requires_replay_verification": false,
+      "requires_state_space_closure": true,
+      "requires_symbolic_search": true,
+      "semantic_fields": 3,
+      "symbolic_synthesis_required": true,
+      "synthesis_notes": "Gold builder calls minimized_dfa_hash on both DFAs; R2C uses solver.equivalence_certificate. No alternate witness types accepted.",
+      "verdict_polarity": "true (equivalent)",
+      "verifier_accepts_multiple_forms": false,
+      "verifier_recomputes": [
+        "are_equivalent_dfas(fsm_a, fsm_b) [pair BFS]",
+        "minimized_dfa_hash(fsm_a)",
+        "minimized_dfa_hash(fsm_b)",
+        "hash equality across equivalent DFAs"
+      ],
+      "verifier_strictness_notes": "Strictest class: semantic equivalence PLUS exact hash match to verifier-recomputed minimized_dfa_hash outputs. Hash mismatch rejects witness even when verdict/equivalence is correct."
+    },
+    "trace_witness": {
+      "canonical_fields": [],
+      "canonicalization_required": false,
+      "certificate_type": "trace_witness",
+      "code_paths": {
+        "builder": "certificates/reachability.py::_trace_payload",
+        "oracle": "oracle/reachability.py::shortest_reachability_witness",
+        "parser": "evaluator/parser.py::_validate_c2_certificate (trace_witness)",
+        "verifier": "verifier/reachability.py::_verify_trace_witness"
+      },
+      "envelope_fields": [
+        "certificate_type",
+        "version",
+        "fsm_id",
+        "verdict_supported"
+      ],
+      "estimated_complexity_score": 3.5,
+      "estimated_information_content": "O(|trace|) symbols plus O(|trace|+1) state labels; multiple traces may exist for same target.",
+      "exact_match_fields": [
+        "state_sequence (must match replay exactly)"
+      ],
+      "family": "C2",
+      "local_reasoning_sufficient": true,
+      "multiple_valid_certificates": true,
+      "optional_payload_fields": [
+        "branching_choices",
+        "accepting"
+      ],
+      "payload_fields": [
+        "trace",
+        "state_sequence"
+      ],
+      "required_fields": 7,
+      "requires_canonical_hashing": false,
+      "requires_exact_set_reconstruction": false,
+      "requires_minimization": false,
+      "requires_replay_verification": true,
+      "requires_state_space_closure": false,
+      "requires_symbolic_search": true,
+      "semantic_fields": 2,
+      "symbolic_synthesis_required": true,
+      "synthesis_notes": "Single-FSM path search; analogous to distinguishing_trace on one machine.",
+      "verdict_polarity": "true (reachable)",
+      "verifier_accepts_multiple_forms": true,
+      "verifier_recomputes": [
+        "simulate(fsm, trace) state_sequence",
+        "initial state and target_state endpoints"
+      ],
+      "verifier_strictness_notes": "Replay-based; any valid path ending at target accepted. Prompt example includes accepting but verifier ignores it."
+    },
+    "unreachability_witness": {
+      "canonical_fields": [
+        "reachable_states"
+      ],
+      "canonicalization_required": true,
+      "certificate_type": "unreachability_witness",
+      "code_paths": {
+        "builder": "certificates/reachability.py::_unreachability_payload",
+        "closure": "runtime/reachability.py::reachable_states",
+        "parser": "evaluator/parser.py::_validate_c2_certificate (unreachability)",
+        "verifier": "verifier/reachability.py::_verify_unreachability_witness"
+      },
+      "envelope_fields": [
+        "certificate_type",
+        "version",
+        "fsm_id",
+        "verdict_supported"
+      ],
+      "estimated_complexity_score": 5.0,
+      "estimated_information_content": "O(|R|) state names where R is reachable set; unique set content, list order immaterial (set equality).",
+      "exact_match_fields": [
+        "reachable_states set equality (frozenset)",
+        "target_state string"
+      ],
+      "family": "C2",
+      "local_reasoning_sufficient": true,
+      "multiple_valid_certificates": false,
+      "optional_payload_fields": [],
+      "payload_fields": [
+        "reachable_states",
+        "target_state"
+      ],
+      "required_fields": 7,
+      "requires_canonical_hashing": false,
+      "requires_exact_set_reconstruction": true,
+      "requires_minimization": false,
+      "requires_replay_verification": false,
+      "requires_state_space_closure": true,
+      "requires_symbolic_search": false,
+      "semantic_fields": 2,
+      "symbolic_synthesis_required": false,
+      "synthesis_notes": "Gold builder lists full BFS reachable set. Claude R1 ~100% despite exact-set contract \u2014 closure is simpler than minimized_dfa_hash.",
+      "verdict_polarity": "false (unreachable)",
+      "verifier_accepts_multiple_forms": false,
+      "verifier_recomputes": [
+        "reachable_states(fsm) [BFS from initial]",
+        "target_state not in reachable set"
+      ],
+      "verifier_strictness_notes": "Requires exact reachable set, not a valid sub/superset invariant. Set canonicalization (unique membership) but not hash-based."
+    }
+  },
+  "claude_r1_certificate_valid_rate_by_type": {
+    "distinguishing_trace": 0.9390000000000001,
+    "equivalence_witness": 0.0
+  },
+  "comparative_matrix": [
+    {
+      "canonical_fields": 0,
+      "canonicalization_required": false,
+      "certificate_type": "distinguishing_trace",
+      "estimated_complexity_score": 4.5,
+      "exact_match_fields": 1,
+      "family": "F1",
+      "local_reasoning_sufficient": false,
+      "multiple_valid_forms": true,
+      "required_fields": 8,
+      "requires_canonical_hashing": false,
+      "requires_exact_set_reconstruction": false,
+      "requires_minimization": false,
+      "requires_replay_verification": true,
+      "semantic_fields": 3,
+      "symbolic_synthesis_required": true,
+      "verifier_recomputes": 3
+    },
+    {
+      "canonical_fields": 2,
+      "canonicalization_required": true,
+      "certificate_type": "equivalence_witness",
+      "estimated_complexity_score": 9.5,
+      "exact_match_fields": 4,
+      "family": "F1",
+      "local_reasoning_sufficient": false,
+      "multiple_valid_forms": false,
+      "required_fields": 9,
+      "requires_canonical_hashing": true,
+      "requires_exact_set_reconstruction": false,
+      "requires_minimization": true,
+      "requires_replay_verification": false,
+      "semantic_fields": 3,
+      "symbolic_synthesis_required": true,
+      "verifier_recomputes": 4
+    },
+    {
+      "canonical_fields": 0,
+      "canonicalization_required": false,
+      "certificate_type": "trace_witness",
+      "estimated_complexity_score": 3.5,
+      "exact_match_fields": 1,
+      "family": "C2",
+      "local_reasoning_sufficient": true,
+      "multiple_valid_forms": true,
+      "required_fields": 7,
+      "requires_canonical_hashing": false,
+      "requires_exact_set_reconstruction": false,
+      "requires_minimization": false,
+      "requires_replay_verification": true,
+      "semantic_fields": 2,
+      "symbolic_synthesis_required": true,
+      "verifier_recomputes": 2
+    },
+    {
+      "canonical_fields": 1,
+      "canonicalization_required": true,
+      "certificate_type": "unreachability_witness",
+      "estimated_complexity_score": 5.0,
+      "exact_match_fields": 2,
+      "family": "C2",
+      "local_reasoning_sufficient": true,
+      "multiple_valid_forms": false,
+      "required_fields": 7,
+      "requires_canonical_hashing": false,
+      "requires_exact_set_reconstruction": true,
+      "requires_minimization": false,
+      "requires_replay_verification": false,
+      "semantic_fields": 2,
+      "symbolic_synthesis_required": false,
+      "verifier_recomputes": 2
+    }
+  ],
+  "failure_taxonomy": {
+    "pooled_by_certificate_type": {
+      "distinguishing_trace": {
+        "mean_invalid_rate_across_runs": 0.183,
+        "semantic_vs_formatting": {
+          "formatting": 0,
+          "other": 0,
+          "semantic": 18
+        },
+        "top_failure_categories": [
+          {
+            "category": "acceptance_mismatch",
+            "count": 16,
+            "percentage": 0.889
+          },
+          {
+            "category": "replay_failure",
+            "count": 2,
+            "percentage": 0.111
+          }
+        ]
+      },
+      "equivalence_witness": {
+        "mean_invalid_rate_across_runs": 1.0,
+        "semantic_vs_formatting": {
+          "formatting": 0,
+          "other": 0,
+          "semantic": 102
+        },
+        "top_failure_categories": [
+          {
+            "category": "equivalence_hash_mismatch",
+            "count": 102,
+            "percentage": 1.0
+          }
+        ]
+      },
+      "trace_witness": {
+        "mean_invalid_rate_across_runs": 0.07,
+        "semantic_vs_formatting": {
+          "formatting": 6,
+          "other": 0,
+          "semantic": 1
+        },
+        "top_failure_categories": [
+          {
+            "category": "wrong_trace_format",
+            "count": 6,
+            "percentage": 0.857
+          },
+          {
+            "category": "replay_failure",
+            "count": 1,
+            "percentage": 0.143
+          }
+        ]
+      },
+      "unreachability_witness": {
+        "mean_invalid_rate_across_runs": 0.02,
+        "semantic_vs_formatting": {
+          "formatting": 0,
+          "other": 0,
+          "semantic": 2
+        },
+        "top_failure_categories": [
+          {
+            "category": "incomplete_reachability_set",
+            "count": 2,
+            "percentage": 1.0
+          }
+        ]
+      }
+    },
+    "runs_analyzed": [
+      {
+        "by_certificate_type": {
+          "distinguishing_trace": {
+            "certificate_invalid": 3,
+            "certificate_invalid_rate": 0.061,
+            "extractable": 49,
+            "formatting_failures": 0,
+            "n": 49,
+            "sample_errors": [
+              {
+                "errors": [
+                  "trace replay failed: no transition from 'loop_0_c' on 'a'"
+                ],
+                "item_id": "62a5779f-865c-50b5-b7ee-985a2167cb82"
+              },
+              {
+                "errors": [
+                  "acceptance.B mismatch: replay=False, declared=True"
+                ],
+                "item_id": "81d7180c-f336-5216-bb3f-939e07b468cc"
+              }
+            ],
+            "semantic_failures": 3,
+            "top_failure_categories": [
+              {
+                "category": "acceptance_mismatch",
+                "count": 2
+              },
+              {
+                "category": "replay_failure",
+                "count": 1
+              }
+            ],
+            "verifier_rejection_mechanism": "Replay trace on both DFAs; reject if acceptance labels mismatch replay or trace does not distinguish."
+          },
+          "equivalence_witness": {
+            "certificate_invalid": 51,
+            "certificate_invalid_rate": 1.0,
+            "extractable": 51,
+            "formatting_failures": 0,
+            "n": 51,
+            "sample_errors": [
+              {
+                "errors": [
+                  "minimized_hash_A mismatch"
+                ],
+                "item_id": "c3ee241b-d418-568b-b476-b6cf390cb2cc"
+              },
+              {
+                "errors": [
+                  "minimized_hash_A mismatch"
+                ],
+                "item_id": "a6f510b5-ceea-5cbe-98b2-2876be119a7d"
+              }
+            ],
+            "semantic_failures": 51,
+            "top_failure_categories": [
+              {
+                "category": "equivalence_hash_mismatch",
+                "count": 51
+              }
+            ],
+            "verifier_rejection_mechanism": "Run are_equivalent_dfas; recompute minimized_dfa_hash for each DFA; reject on semantic non-equivalence or any hash mismatch."
+          }
+        },
+        "condition": "R1",
+        "label": "F1 Claude R1",
+        "scores_path": "runs/frontier_claude_sonnet_tools_n100_v2/claude-sonnet-4-5-20250929/F1/temp_0.2/R1/scores.jsonl"
+      },
+      {
+        "by_certificate_type": {
+          "distinguishing_trace": {
+            "certificate_invalid": 15,
+            "certificate_invalid_rate": 0.306,
+            "extractable": 49,
+            "formatting_failures": 0,
+            "n": 49,
+            "sample_errors": [
+              {
+                "errors": [
+                  "acceptance.B mismatch: replay=False, declared=True"
+                ],
+                "item_id": "79ce6d56-2058-58e7-a493-2f2925a96334"
+              },
+              {
+                "errors": [
+                  "trace must distinguish A and B (acceptance values equal)"
+                ],
+                "item_id": "b6a6ed30-e94e-5c37-a30f-d762f52686b0"
+              }
+            ],
+            "semantic_failures": 15,
+            "top_failure_categories": [
+              {
+                "category": "acceptance_mismatch",
+                "count": 14
+              },
+              {
+                "category": "replay_failure",
+                "count": 1
+              }
+            ],
+            "verifier_rejection_mechanism": "Replay trace on both DFAs; reject if acceptance labels mismatch replay or trace does not distinguish."
+          },
+          "equivalence_witness": {
+            "certificate_invalid": 51,
+            "certificate_invalid_rate": 1.0,
+            "extractable": 51,
+            "formatting_failures": 0,
+            "n": 51,
+            "sample_errors": [
+              {
+                "errors": [
+                  "minimized_hash_A mismatch"
+                ],
+                "item_id": "c3ee241b-d418-568b-b476-b6cf390cb2cc"
+              },
+              {
+                "errors": [
+                  "minimized_hash_A mismatch"
+                ],
+                "item_id": "a6f510b5-ceea-5cbe-98b2-2876be119a7d"
+              }
+            ],
+            "semantic_failures": 51,
+            "top_failure_categories": [
+              {
+                "category": "equivalence_hash_mismatch",
+                "count": 51
+              }
+            ],
+            "verifier_rejection_mechanism": "Run are_equivalent_dfas; recompute minimized_dfa_hash for each DFA; reject on semantic non-equivalence or any hash mismatch."
+          }
+        },
+        "condition": "Oracle+Format",
+        "label": "F1 Oracle+Format",
+        "scores_path": "runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1/scores.jsonl"
+      },
+      {
+        "by_certificate_type": {
+          "trace_witness": {
+            "certificate_invalid": 2,
+            "certificate_invalid_rate": 0.04,
+            "extractable": 50,
+            "formatting_failures": 2,
+            "n": 50,
+            "sample_errors": [
+              {
+                "errors": [
+                  "state_sequence length must be len(trace)+1, got 5 vs 3"
+                ],
+                "item_id": "25ee4d3c-d733-58f4-81b8-00bb44eb9781"
+              },
+              {
+                "errors": [
+                  "state_sequence length must be len(trace)+1, got 4 vs 2"
+                ],
+                "item_id": "60bea605-39b6-5b86-af1c-b560fa39c4a5"
+              }
+            ],
+            "semantic_failures": 0,
+            "top_failure_categories": [
+              {
+                "category": "wrong_trace_format",
+                "count": 2
+              }
+            ],
+            "verifier_rejection_mechanism": "Simulate trace; reject if state_sequence length/endpoints/replay mismatch."
+          },
+          "unreachability_witness": {
+            "certificate_invalid": 0,
+            "certificate_invalid_rate": 0.0,
+            "extractable": 50,
+            "formatting_failures": 0,
+            "n": 50,
+            "sample_errors": [],
+            "semantic_failures": 0,
+            "top_failure_categories": [],
+            "verifier_rejection_mechanism": "BFS reachable set; reject if witness set != computed set or target listed."
+          }
+        },
+        "condition": "R1",
+        "label": "C2 Claude R1",
+        "scores_path": "runs/ablations_c2_existential_universal_claude_n100_v1/R1/scores.jsonl"
+      },
+      {
+        "by_certificate_type": {
+          "trace_witness": {
+            "certificate_invalid": 5,
+            "certificate_invalid_rate": 0.1,
+            "extractable": 50,
+            "formatting_failures": 4,
+            "n": 50,
+            "sample_errors": [
+              {
+                "errors": [
+                  "state_sequence length must be len(trace)+1, got 4 vs 2"
+                ],
+                "item_id": "30383ae0-d58c-5d8c-8e02-2d5b1a8a53a3"
+              },
+              {
+                "errors": [
+                  "state_sequence length must be len(trace)+1, got 4 vs 2"
+                ],
+                "item_id": "3c813384-4045-549c-919e-062995ef8ec9"
+              }
+            ],
+            "semantic_failures": 1,
+            "top_failure_categories": [
+              {
+                "category": "wrong_trace_format",
+                "count": 4
+              },
+              {
+                "category": "replay_failure",
+                "count": 1
+              }
+            ],
+            "verifier_rejection_mechanism": "Simulate trace; reject if state_sequence length/endpoints/replay mismatch."
+          },
+          "unreachability_witness": {
+            "certificate_invalid": 2,
+            "certificate_invalid_rate": 0.04,
+            "extractable": 50,
+            "formatting_failures": 0,
+            "n": 50,
+            "sample_errors": [
+              {
+                "errors": [
+                  "extra non-reachable states: ['q1']"
+                ],
+                "item_id": "b97f6de1-dbdc-5217-8760-8d3a153f2297"
+              },
+              {
+                "errors": [
+                  "missing reachable states: ['q4']",
+                  "extra non-reachable states: ['q1']"
+                ],
+                "item_id": "dcdc7c27-a573-53b6-8f38-db160f3dcc20"
+              }
+            ],
+            "semantic_failures": 2,
+            "top_failure_categories": [
+              {
+                "category": "incomplete_reachability_set",
+                "count": 2
+              }
+            ],
+            "verifier_rejection_mechanism": "BFS reachable set; reject if witness set != computed set or target listed."
+          }
+        },
+        "condition": "Oracle+Format",
+        "label": "C2 Oracle+Format",
+        "scores_path": "runs/ablations_c2_existential_universal_claude_n100_v1/Oracle/scores.jsonl"
+      }
+    ]
+  },
+  "mechanistic_explanation": {
+    "what_makes_equivalence_witness_hard": [
+      "Payload is not a human-readable witness; it requires two hex hashes produced by minimized_dfa_hash (complete DFA \u2192 reachable core \u2192 enumerate language bits for lengths 0..min(|Q|,12)).",
+      "Verifier independently runs are_equivalent_dfas AND recomputes both hashes; all four checks must pass.",
+      "No alternate certificate types or approximate hashes accepted (verifier audit: single canonical witness form).",
+      "Parser enforces equivalent=true and non-empty hash strings before semantic verification.",
+      "Claude R1 failures are 51/51 equivalence_hash_mismatch with verdict_accuracy=1.0 \u2014 models know equivalence but cannot emit verifier-identical hashes without solver.equivalence_certificate.",
+      "R2C success (~0.98) uses build_equivalence_witness_certificate / solver tool \u2014 same code path as gold builder."
+    ],
+    "why_c2_does_not_mirror_f1": [
+      "trace_witness: replay-only, multiple valid paths, no hashing.",
+      "unreachability_witness: exact set required but computable by single BFS without minimization or language bitvector hashing.",
+      "Claude R1 unreachability_witness full\u22481.00 vs equivalence_witness 0.00 despite both being 'negative verdict' items \u2014 negates simple existential/universal asymmetry explanation."
+    ]
+  },
+  "methodology": {
+    "complexity_score_scale": "Heuristic 1\u201310 composite: +2 canonical hashing, +2 minimization, +1.5 exact set reconstruction, +1 symbolic search, +1 state-space closure, +1 strict exact-match fields, \u22121 local reasoning sufficient, \u22120.5 multiple valid forms accepted.",
+    "no_new_model_calls": true,
+    "no_verifier_changes": true,
+    "sources": [
+      "verifier/separation.py",
+      "verifier/reachability.py",
+      "evaluator/parser.py",
+      "certificates/separation.py",
+      "certificates/reachability.py",
+      "runtime/dfa_minimize.py",
+      "frozen Claude R1 / Oracle scoring outputs (no new model calls)"
+    ]
+  },
+  "research_answers": {
+    "best_predictor_of_claude_collapse": "Canonical hash emission under R1 self-construction. Claude R1: equivalence_witness 51/51 invalid (100%) with equivalence_hash_mismatch; distinguishing_trace 3/49 invalid (~6%); C2 trace_witness 2/50; unreachability_witness 0/50. Collapse tracks requires_canonical_hashing=True, not existential-vs-universal polarity.",
+    "does_verifier_strictness_differ": "Yes. Strictness ordering by estimated_complexity_score: equivalence_witness (9.5) > unreachability_witness (5.0) > distinguishing_trace (4.5) > trace_witness (3.5). Only equivalence_witness rejects semantically correct verdicts when hashes are wrong (equivalence_hash_mismatch).",
+    "is_equivalence_witness_uniquely_canonicalization_dependent": "Yes, among these four classes, equivalence_witness is the **only** one requiring minimized_dfa_hash canonical strings (requires_canonical_hashing=True). unreachability_witness requires exact set reconstruction but not hashing; trace_witness and distinguishing_trace accept multiple replay-valid witnesses.",
+    "is_equivalence_witness_uniquely_synthesis_dependent": "No \u2014 all four require symbolic synthesis for gold construction. equivalence_witness uniquely pairs synthesis with **non-negotiable hash output**; distinguishing_trace and trace_witness need search but accept any valid witness, and unreachability_witness needs only BFS closure (no search).",
+    "multiple_valid_certificates_other_classes": "Yes. distinguishing_trace and trace_witness accept multiple valid witnesses (verifier_accepts_multiple_forms=True). unreachability_witness allows permutation of list order but not set content. equivalence_witness accepts a single hash pair tied to minimized_dfa_hash.",
+    "paper_hypothesis": "Claude's F1 equivalence collapse is driven by the **canonical hash witness contract** (minimized_dfa_hash), not by universal quantification per se: C2 unreachability_witness also demands exact closure yet remains easy, while F1 distinguishing_trace (existential trace) stays easy without hashing. R2C closes equivalence_witness only via solver.equivalence_certificate, which runs the same hash builder as the verifier."
+  }
+}

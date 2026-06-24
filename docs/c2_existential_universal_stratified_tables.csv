@@ -1,0 +1,77 @@
+Table 1: Overall by condition
+condition,n,extract,verdict,cert,full,not_extractable,verdict_wrong,certificate_invalid,correct
+R1,100,1.0,1.0,0.98,0.98,0,0,2,98
+Oracle+Format,100,1.0,1.0,0.93,0.93,0,0,7,93
+R2A,100,1.0,1.0,1.0,1.0,0,0,0,100
+R2B,100,1.0,0.99,0.98,0.98,0,1,1,98
+R2C,100,1.0,1.0,1.0,1.0,0,0,0,100
+
+Table 2: By certificate subtype
+condition,certificate_type,n,extract,verdict,cert,full,certificate_invalid
+R1,trace_witness,50,1.0,1.0,0.96,0.96,2
+R1,unreachability_witness,50,1.0,1.0,1.0,1.0,0
+Oracle+Format,trace_witness,50,1.0,1.0,0.9,0.9,5
+Oracle+Format,unreachability_witness,50,1.0,1.0,0.96,0.96,2
+R2A,trace_witness,50,1.0,1.0,1.0,1.0,0
+R2A,unreachability_witness,50,1.0,1.0,1.0,1.0,0
+R2B,trace_witness,50,1.0,1.0,1.0,1.0,0
+R2B,unreachability_witness,50,1.0,0.98,0.96,0.96,1
+R2C,trace_witness,50,1.0,1.0,1.0,1.0,0
+R2C,unreachability_witness,50,1.0,1.0,1.0,1.0,0
+
+Table 3: By gold verdict
+condition,gold_verdict,n,extract,verdict,cert,full,certificate_invalid
+R1,reachable,50,1.0,1.0,0.96,0.96,2
+R1,unreachable,50,1.0,1.0,1.0,1.0,0
+Oracle+Format,reachable,50,1.0,1.0,0.9,0.9,5
+Oracle+Format,unreachable,50,1.0,1.0,0.96,0.96,2
+R2A,reachable,50,1.0,1.0,1.0,1.0,0
+R2A,unreachable,50,1.0,1.0,1.0,1.0,0
+R2B,reachable,50,1.0,1.0,1.0,1.0,0
+R2B,unreachable,50,1.0,0.98,0.96,0.96,1
+R2C,reachable,50,1.0,1.0,1.0,1.0,0
+R2C,unreachable,50,1.0,1.0,1.0,1.0,0
+
+Table 4: Failure taxonomy
+condition,certificate_type,failure_category,count,percentage
+R1,trace_witness,wrong_trace_format,2,1.0
+Oracle+Format,trace_witness,wrong_trace_format,4,0.8
+Oracle+Format,trace_witness,replay_failure,1,0.2
+Oracle+Format,unreachability_witness,incomplete_reachability_set,2,1.0
+R2B,unreachability_witness,incomplete_reachability_set,1,1.0
+
+Table 5: Existential-vs-universal gap
+condition,existential_cert_full,universal_cert_full,existential_cert_rate,universal_cert_rate,subtype_gap
+R1,0.96,1.0,0.96,1.0,-0.04
+Oracle+Format,0.9,0.96,0.9,0.96,-0.06
+R2A,1.0,1.0,1.0,1.0,0.0
+R2B,1.0,0.96,1.0,0.96,0.04
+R2C,1.0,1.0,1.0,1.0,0.0
+
+Table 6: Local model C2 subtype
+model,track,certificate_type,n,extract,verdict,cert,full
+gemma2_9b,R0,trace_witness,28,1.0,1.0,0.036,0.036
+gemma2_9b,R0,unreachability_witness,72,0.972,0.143,0.083,0.083
+gemma2_9b,R1,trace_witness,28,1.0,1.0,0.0,0.0
+gemma2_9b,R1,unreachability_witness,72,1.0,0.014,0.0,0.0
+gemma2_9b,R2,trace_witness,28,1.0,1.0,0.0,0.0
+gemma2_9b,R2,unreachability_witness,72,1.0,1.0,0.236,0.236
+llama3.1_8b,R0,trace_witness,28,1.0,0.571,0.0,0.0
+llama3.1_8b,R0,unreachability_witness,72,1.0,0.681,0.139,0.139
+llama3.1_8b,R1,trace_witness,28,0.179,0.8,0.0,0.0
+llama3.1_8b,R1,unreachability_witness,72,0.181,0.154,0.014,0.014
+llama3.1_8b,R2,trace_witness,28,0.964,1.0,0.036,0.036
+llama3.1_8b,R2,unreachability_witness,72,0.958,0.986,0.083,0.083
+mistral-nemo_12b,R0,trace_witness,28,1.0,0.893,0.036,0.036
+mistral-nemo_12b,R0,unreachability_witness,72,1.0,0.333,0.194,0.194
+mistral-nemo_12b,R1,trace_witness,28,0.964,0.37,0.0,0.0
+mistral-nemo_12b,R1,unreachability_witness,72,0.944,0.912,0.111,0.111
+mistral-nemo_12b,R2,trace_witness,28,1.0,1.0,0.0,0.0
+mistral-nemo_12b,R2,unreachability_witness,72,1.0,1.0,0.083,0.083
+qwen2.5-coder_7b,R0,trace_witness,28,1.0,0.929,0.0,0.0
+qwen2.5-coder_7b,R0,unreachability_witness,72,0.972,0.414,0.028,0.028
+qwen2.5-coder_7b,R1,trace_witness,28,1.0,0.107,0.0,0.0
+qwen2.5-coder_7b,R1,unreachability_witness,72,1.0,0.944,0.056,0.056
+qwen2.5-coder_7b,R2,trace_witness,28,1.0,0.893,0.0,0.0
+qwen2.5-coder_7b,R2,unreachability_witness,72,1.0,1.0,0.069,0.069
+

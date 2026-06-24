@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{Certificate class complexity and Claude R1 certificate success.}
+\label{tab:cert-complexity}
+\begin{tabular}{llrrrrr}
+\toprule
+certificate\_type & family & required\_fields & canonical\_hashing & multiple\_valid\_forms & complexity\_score & Claude\_R1\_cert \\
+\midrule
+distinguishing\_trace & F1 & 8 & False & True & 4.5 & 0.939 \\
+equivalence\_witness & F1 & 9 & True & False & 9.5 & 0.0 \\
+trace\_witness & C2 & 7 & False & True & 3.5 & 0.96 \\
+unreachability\_witness & C2 & 7 & False & False & 5.0 & 1.0 \\
+\bottomrule
+\end{tabular}
+\end{table}

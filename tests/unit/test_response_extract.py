@@ -205,3 +205,21 @@ def test_render_prompt_anthropic_f1_strict_contract() -> None:
     c2_prompt = render_prompt(c2_item, provider="anthropic")
     assert "equivalence_witness" not in c2_prompt
     assert "Anthropic output contract" not in c2_prompt
+
+
+def test_extract_submission_payload_with_json_repair_smart_quotes() -> None:
+    payload = _c2_payload()
+    inner = json.dumps(payload)
+    raw = inner.replace('"', "\u201c", 1).replace('"', "\u201d", 1)
+    for ch in ('"', '"'):
+        if ch in raw:
+            raw = raw.replace(ch, '"', 1)
+    raw = inner.replace('"item_id"', "\u201citem_id\u201d", 1)
+    from fsmreasonbench.runners.response_extract import (
+        extract_submission_payload_with_json_repair,
+        normalize_json_text,
+    )
+
+    assert normalize_json_text(raw) == inner
+    extracted = extract_submission_payload_with_json_repair(raw)
+    assert extracted == payload

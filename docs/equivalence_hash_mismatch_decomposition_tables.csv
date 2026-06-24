@@ -1,0 +1,42 @@
+Table A: category counts
+scope,category,count,percentage
+R1,C1_EMPTY_OR_PLACEHOLDER,13,0.255
+R1,C2_RANDOM_OR_NONMATCHING_HASH,1,0.02
+R1,C5_EQUAL_BUT_WRONG_SHARED_HASH,29,0.569
+R1,C6_NONCANONICAL_STRUCTURAL_PROOF,8,0.157
+Oracle+Format,C1_EMPTY_OR_PLACEHOLDER,49,0.961
+Oracle+Format,C5_EQUAL_BUT_WRONG_SHARED_HASH,2,0.039
+pooled,C1_EMPTY_OR_PLACEHOLDER,62,0.608
+pooled,C2_RANDOM_OR_NONMATCHING_HASH,1,0.01
+pooled,C5_EQUAL_BUT_WRONG_SHARED_HASH,31,0.304
+pooled,C6_NONCANONICAL_STRUCTURAL_PROOF,8,0.078
+
+Table B: hash pattern analysis
+scope,metric,value
+R1,n_failures,51
+R1,hash_missing_or_placeholder_rate,0.255
+R1,hash_like_but_wrong_rate,0.745
+R1,one_hash_correct_rate,0.0
+R1,swapped_rate,0.0
+R1,equal_but_wrong_shared_hash_rate,0.569
+Oracle+Format,n_failures,51
+Oracle+Format,hash_missing_or_placeholder_rate,0.961
+Oracle+Format,hash_like_but_wrong_rate,0.039
+Oracle+Format,one_hash_correct_rate,0.0
+Oracle+Format,swapped_rate,0.0
+Oracle+Format,equal_but_wrong_shared_hash_rate,0.039
+pooled,n_failures,102
+pooled,hash_missing_or_placeholder_rate,0.608
+pooled,hash_like_but_wrong_rate,0.392
+pooled,one_hash_correct_rate,0.0
+pooled,swapped_rate,0.0
+pooled,equal_but_wrong_shared_hash_rate,0.304
+
+Table C: noncanonical proof signals
+scope,signal,count
+R1,language_argument,24
+R1,step_replay_argument,4
+R1,minimized_automaton,11
+pooled,language_argument,24
+pooled,step_replay_argument,4
+pooled,minimized_automaton,11

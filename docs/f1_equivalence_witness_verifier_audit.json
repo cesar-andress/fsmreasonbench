@@ -1,0 +1,146 @@
+{
+  "code_paths": {
+    "parser": "src/fsmreasonbench/evaluator/parser.py::_validate_f1_certificate / _validate_equivalence_witness_payload",
+    "scorer": "src/fsmreasonbench/evaluator/scorer_f1.py::score_f1_item \u2192 verify_f1_certificate",
+    "semantic_verifier": "src/fsmreasonbench/verifier/separation.py::verify_equivalence_witness_certificate",
+    "equivalence_check": "src/fsmreasonbench/runtime/dfa_minimize.py::are_equivalent_dfas",
+    "hash_computation": "src/fsmreasonbench/runtime/dfa_minimize.py::minimized_dfa_hash",
+    "certificate_builder": "src/fsmreasonbench/certificates/separation.py::build_equivalence_witness_certificate",
+    "error_taxonomy": "src/fsmreasonbench/evaluator/failure_taxonomy.py::classify_certificate_errors"
+  },
+  "acceptance_conditions": {
+    "required_envelope_fields": [
+      "certificate_type == equivalence_witness",
+      "fsm_ids == [fsm_a.fsm_id, fsm_b.fsm_id]",
+      "payload.equivalent == true",
+      "payload.minimized_hash_A non-empty string",
+      "payload.minimized_hash_B non-empty string"
+    ],
+    "recomputed_independently": [
+      "are_equivalent_dfas(fsm_a, fsm_b) must be True",
+      "minimized_dfa_hash(fsm_a) compared to payload.minimized_hash_A",
+      "minimized_dfa_hash(fsm_b) compared to payload.minimized_hash_B",
+      "recomputed hashes must be equal"
+    ],
+    "single_canonical_witness_form": true,
+    "alternative_witness_forms_supported": false,
+    "hash_mismatch_implication": "When are_equivalent_dfas is True, hash mismatch means the declared witness does not match the verifier's recomputed language signature; it does NOT by itself prove non-equivalence.",
+    "certificate_contract_limitations": [
+      "Only equivalence_witness with minimized_hash_A/B is accepted; no bijection table, no Hopcroft partition export, no distinguishing-trace negation proof.",
+      "JSON schema file schema/certificate/separation.schema.json covers distinguishing_trace only; equivalence_witness is validated by evaluator parser + semantic verifier.",
+      "Hash algorithm is fixed: content_hash of bounded language bitvector (trace lengths 0..min(|Q|,12) over reachable completed DFA)."
+    ]
+  },
+  "checks": [
+    {
+      "check_id": "A",
+      "title": "Gold equivalence_witness passes",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "B",
+      "title": "Independently recomputed witness passes",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "C",
+      "title": "Correct verdict but wrong hash fails",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "D",
+      "title": "Gold hashes on non-equivalent pair fails semantically",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "E",
+      "title": "Non-equivalent pair with equivalence_witness fails",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "F",
+      "title": "Schema-valid irrelevant hashes fail",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "G",
+      "title": "Behavior-preserving equivalent pair passes after rebuild",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "H",
+      "title": "Alternative witness extras do not bypass hash contract",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "I",
+      "title": "Hash mismatch on equivalent pair is not labeled non-equivalent",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "M_hash_a",
+      "title": "mutate minimized_hash_A",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "M_hash_b",
+      "title": "mutate minimized_hash_B",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "M_cert_type",
+      "title": "mutate certificate_type",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "M_fsm_ids",
+      "title": "mutate fsm_ids",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "M_equivalent_flag",
+      "title": "mutate equivalent flag",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "M_accepting",
+      "title": "mutate accepting states rejects",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "M_transition",
+      "title": "mutate transitions rejects",
+      "passed": true,
+      "detail": "passed"
+    }
+  ],
+  "summary": {
+    "total": 16,
+    "passed": 16,
+    "failed": 0,
+    "all_passed": true
+  },
+  "reviewer_questions": {
+    "is_checking_semantic_or_purely_canonical": "Both. The verifier runs are_equivalent_dfas independently, then requires exact match to minimized_dfa_hash outputs. Semantic failure and hash mismatch are distinct.",
+    "is_verifier_recomputing_from_supplied_fsms": "Yes. Equivalence and both hashes are recomputed from the benchmark FSM objects passed into verify_equivalence_witness_certificate; certificate hashes are never trusted alone.",
+    "could_claude_zero_be_fragile_hash_format": "Partially. Claude R1 eq-witness failures are taxonomy-labeled equivalence_hash_mismatch while verdict accuracy is 1.0, so models can be verdict-correct yet fail for not emitting the verifier's hash strings. That reflects the fixed witness contract, not JSON formatting. It is not merely canonical pedantry because non-equivalent pairs are rejected semantically before hash comparison when applicable.",
+    "certificate_contract_limitations": "Only hash-based equivalence_witness is accepted. No bijection/partition witnesses; separation.schema.json documents distinguishing_trace only.",
+    "paper_validity_section_sentence": "See paper_validity_sentence in this audit JSON."
+  },
+  "paper_validity_sentence": "An F1 equivalence_witness is valid iff the benchmark DFAs are semantically equivalent (independent BFS equivalence check) and the submitter supplies the exact minimized language-signature hashes recomputed by the verifier from those DFAs; hash mismatch rejects the witness format but is not, by itself, evidence of non-equivalence when the semantic check succeeds."
+}

@@ -1,0 +1,602 @@
+{
+  "certificate_contract_note": "unreachability_witness requires payload.reachable_states to match the exact canonical reachable set from the verifier (not a valid sub/superset).",
+  "cohort_items_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/cohorts/v0.1-expanded-n100/c2-reachability-balanced-n100/items.jsonl",
+  "conditions_loaded": [
+    "R1",
+    "Oracle+Format",
+    "R2A",
+    "R2B",
+    "R2C"
+  ],
+  "metadata_item_count": 100,
+  "study_root": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_c2_existential_universal_claude_n100_v1",
+  "tables": {
+    "table1_overall_by_condition": [
+      {
+        "cert": 0.98,
+        "certificate_invalid": 2,
+        "condition": "R1",
+        "correct": 98,
+        "extract": 1.0,
+        "full": 0.98,
+        "n": 100,
+        "not_extractable": 0,
+        "verdict": 1.0,
+        "verdict_wrong": 0
+      },
+      {
+        "cert": 0.93,
+        "certificate_invalid": 7,
+        "condition": "Oracle+Format",
+        "correct": 93,
+        "extract": 1.0,
+        "full": 0.93,
+        "n": 100,
+        "not_extractable": 0,
+        "verdict": 1.0,
+        "verdict_wrong": 0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "condition": "R2A",
+        "correct": 100,
+        "extract": 1.0,
+        "full": 1.0,
+        "n": 100,
+        "not_extractable": 0,
+        "verdict": 1.0,
+        "verdict_wrong": 0
+      },
+      {
+        "cert": 0.98,
+        "certificate_invalid": 1,
+        "condition": "R2B",
+        "correct": 98,
+        "extract": 1.0,
+        "full": 0.98,
+        "n": 100,
+        "not_extractable": 0,
+        "verdict": 0.99,
+        "verdict_wrong": 1
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "condition": "R2C",
+        "correct": 100,
+        "extract": 1.0,
+        "full": 1.0,
+        "n": 100,
+        "not_extractable": 0,
+        "verdict": 1.0,
+        "verdict_wrong": 0
+      }
+    ],
+    "table2_by_certificate_subtype": [
+      {
+        "cert": 0.96,
+        "certificate_invalid": 2,
+        "certificate_type": "trace_witness",
+        "condition": "R1",
+        "extract": 1.0,
+        "full": 0.96,
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "certificate_type": "unreachability_witness",
+        "condition": "R1",
+        "extract": 1.0,
+        "full": 1.0,
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.9,
+        "certificate_invalid": 5,
+        "certificate_type": "trace_witness",
+        "condition": "Oracle+Format",
+        "extract": 1.0,
+        "full": 0.9,
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.96,
+        "certificate_invalid": 2,
+        "certificate_type": "unreachability_witness",
+        "condition": "Oracle+Format",
+        "extract": 1.0,
+        "full": 0.96,
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "certificate_type": "trace_witness",
+        "condition": "R2A",
+        "extract": 1.0,
+        "full": 1.0,
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "certificate_type": "unreachability_witness",
+        "condition": "R2A",
+        "extract": 1.0,
+        "full": 1.0,
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "certificate_type": "trace_witness",
+        "condition": "R2B",
+        "extract": 1.0,
+        "full": 1.0,
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.96,
+        "certificate_invalid": 1,
+        "certificate_type": "unreachability_witness",
+        "condition": "R2B",
+        "extract": 1.0,
+        "full": 0.96,
+        "n": 50,
+        "verdict": 0.98
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "certificate_type": "trace_witness",
+        "condition": "R2C",
+        "extract": 1.0,
+        "full": 1.0,
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "certificate_type": "unreachability_witness",
+        "condition": "R2C",
+        "extract": 1.0,
+        "full": 1.0,
+        "n": 50,
+        "verdict": 1.0
+      }
+    ],
+    "table3_by_gold_verdict": [
+      {
+        "cert": 0.96,
+        "certificate_invalid": 2,
+        "condition": "R1",
+        "extract": 1.0,
+        "full": 0.96,
+        "gold_verdict": "reachable",
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "condition": "R1",
+        "extract": 1.0,
+        "full": 1.0,
+        "gold_verdict": "unreachable",
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.9,
+        "certificate_invalid": 5,
+        "condition": "Oracle+Format",
+        "extract": 1.0,
+        "full": 0.9,
+        "gold_verdict": "reachable",
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.96,
+        "certificate_invalid": 2,
+        "condition": "Oracle+Format",
+        "extract": 1.0,
+        "full": 0.96,
+        "gold_verdict": "unreachable",
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "condition": "R2A",
+        "extract": 1.0,
+        "full": 1.0,
+        "gold_verdict": "reachable",
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "condition": "R2A",
+        "extract": 1.0,
+        "full": 1.0,
+        "gold_verdict": "unreachable",
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "condition": "R2B",
+        "extract": 1.0,
+        "full": 1.0,
+        "gold_verdict": "reachable",
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.96,
+        "certificate_invalid": 1,
+        "condition": "R2B",
+        "extract": 1.0,
+        "full": 0.96,
+        "gold_verdict": "unreachable",
+        "n": 50,
+        "verdict": 0.98
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "condition": "R2C",
+        "extract": 1.0,
+        "full": 1.0,
+        "gold_verdict": "reachable",
+        "n": 50,
+        "verdict": 1.0
+      },
+      {
+        "cert": 1.0,
+        "certificate_invalid": 0,
+        "condition": "R2C",
+        "extract": 1.0,
+        "full": 1.0,
+        "gold_verdict": "unreachable",
+        "n": 50,
+        "verdict": 1.0
+      }
+    ],
+    "table4_failure_taxonomy": [
+      {
+        "certificate_type": "trace_witness",
+        "condition": "R1",
+        "count": 2,
+        "failure_category": "wrong_trace_format",
+        "percentage": 1.0
+      },
+      {
+        "certificate_type": "trace_witness",
+        "condition": "Oracle+Format",
+        "count": 4,
+        "failure_category": "wrong_trace_format",
+        "percentage": 0.8
+      },
+      {
+        "certificate_type": "trace_witness",
+        "condition": "Oracle+Format",
+        "count": 1,
+        "failure_category": "replay_failure",
+        "percentage": 0.2
+      },
+      {
+        "certificate_type": "unreachability_witness",
+        "condition": "Oracle+Format",
+        "count": 2,
+        "failure_category": "incomplete_reachability_set",
+        "percentage": 1.0
+      },
+      {
+        "certificate_type": "unreachability_witness",
+        "condition": "R2B",
+        "count": 1,
+        "failure_category": "incomplete_reachability_set",
+        "percentage": 1.0
+      }
+    ],
+    "table5_existential_universal_gap": [
+      {
+        "condition": "R1",
+        "existential_cert_full": 0.96,
+        "existential_cert_rate": 0.96,
+        "subtype_gap": -0.04,
+        "universal_cert_full": 1.0,
+        "universal_cert_rate": 1.0
+      },
+      {
+        "condition": "Oracle+Format",
+        "existential_cert_full": 0.9,
+        "existential_cert_rate": 0.9,
+        "subtype_gap": -0.06,
+        "universal_cert_full": 0.96,
+        "universal_cert_rate": 0.96
+      },
+      {
+        "condition": "R2A",
+        "existential_cert_full": 1.0,
+        "existential_cert_rate": 1.0,
+        "subtype_gap": 0.0,
+        "universal_cert_full": 1.0,
+        "universal_cert_rate": 1.0
+      },
+      {
+        "condition": "R2B",
+        "existential_cert_full": 1.0,
+        "existential_cert_rate": 1.0,
+        "subtype_gap": 0.04,
+        "universal_cert_full": 0.96,
+        "universal_cert_rate": 0.96
+      },
+      {
+        "condition": "R2C",
+        "existential_cert_full": 1.0,
+        "existential_cert_rate": 1.0,
+        "subtype_gap": 0.0,
+        "universal_cert_full": 1.0,
+        "universal_cert_rate": 1.0
+      }
+    ],
+    "table6_local_matrix_c2_subtype": [
+      {
+        "cert": 0.036,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.036,
+        "model": "gemma2_9b",
+        "n": 28,
+        "track": "R0",
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.083,
+        "certificate_type": "unreachability_witness",
+        "extract": 0.972,
+        "full": 0.083,
+        "model": "gemma2_9b",
+        "n": 72,
+        "track": "R0",
+        "verdict": 0.143
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.0,
+        "model": "gemma2_9b",
+        "n": 28,
+        "track": "R1",
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "unreachability_witness",
+        "extract": 1.0,
+        "full": 0.0,
+        "model": "gemma2_9b",
+        "n": 72,
+        "track": "R1",
+        "verdict": 0.014
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.0,
+        "model": "gemma2_9b",
+        "n": 28,
+        "track": "R2",
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.236,
+        "certificate_type": "unreachability_witness",
+        "extract": 1.0,
+        "full": 0.236,
+        "model": "gemma2_9b",
+        "n": 72,
+        "track": "R2",
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.0,
+        "model": "llama3.1_8b",
+        "n": 28,
+        "track": "R0",
+        "verdict": 0.571
+      },
+      {
+        "cert": 0.139,
+        "certificate_type": "unreachability_witness",
+        "extract": 1.0,
+        "full": 0.139,
+        "model": "llama3.1_8b",
+        "n": 72,
+        "track": "R0",
+        "verdict": 0.681
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 0.179,
+        "full": 0.0,
+        "model": "llama3.1_8b",
+        "n": 28,
+        "track": "R1",
+        "verdict": 0.8
+      },
+      {
+        "cert": 0.014,
+        "certificate_type": "unreachability_witness",
+        "extract": 0.181,
+        "full": 0.014,
+        "model": "llama3.1_8b",
+        "n": 72,
+        "track": "R1",
+        "verdict": 0.154
+      },
+      {
+        "cert": 0.036,
+        "certificate_type": "trace_witness",
+        "extract": 0.964,
+        "full": 0.036,
+        "model": "llama3.1_8b",
+        "n": 28,
+        "track": "R2",
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.083,
+        "certificate_type": "unreachability_witness",
+        "extract": 0.958,
+        "full": 0.083,
+        "model": "llama3.1_8b",
+        "n": 72,
+        "track": "R2",
+        "verdict": 0.986
+      },
+      {
+        "cert": 0.036,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.036,
+        "model": "mistral-nemo_12b",
+        "n": 28,
+        "track": "R0",
+        "verdict": 0.893
+      },
+      {
+        "cert": 0.194,
+        "certificate_type": "unreachability_witness",
+        "extract": 1.0,
+        "full": 0.194,
+        "model": "mistral-nemo_12b",
+        "n": 72,
+        "track": "R0",
+        "verdict": 0.333
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 0.964,
+        "full": 0.0,
+        "model": "mistral-nemo_12b",
+        "n": 28,
+        "track": "R1",
+        "verdict": 0.37
+      },
+      {
+        "cert": 0.111,
+        "certificate_type": "unreachability_witness",
+        "extract": 0.944,
+        "full": 0.111,
+        "model": "mistral-nemo_12b",
+        "n": 72,
+        "track": "R1",
+        "verdict": 0.912
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.0,
+        "model": "mistral-nemo_12b",
+        "n": 28,
+        "track": "R2",
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.083,
+        "certificate_type": "unreachability_witness",
+        "extract": 1.0,
+        "full": 0.083,
+        "model": "mistral-nemo_12b",
+        "n": 72,
+        "track": "R2",
+        "verdict": 1.0
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.0,
+        "model": "qwen2.5-coder_7b",
+        "n": 28,
+        "track": "R0",
+        "verdict": 0.929
+      },
+      {
+        "cert": 0.028,
+        "certificate_type": "unreachability_witness",
+        "extract": 0.972,
+        "full": 0.028,
+        "model": "qwen2.5-coder_7b",
+        "n": 72,
+        "track": "R0",
+        "verdict": 0.414
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.0,
+        "model": "qwen2.5-coder_7b",
+        "n": 28,
+        "track": "R1",
+        "verdict": 0.107
+      },
+      {
+        "cert": 0.056,
+        "certificate_type": "unreachability_witness",
+        "extract": 1.0,
+        "full": 0.056,
+        "model": "qwen2.5-coder_7b",
+        "n": 72,
+        "track": "R1",
+        "verdict": 0.944
+      },
+      {
+        "cert": 0.0,
+        "certificate_type": "trace_witness",
+        "extract": 1.0,
+        "full": 0.0,
+        "model": "qwen2.5-coder_7b",
+        "n": 28,
+        "track": "R2",
+        "verdict": 0.893
+      },
+      {
+        "cert": 0.069,
+        "certificate_type": "unreachability_witness",
+        "extract": 1.0,
+        "full": 0.069,
+        "model": "qwen2.5-coder_7b",
+        "n": 72,
+        "track": "R2",
+        "verdict": 1.0
+      }
+    ]
+  }
+}

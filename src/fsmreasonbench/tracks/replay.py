@@ -68,6 +68,54 @@ def replay_tool_invocation(
             "verdict_supported": certificate["verdict_supported"],
         }
 
+    if invocation.tool_name == "verifier.validate_c2_certificate":
+        from fsmreasonbench.verifier.reachability import verify_reachability_certificate
+
+        fsm = fsm_by_id[invocation.inputs["fsm_id"]]
+        target_state = invocation.inputs["target_state"]
+        certificate = invocation.inputs["certificate"]
+        result = verify_reachability_certificate(fsm, target_state, certificate)
+        return {"valid": result.valid, "error_count": len(result.errors)}
+
+    if invocation.tool_name == "format.repair_c2_submission":
+        from fsmreasonbench.runners.c2_attribution_tools import (
+            _execute_repair_c2_submission,
+        )
+
+        replay = _execute_repair_c2_submission(
+            "replay",
+            invocation.tool_name,
+            {"submission": invocation.inputs["submission"]},
+            audit=audit,
+        )
+        if replay["status"] != "executed":
+            raise ValueError(replay.get("error", "repair replay failed"))
+        return {"repaired": True}
+
+    if invocation.tool_name == "verifier.validate_f1_certificate":
+        from fsmreasonbench.verifier.separation import verify_f1_certificate
+
+        fsm_a = fsm_by_id[invocation.inputs["fsm_id_a"]]
+        fsm_b = fsm_by_id[invocation.inputs["fsm_id_b"]]
+        certificate = invocation.inputs["certificate"]
+        result = verify_f1_certificate(fsm_a, fsm_b, certificate)
+        return {"valid": result.valid, "error_count": len(result.errors)}
+
+    if invocation.tool_name == "format.repair_f1_submission":
+        from fsmreasonbench.runners.r2_attribution_tools import (
+            _execute_repair_f1_submission,
+        )
+
+        replay = _execute_repair_f1_submission(
+            "replay",
+            invocation.tool_name,
+            {"submission": invocation.inputs["submission"]},
+            audit=audit,
+        )
+        if replay["status"] != "executed":
+            raise ValueError(replay.get("error", "repair replay failed"))
+        return {"repaired": True}
+
     raise ValueError(f"unsupported replay tool: {invocation.tool_name!r}")
 
 

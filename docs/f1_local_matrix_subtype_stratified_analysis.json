@@ -1,0 +1,1196 @@
+{
+  "experiment": "f1_local_matrix_subtype_stratified_analysis",
+  "matrix_root": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/local_matrix_n100_t02_v2",
+  "cohort_items_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/cohorts/v0.1-expanded-n100/f1-mixed-level3/items.jsonl",
+  "models": [
+    "gemma2_9b",
+    "llama3.1_8b",
+    "mistral-nemo_12b",
+    "qwen2.5-coder_7b"
+  ],
+  "tracks": [
+    "R0",
+    "R1",
+    "R2"
+  ],
+  "cells_discovered": 12,
+  "item_id_alignment": [
+    {
+      "model": "gemma2_9b",
+      "track": "R0",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "gemma2_9b",
+      "track": "R1",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "gemma2_9b",
+      "track": "R2",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "llama3.1_8b",
+      "track": "R0",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "llama3.1_8b",
+      "track": "R1",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "llama3.1_8b",
+      "track": "R2",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "mistral-nemo_12b",
+      "track": "R0",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "mistral-nemo_12b",
+      "track": "R1",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "mistral-nemo_12b",
+      "track": "R2",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "qwen2.5-coder_7b",
+      "track": "R0",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "qwen2.5-coder_7b",
+      "track": "R1",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    },
+    {
+      "model": "qwen2.5-coder_7b",
+      "track": "R2",
+      "n": 100,
+      "cohort_n": 100,
+      "shared_with_cohort": 100,
+      "only_in_run": [],
+      "missing_from_run": [],
+      "perfect_cohort_alignment": true
+    }
+  ],
+  "metadata_availability": {
+    "gold_verdict": "answer_key.verdict",
+    "gold_certificate_type": "answer_key.certificate.certificate_type",
+    "gold_equivalent": "difficulty.core.equivalent",
+    "distinguishing_trace_length": "difficulty.core.distinguishing_trace_length",
+    "failure_category": "derived from scores.certificate_errors via classify_certificate_errors",
+    "notes": [
+      "All local F1 cells in this matrix share the expanded n=100 cohort item IDs.",
+      "All 49 non-equivalent cohort items use distinguishing_trace_length=3.",
+      "Analysis uses within-run stratification only (no cross-run pairing)."
+    ],
+    "non_equivalent_trace_lengths_observed": [
+      3
+    ]
+  },
+  "tables": {
+    "overall": [
+      {
+        "model": "gemma2_9b",
+        "track": "R0",
+        "n": 100,
+        "extract": 1.0,
+        "verdict": 0.53,
+        "cert": 0.24,
+        "full": 0.24,
+        "not_extractable": 0,
+        "provider_error": 0,
+        "verdict_wrong": 47,
+        "certificate_invalid": 29,
+        "correct": 24
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R1",
+        "n": 100,
+        "extract": 1.0,
+        "verdict": 0.85,
+        "cert": 0.0,
+        "full": 0.0,
+        "not_extractable": 0,
+        "provider_error": 0,
+        "verdict_wrong": 15,
+        "certificate_invalid": 85,
+        "correct": 0
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R2",
+        "n": 100,
+        "extract": 0.54,
+        "verdict": 1.0,
+        "cert": 0.03,
+        "full": 0.03,
+        "not_extractable": 46,
+        "provider_error": 0,
+        "verdict_wrong": 0,
+        "certificate_invalid": 51,
+        "correct": 3
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R0",
+        "n": 100,
+        "extract": 1.0,
+        "verdict": 0.49,
+        "cert": 0.2,
+        "full": 0.2,
+        "not_extractable": 0,
+        "provider_error": 0,
+        "verdict_wrong": 51,
+        "certificate_invalid": 29,
+        "correct": 20
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R1",
+        "n": 100,
+        "extract": 0.09,
+        "verdict": 0.444,
+        "cert": 0.0,
+        "full": 0.0,
+        "not_extractable": 66,
+        "provider_error": 25,
+        "verdict_wrong": 5,
+        "certificate_invalid": 4,
+        "correct": 0
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R2",
+        "n": 100,
+        "extract": 0.07,
+        "verdict": 1.0,
+        "cert": 0.01,
+        "full": 0.01,
+        "not_extractable": 85,
+        "provider_error": 8,
+        "verdict_wrong": 0,
+        "certificate_invalid": 6,
+        "correct": 1
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R0",
+        "n": 100,
+        "extract": 1.0,
+        "verdict": 0.49,
+        "cert": 0.1,
+        "full": 0.1,
+        "not_extractable": 0,
+        "provider_error": 0,
+        "verdict_wrong": 51,
+        "certificate_invalid": 39,
+        "correct": 10
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R1",
+        "n": 100,
+        "extract": 0.04,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "not_extractable": 96,
+        "provider_error": 0,
+        "verdict_wrong": 0,
+        "certificate_invalid": 4,
+        "correct": 0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R2",
+        "n": 100,
+        "extract": 0.06,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "not_extractable": 94,
+        "provider_error": 0,
+        "verdict_wrong": 0,
+        "certificate_invalid": 6,
+        "correct": 0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R0",
+        "n": 100,
+        "extract": 1.0,
+        "verdict": 0.49,
+        "cert": 0.03,
+        "full": 0.03,
+        "not_extractable": 0,
+        "provider_error": 0,
+        "verdict_wrong": 51,
+        "certificate_invalid": 46,
+        "correct": 3
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R1",
+        "n": 100,
+        "extract": 0.65,
+        "verdict": 0.985,
+        "cert": 0.0,
+        "full": 0.0,
+        "not_extractable": 35,
+        "provider_error": 0,
+        "verdict_wrong": 1,
+        "certificate_invalid": 64,
+        "correct": 0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R2",
+        "n": 100,
+        "extract": 0.66,
+        "verdict": 1.0,
+        "cert": 0.3,
+        "full": 0.3,
+        "not_extractable": 34,
+        "provider_error": 0,
+        "verdict_wrong": 0,
+        "certificate_invalid": 36,
+        "correct": 30
+      }
+    ],
+    "by_certificate_type": [
+      {
+        "model": "gemma2_9b",
+        "track": "R0",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 0.078,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 4
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.49,
+        "full": 0.49,
+        "certificate_invalid": 25
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R1",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 51
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R1",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 0.694,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 34
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R2",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 0.275,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 14
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R2",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 0.816,
+        "verdict": 1.0,
+        "cert": 0.061,
+        "full": 0.061,
+        "certificate_invalid": 37
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R0",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.408,
+        "full": 0.408,
+        "certificate_invalid": 29
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R1",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 0.098,
+        "verdict": 0.8,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 4
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R1",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 0.082,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R2",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 0.137,
+        "verdict": 1.0,
+        "cert": 0.02,
+        "full": 0.02,
+        "certificate_invalid": 6
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R2",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 0.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R0",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.204,
+        "full": 0.204,
+        "certificate_invalid": 39
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R1",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 0.02,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 1
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R1",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 0.061,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 3
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R2",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 0.118,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 6
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R2",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 0.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R0",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.061,
+        "full": 0.061,
+        "certificate_invalid": 46
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R1",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 0.314,
+        "verdict": 0.938,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 15
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R1",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 49
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R2",
+        "certificate_type": "equivalence_witness",
+        "n": 51,
+        "extract": 0.373,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 19
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R2",
+        "certificate_type": "distinguishing_trace",
+        "n": 49,
+        "extract": 0.959,
+        "verdict": 1.0,
+        "cert": 0.612,
+        "full": 0.612,
+        "certificate_invalid": 17
+      }
+    ],
+    "by_gold_verdict": [
+      {
+        "model": "gemma2_9b",
+        "track": "R0",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 0.078,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 4
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R0",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.49,
+        "full": 0.49,
+        "certificate_invalid": 25
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R1",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 51
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R1",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 0.694,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 34
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R2",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 0.275,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 14
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R2",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 0.816,
+        "verdict": 1.0,
+        "cert": 0.061,
+        "full": 0.061,
+        "certificate_invalid": 37
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R0",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R0",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.408,
+        "full": 0.408,
+        "certificate_invalid": 29
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R1",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 0.098,
+        "verdict": 0.8,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 4
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R1",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 0.082,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R2",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 0.137,
+        "verdict": 1.0,
+        "cert": 0.02,
+        "full": 0.02,
+        "certificate_invalid": 6
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R2",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 0.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R0",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R0",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.204,
+        "full": 0.204,
+        "certificate_invalid": 39
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R1",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 0.02,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 1
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R1",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 0.061,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 3
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R2",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 0.118,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 6
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R2",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 0.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R0",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 1.0,
+        "verdict": 0.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R0",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.061,
+        "full": 0.061,
+        "certificate_invalid": 46
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R1",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 0.314,
+        "verdict": 0.938,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 15
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R1",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 1.0,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 49
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R2",
+        "gold_verdict": "equivalent",
+        "n": 51,
+        "extract": 0.373,
+        "verdict": 1.0,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 19
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R2",
+        "gold_verdict": "non_equivalent",
+        "n": 49,
+        "extract": 0.959,
+        "verdict": 1.0,
+        "cert": 0.612,
+        "full": 0.612,
+        "certificate_invalid": 17
+      }
+    ],
+    "failure_taxonomy": [
+      {
+        "model": "gemma2_9b",
+        "track": "R0",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "acceptance_mismatch",
+        "count": 4,
+        "percentage": 1.0
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 25,
+        "percentage": 1.0
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R1",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "equivalence_hash_mismatch",
+        "count": 51,
+        "percentage": 1.0
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R1",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 34,
+        "percentage": 1.0
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R2",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "equivalence_hash_mismatch",
+        "count": 14,
+        "percentage": 1.0
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R2",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 37,
+        "percentage": 1.0
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 25,
+        "percentage": 0.862
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "replay_failure",
+        "count": 4,
+        "percentage": 0.138
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R1",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "equivalence_hash_mismatch",
+        "count": 4,
+        "percentage": 1.0
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R2",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "equivalence_hash_mismatch",
+        "count": 6,
+        "percentage": 1.0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 39,
+        "percentage": 1.0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R1",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "equivalence_hash_mismatch",
+        "count": 1,
+        "percentage": 1.0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R1",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 3,
+        "percentage": 1.0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R2",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "equivalence_hash_mismatch",
+        "count": 6,
+        "percentage": 1.0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 45,
+        "percentage": 0.978
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R0",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "replay_failure",
+        "count": 1,
+        "percentage": 0.022
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R1",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "equivalence_hash_mismatch",
+        "count": 15,
+        "percentage": 1.0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R1",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 49,
+        "percentage": 1.0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R2",
+        "certificate_type": "equivalence_witness",
+        "failure_category": "equivalence_hash_mismatch",
+        "count": 19,
+        "percentage": 1.0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R2",
+        "certificate_type": "distinguishing_trace",
+        "failure_category": "acceptance_mismatch",
+        "count": 17,
+        "percentage": 1.0
+      }
+    ],
+    "gap_decomposition": [
+      {
+        "model": "gemma2_9b",
+        "track": "R0",
+        "dist_trace_full": 0.49,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.49,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.49
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R1",
+        "dist_trace_full": 0.0,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.0,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.0
+      },
+      {
+        "model": "gemma2_9b",
+        "track": "R2",
+        "dist_trace_full": 0.061,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.061,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.061
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R0",
+        "dist_trace_full": 0.408,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.408,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.408
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R1",
+        "dist_trace_full": 0.0,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.0,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.0
+      },
+      {
+        "model": "llama3.1_8b",
+        "track": "R2",
+        "dist_trace_full": 0.0,
+        "eq_witness_full": 0.02,
+        "dist_trace_cert": 0.0,
+        "eq_witness_cert": 0.02,
+        "subtype_gap": -0.02
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R0",
+        "dist_trace_full": 0.204,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.204,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.204
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R1",
+        "dist_trace_full": 0.0,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.0,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.0
+      },
+      {
+        "model": "mistral-nemo_12b",
+        "track": "R2",
+        "dist_trace_full": 0.0,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.0,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R0",
+        "dist_trace_full": 0.061,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.061,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.061
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R1",
+        "dist_trace_full": 0.0,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.0,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.0
+      },
+      {
+        "model": "qwen2.5-coder_7b",
+        "track": "R2",
+        "dist_trace_full": 0.612,
+        "eq_witness_full": 0.0,
+        "dist_trace_cert": 0.612,
+        "eq_witness_cert": 0.0,
+        "subtype_gap": 0.612
+      }
+    ]
+  },
+  "claude_reference": {
+    "R1": {
+      "overall": {
+        "n": 100,
+        "cert": 0.46,
+        "full": 0.46,
+        "certificate_invalid": 54
+      },
+      "equivalence_witness": {
+        "n": 51,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 51
+      },
+      "distinguishing_trace": {
+        "n": 49,
+        "cert": 0.9387755102040817,
+        "full": 0.9387755102040817,
+        "certificate_invalid": 3
+      },
+      "gold_equivalent": {
+        "n": 51,
+        "cert": 0.0,
+        "full": 0.0,
+        "certificate_invalid": 51
+      },
+      "gold_non_equivalent": {
+        "n": 49,
+        "cert": 0.9387755102040817,
+        "full": 0.9387755102040817,
+        "certificate_invalid": 3
+      }
+    },
+    "R2": {
+      "overall": {
+        "n": 100,
+        "cert": 0.99,
+        "full": 0.99,
+        "certificate_invalid": 0
+      },
+      "equivalence_witness": {
+        "n": 51,
+        "cert": 0.9803921568627451,
+        "full": 0.9803921568627451,
+        "certificate_invalid": 0
+      },
+      "distinguishing_trace": {
+        "n": 49,
+        "cert": 1.0,
+        "full": 1.0,
+        "certificate_invalid": 0
+      },
+      "gold_equivalent": {
+        "n": 51,
+        "cert": 0.9803921568627451,
+        "full": 0.9803921568627451,
+        "certificate_invalid": 0
+      },
+      "gold_non_equivalent": {
+        "n": 49,
+        "cert": 1.0,
+        "full": 1.0,
+        "certificate_invalid": 0
+      }
+    }
+  }
+}

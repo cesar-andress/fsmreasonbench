@@ -1,0 +1,20 @@
+Table: Comparative matrix
+certificate_type,family,required_fields,semantic_fields,canonical_fields,exact_match_fields,verifier_recomputes,multiple_valid_forms,canonicalization_required,symbolic_synthesis_required,requires_minimization,requires_canonical_hashing,requires_exact_set_reconstruction,requires_replay_verification,local_reasoning_sufficient,estimated_complexity_score
+distinguishing_trace,F1,8,3,0,1,3,True,False,True,False,False,False,True,False,4.5
+equivalence_witness,F1,9,3,2,4,4,False,True,True,True,True,False,False,False,9.5
+trace_witness,C2,7,2,0,1,2,True,False,True,False,False,False,True,True,3.5
+unreachability_witness,C2,7,2,1,2,2,False,True,False,False,False,True,False,True,5.0
+
+Table: Failure taxonomy by certificate type (pooled)
+certificate_type,category,count,percentage,semantic_or_formatting
+equivalence_witness,equivalence_hash_mismatch,102,1.0,semantic
+distinguishing_trace,acceptance_mismatch,16,0.889,semantic
+distinguishing_trace,replay_failure,2,0.111,semantic
+unreachability_witness,incomplete_reachability_set,2,1.0,semantic
+trace_witness,wrong_trace_format,6,0.857,formatting
+trace_witness,replay_failure,1,0.143,semantic
+
+Table: Claude R1 cert valid rate by type
+certificate_type,certificate_valid_rate
+distinguishing_trace,0.9390000000000001
+equivalence_witness,0.0
