@@ -1,7 +1,10 @@
 # Frozen experimental results (paper-facing)
 
-**Frozen:** 2026-06-20  
+**Frozen:** 2026-06-20 · **PAPER FREEZE mode**  
 **Status:** Experimental state locked for manuscript drafting. Scoring, verifier, cohorts, prompts, and answer keys are **unchanged** unless a critical bug is found.
+
+**LaTeX sources:** [`docs/paper_results_latex.md`](paper_results_latex.md) · `paper/results_frozen.tex` · `paper/tables/*_n100*.tex`  
+**Audit checklist:** [`PAPER_FREEZE_AUDIT.md`](PAPER_FREEZE_AUDIT.md)
 
 This document is the **canonical entry point** for n=100 empirical results cited in the paper. Run artifacts live under `runs/` (gitignored); numbers below match auto-generated `report.md` / `combined_summary.json` at freeze time.
 
@@ -34,6 +37,7 @@ These are **v0.1-exploratory expanded** snapshots — reproducible and frozen fo
 |----------|--------|
 | `runs/frontier_claude_sonnet_full_n100_v1` | **Provider-contaminated.** Anthropic HTTP 400 (insufficient credit) and HTTP 429 (rate limit) were misclassified as `not_extractable`, inflating apparent model extraction failure. Repaired post-hoc for diagnostics only; **not** a citable score. |
 | `runs/frontier_gemini_*` (any) | **Quota-contaminated.** Gemini 429 quota failures dominated several cells. **Do not include Gemini as a model result** in the paper. |
+| `runs/frontier_gemini_flash_r0_smoke_v1` … `v4` | Confirmed on disk; all excluded from scientific conclusions. |
 | Earlier Claude pilots (`frontier_claude_sonnet_f1_r2_n20_v2`, etc.) | Superseded by clean n=100 tools run where noted; retain only for development audit. |
 
 **Clean frontier tools result:** `runs/frontier_claude_sonnet_tools_n100_v2` only (4/4 cells, zero provider_error, zero failed/missing/running/stale).
@@ -217,8 +221,61 @@ PYTHONPATH=src python -m fsmreasonbench.cli.plot_local_matrix \
 
 ---
 
+---
+
+## Audit notes
+
+**Verification (2026-06-20):**
+
+| Check | Result |
+|-------|--------|
+| `local_matrix_n100_t02_v2` cell count | 24/24 `completed` in `combined_summary.json` |
+| `frontier_claude_sonnet_tools_n100_v2` cell count | 4/4 `completed`; all `provider_error_count=0` |
+| Metrics match `report.md` | Yes (regenerated with `--report-only` at freeze) |
+| Scoring / verifier / cohorts modified for freeze | **No** |
+| Gemini included as model result | **No** |
+| Contaminated Claude full n=100 cited | **No** (audit reference only) |
+
+**Denominator reminder:** Verdict and certificate rates condition on **extractable** items; fully correct and extractability use **n=100**. The Knowing–Showing gap (Verdict − Full) therefore mixes denominators by design—it flags cells where boolean accuracy overstates end-to-end certification.
+
+**Unsafe cells (local):** Llama F1 R1/R2 and Mistral F1 R1/R2 have extractability <50%; verdict/certificate rates are not comparable across tracks without qualification (see [`paper_local_results.md`](paper_local_results.md)).
+
+---
+
+## Appendix A — Full local matrix (24 cells)
+
+| Model | Fam | Track | Extract | Verdict | Cert | Full |
+|-------|-----|-------|--------:|--------:|-----:|-----:|
+| gemma2:9b | C2 | R0 | 0.980 | 0.388 | 0.071 | 0.070 |
+| gemma2:9b | C2 | R1 | 1.000 | 0.290 | 0.000 | 0.000 |
+| gemma2:9b | C2 | R2 | 1.000 | 1.000 | 0.170 | 0.170 |
+| gemma2:9b | F1 | R0 | 1.000 | 0.530 | 0.240 | 0.240 |
+| gemma2:9b | F1 | R1 | 1.000 | 0.850 | 0.000 | 0.000 |
+| gemma2:9b | F1 | R2 | 0.540 | 1.000 | 0.056 | 0.030 |
+| llama3.1:8b | C2 | R0 | 1.000 | 0.650 | 0.100 | 0.100 |
+| llama3.1:8b | C2 | R1 | 0.180 | 0.333 | 0.056 | 0.010 |
+| llama3.1:8b | C2 | R2 | 0.960 | 0.990 | 0.073 | 0.070 |
+| llama3.1:8b | F1 | R0 | 1.000 | 0.490 | 0.200 | 0.200 |
+| llama3.1:8b | F1 | R1 | 0.090 | 0.444 | 0.000 | 0.000 |
+| llama3.1:8b | F1 | R2 | 0.070 | 1.000 | 0.143 | 0.010 |
+| mistral-nemo:12b | C2 | R0 | 1.000 | 0.490 | 0.150 | 0.150 |
+| mistral-nemo:12b | C2 | R1 | 0.950 | 0.758 | 0.084 | 0.080 |
+| mistral-nemo:12b | C2 | R2 | 1.000 | 1.000 | 0.060 | 0.060 |
+| mistral-nemo:12b | F1 | R0 | 1.000 | 0.490 | 0.100 | 0.100 |
+| mistral-nemo:12b | F1 | R1 | 0.040 | 1.000 | 0.000 | 0.000 |
+| mistral-nemo:12b | F1 | R2 | 0.060 | 1.000 | 0.000 | 0.000 |
+| qwen2.5-coder:7b | C2 | R0 | 0.980 | 0.561 | 0.020 | 0.020 |
+| qwen2.5-coder:7b | C2 | R1 | 1.000 | 0.710 | 0.040 | 0.040 |
+| qwen2.5-coder:7b | C2 | R2 | 1.000 | 0.970 | 0.050 | 0.050 |
+| qwen2.5-coder:7b | F1 | R0 | 1.000 | 0.490 | 0.030 | 0.030 |
+| qwen2.5-coder:7b | F1 | R1 | 0.650 | 0.985 | 0.000 | 0.000 |
+| qwen2.5-coder:7b | F1 | R2 | 0.660 | 1.000 | 0.455 | 0.300 |
+
+---
+
 ## Changelog
 
 | Date | Change |
 |------|--------|
 | 2026-06-20 | Freeze local n=100 matrix (`local_matrix_n100_t02_v2`, 24/24) and clean Claude tools n=100 (`frontier_claude_sonnet_tools_n100_v2`, 4/4). Exclude contaminated full-matrix Claude n=100 and all Gemini quota runs from paper results. |
+| 2026-06-20 | PAPER FREEZE audit: full 24-cell table, audit notes, LaTeX tables (`paper/tables/*_n100*.tex`), `paper/results_frozen.tex`, `docs/paper_results_latex.md`, `docs/PAPER_FREEZE_AUDIT.md`. |

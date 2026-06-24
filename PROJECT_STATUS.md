@@ -190,8 +190,8 @@ Exploratory local-model runs; **not frozen cohorts**. Raw transcripts and JSONL 
 |-------|---------------------|----------|
 | v0 (single model) | [`docs/pilot_v0_report.md`](docs/pilot_v0_report.md), [`docs/pilot_v0_summary.json`](docs/pilot_v0_summary.json) | `runs/pilot_v0/` |
 | v1 (multi-model) | [`docs/pilot_v1_report.md`](docs/pilot_v1_report.md), [`docs/pilot_v1_summary.json`](docs/pilot_v1_summary.json), [`docs/pilot_v1_summary.csv`](docs/pilot_v1_summary.csv) | `runs/pilot_v1/` |
-| **n=100 local matrix (frozen)** | [`docs/paper_results.md`](docs/paper_results.md), [`docs/paper_local_results.md`](docs/paper_local_results.md) | `runs/local_matrix_n100_t02_v2/` (24/24) |
-| **Claude Sonnet tools n=100 (frozen)** | [`docs/paper_results.md`](docs/paper_results.md) | `runs/frontier_claude_sonnet_tools_n100_v2/` (4/4) |
+| **n=100 local matrix (frozen)** | [`docs/paper_results.md`](docs/paper_results.md), [`docs/paper_local_results.md`](docs/paper_local_results.md), [`docs/PAPER_FREEZE_AUDIT.md`](docs/PAPER_FREEZE_AUDIT.md) | `runs/local_matrix_n100_t02_v2/` (24/24) |
+| **Claude Sonnet tools n=100 (frozen)** | [`docs/paper_results.md`](docs/paper_results.md), [`docs/paper_results_latex.md`](docs/paper_results_latex.md) | `runs/frontier_claude_sonnet_tools_n100_v2/` (4/4) |
 
 **Excluded from paper citations:** `runs/frontier_claude_sonnet_full_n100_v1` (provider-contaminated), all `runs/frontier_gemini_*` (quota-contaminated). See `docs/paper_results.md`.
 
