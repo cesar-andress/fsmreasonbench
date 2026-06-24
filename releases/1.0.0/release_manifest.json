@@ -1,0 +1,20 @@
+{
+  "manifest_kind": "fsmreasonbench_release_manifest",
+  "benchmark_version": "1.0.0",
+  "cohort_version": "v0.1-expanded-n100",
+  "schema_version": "1.0.0",
+  "verifier_version": "1.0.0",
+  "generator_version": "1.0.0",
+  "python_version": "3.11+",
+  "released_at": "2026-06-20T00:00:00Z",
+  "zenodo": {
+    "primary_doi": "10.5281/zenodo.20836348",
+    "url": "https://doi.org/10.5281/zenodo.20836348"
+  },
+  "notes": "Frozen empirical evaluation release supporting the TMLR paper. Paper cohort v0.1-expanded-n100 (C2 + F1, n=100 per family). Cite the Zenodo DOI and version pins in this manifest.",
+  "reproduction": {
+    "validate_cohort": "PYTHONPATH=src python -m fsmreasonbench.cli.validate_cohort",
+    "export_paper_package": "PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package",
+    "artifact_health": "PYTHONPATH=src python -m fsmreasonbench.cli.artifact_health"
+  }
+}

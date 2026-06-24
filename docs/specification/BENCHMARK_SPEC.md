@@ -1,9 +1,9 @@
 # FSMReasonBench — Normative Benchmark Specification (v2.0-draft)
 
-**Status:** draft (pre-release; not citable until Zenodo DOI)  
-**Version:** 2.0.0-draft → normalized to **1.0.0** at first Zenodo release  
-**Last updated:** 2025-06-19  
-**Archival target:** `FSMReasonBench v1.0.0 (Zenodo DOI)`
+**Status:** published (v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348))  
+**Version:** 1.0.0 (empirical release; normative spec v2 lineage)  
+**Last updated:** 2026-06-20  
+**Citable archive:** Zenodo tarball per `releases/1.0.0/release_manifest.json`
 
 This document is the authoritative specification for FSMReasonBench. The **Zenodo release
 tarball** defined by `releases/<benchmark_version>/release_manifest.json` is the citable

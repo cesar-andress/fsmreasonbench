@@ -1,6 +1,6 @@
 # Evaluation Protocol — FSMReasonBench v2
 
-**Status:** draft (pre-release; not citable until Zenodo DOI)  
+**Status:** normative (v1.0.0 published — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348))  
 **Version:** 2.0.0-draft  
 **Normative parent:** [`BENCHMARK_SPEC.md`](BENCHMARK_SPEC.md)  
 **Archival:** Submissions MUST declare four version pins per [`../artifact/release_policy.md`](../artifact/release_policy.md).

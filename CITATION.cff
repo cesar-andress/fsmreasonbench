@@ -4,6 +4,7 @@ title: "FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machin
 version: "1.0.0"
 doi: 10.5281/zenodo.20836348
 url: https://doi.org/10.5281/zenodo.20836348
+date-released: 2026-06-20
 license: Apache-2.0
 authors:
   - family-names: Andrés

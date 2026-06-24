@@ -15,7 +15,7 @@
 | G4 | "Clone and pip install -e ." | Unpinned deps | `requirements-lock.txt` in release |
 | G5 | CI green badge as reproducibility | CI not archived | Golden tests + scripts in tarball |
 | G6 | Schemas without `schema_version` pin | Contract drift | `schema/VERSION` + manifest pin |
-| G7 | Verifier not yet implemented | Cannot score | Verifier required for v1.0.0 DOI |
+| G7 | Verifier implemented for C2/F1 v1.0.0 slice | Required for DOI | ✅ Satisfied in v1.0.0 |
 | G8 | T1–T7 references in JSON schemas | Spec/code skew | Align schemas to F1–F4 (M1) |
 | G9 | Paper tables from local scripts | Unpublished dependency | `reproduce_table.sh` + archived submissions |
 | G10 | Single bundle with answer keys | Contamination, misuse | Split evaluatee / evaluator deposits |

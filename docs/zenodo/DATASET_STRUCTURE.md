@@ -1,11 +1,11 @@
 # Dataset structure
 
-**Status:** pre-release draft  
-**Audience:** future Zenodo depositors and downstream evaluators
+**Published release:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Audience:** Zenodo tarball users and downstream evaluators
 
 This document describes the JSON record layouts used in FSMReasonBench. Normative schema
-files live in [`schema/`](../../schema/). At release time, schemas will be pinned in the
-Zenodo tarball; this document is a human-readable map.
+files live in [`schema/`](../../schema/). Schemas are pinned in the Zenodo tarball; this
+document is a human-readable map.
 
 ---
 

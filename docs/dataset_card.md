@@ -13,14 +13,14 @@ pretty_name: FSMReasonBench
 
 # FSMReasonBench — Dataset Card
 
-**Artifact version:** `0.2.0-dev` (development)  
-**Card status:** draft — suitable for later adaptation to a Hugging Face dataset repository  
+**Artifact version:** `1.0.0` (published Zenodo release)  
+**Zenodo DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Card status:** describes the published v1.0.0 empirical slice; adaptable to Hugging Face  
 **Normative specification:** [`docs/specification/BENCHMARK_SPEC.md`](specification/BENCHMARK_SPEC.md)
 
-> FSMReasonBench is under active development. Only **C2** (calibration) and an **F1**
-> separation/equivalence slice (flagship) are implemented end-to-end in the current artifact.
-> Families F2–F4 and calibration C1 are specified but not yet wired. This card describes the
-> **design intent** and **current implementation**; it does not assert benchmark completion.
+> **C2** (calibration) and an **F1** separation/equivalence slice are implemented end-to-end in
+> v1.0.0. Families F2–F4 and calibration C1 are specified but not in the published empirical
+> claims. Cite the Zenodo DOI, not git `main`.
 
 ---
 
@@ -85,9 +85,10 @@ open-ended NL-only specifications. See BENCHMARK_SPEC §2.2.
 
 | Tier | Description | Status |
 |------|-------------|--------|
-| **On-demand / exploratory** | Seeded generation under `runs/`; pilot and capability-surface batches | Active in development; not citable as final results |
-| **Exploratory freeze** | Sealed snapshots via `freeze_cohort` (manifest `0.1-exploratory`) | **Two valid cohorts committed** (see below); reproducible for smoke testing, not a public release |
-| **Frozen public cohort** | Content-addressed manifest; evaluatee/evaluator bundle split | Planned; not yet published |
+| **On-demand / exploratory** | Seeded generation under `runs/`; pilot batches | Development only; not primary paper evidence |
+| **Exploratory freeze** | `cohorts/v0.1-exploratory/` ($n{=}20$) | Historical smoke tier; not the citable v1.0.0 release |
+| **Paper cohort (published)** | `cohorts/v0.1-expanded-n100/` ($n{=}100$) | ✅ Frozen in v1.0.0 Zenodo release |
+| **Future `1.0-public` tier** | Larger design target in spec | Not the v1.0.0 paper cohort |
 
 ### Valid exploratory frozen cohorts (non-public)
 
@@ -373,10 +374,13 @@ Release planning: [`docs/zenodo/RELEASE_CHECKLIST.md`](zenodo/RELEASE_CHECKLIST.
 
 ## Citation
 
-The benchmark is not yet released as a citable frozen dataset. When a public cohort is published,
-citation metadata will appear in `CITATION.cff` at the repository root. Until then, refer to
-the development artifact and this dataset card with version `0.2.0-dev` and explicit cohort
-provenance if using exploratory snapshots.
+Cite the published Zenodo release:
+
+**DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)
+
+See [`CITATION.cff`](../../CITATION.cff) at the repository root. Include cohort identifier
+`v0.1-expanded-n100` and version pins from [`releases/1.0.0/release_manifest.json`](../../releases/1.0.0/release_manifest.json)
+when reproducing paper analyses.
 
 ---
 

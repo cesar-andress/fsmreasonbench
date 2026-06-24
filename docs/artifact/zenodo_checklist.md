@@ -1,9 +1,9 @@
 # Zenodo Release Checklist
 
-**Status:** normative (pre-upload gate)  
-**Release:** FSMReasonBench v___ (benchmark_version)
+**Status:** normative gate checklist  
+**Published reference release:** v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)
 
-Complete every item before minting DOI.
+Use this checklist for **future** benchmark versions. v1.0.0 completed publication on 2026-06-20.
 
 ---
 
@@ -59,7 +59,7 @@ Complete every item before minting DOI.
 ## F. Legal and citation
 
 - [ ] `LICENSE` file with SPDX identifier
-- [ ] `CITATION.cff` with DOI placeholder filled post-mint
+- [x] `CITATION.cff` with DOI (v1.0.0: `10.5281/zenodo.20836348`)
 - [ ] Zenodo metadata: creators, ORCID, keywords, related paper DOI
 - [ ] Embargo date for seeds documented in manifest
 

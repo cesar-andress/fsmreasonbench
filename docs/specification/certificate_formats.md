@@ -1,6 +1,6 @@
 # Certificate and Artefact Formats — FSMReasonBench v2
 
-**Status:** draft (pre-release)  
+**Status:** normative (v1.0.0 published)  
 **Version:** 2.0.0-draft  
 **Normative parent:** [`BENCHMARK_SPEC.md`](BENCHMARK_SPEC.md)  
 **Zenodo:** Certificate types are pinned by `schema_version` in release manifest.

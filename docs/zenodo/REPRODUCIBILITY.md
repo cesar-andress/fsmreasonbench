@@ -1,13 +1,14 @@
 # Reproducibility
 
-**Status:** pre-release draft  
-**Audience:** future Zenodo depositors, evaluators, and paper reviewers
+**Published release:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Audience:** Zenodo tarball users, evaluators, and paper reviewers
 
-This document describes how FSMReasonBench achieves reproducibility in the **current
-development artifact**. Normative tiers and tarball-only workflows are defined in
+This document describes how FSMReasonBench achieves reproducibility in the **published v1.0.0
+artifact** and in development clones. Normative tiers and tarball-only workflows are defined in
 [`docs/artifact/reproducibility_policy.md`](../artifact/reproducibility_policy.md).
 
-Nothing in this folder constitutes a frozen release or citable reproducibility claim.
+Citable reproducibility claims for the companion paper refer to frozen cohort
+`v0.1-expanded-n100`, archived runs, and offline analysis exports — not live model API calls.
 
 ---
 

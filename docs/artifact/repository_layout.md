@@ -92,7 +92,7 @@
 |------|------|
 | `releases/README.md` | Release index |
 | `releases/<benchmark_version>/` | Per-release manifest, notes, checksum template |
-| `CITATION.cff` | DOI placeholder until minted |
+| `CITATION.cff` | Zenodo DOI and preferred citation metadata |
 | `LICENSE` | SPDX license (before Zenodo) |
 
 ### 2.8 Tests (development + release gate)

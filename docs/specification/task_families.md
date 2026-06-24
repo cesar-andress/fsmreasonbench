@@ -1,6 +1,6 @@
 # Task Families — FSMReasonBench v2
 
-**Status:** draft (pre-release)  
+**Status:** normative (v1.0.0 published)  
 **Version:** 2.0.0-draft  
 **Normative parent:** [`BENCHMARK_SPEC.md`](BENCHMARK_SPEC.md)  
 **Cohort quotas** are enforced in manifest; see [`../../cohorts/MANIFEST_SPEC.md`](../../cohorts/MANIFEST_SPEC.md).

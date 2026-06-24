@@ -2,88 +2,76 @@
 
 **Evaluating Reasoning over Executable Finite-State Machines**
 
-This repository is the **canonical Zenodo artifact** for FSMReasonBench — not merely a
-GitHub source tree. The citable release is **FSMReasonBench v1.0.0** on Zenodo
-([10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)).
+FSMReasonBench measures whether language models can supply **machine-verifiable witnesses**
+(certificates) for formal finite-state decision tasks—not boolean verdicts alone.
+Each item pairs a typed question with an independent verifier that recomputes witnesses from
+supplied automata under a fixed, auditable contract.
 
-Git `main` is for development. **Cite the Zenodo DOI**, not the git URL.
+## Cite the published artifact
 
-Companion paper (separate): `../paper/`
+**FSMReasonBench v1.0.0** is archived on Zenodo:
 
-**Development milestone:** [`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md) —
-C2 + F1 implemented, exploratory cohort freeze, evaluation pipeline. **Not** a Zenodo release or
-final public benchmark.
+**DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)
 
----
+Use `CITATION.cff` or the DOI above. Git `main` is for development; **do not cite the git URL**.
 
-## Artifact philosophy
-
-| Priority | Principle |
-|----------|-----------|
-| 1 | Normative benchmark specification |
-| 2 | Reproducibility from tarball alone |
-| 3 | Long-term archival value (≥ 5 years) |
-| 4 | Implementation convenience |
-
-Read [`docs/artifact/artifact_philosophy.md`](docs/artifact/artifact_philosophy.md) first.
+Companion empirical paper (separate): [`../paper/`](../paper/)
 
 ---
 
-## Zenodo release model
+## What v1.0.0 includes
 
-Every release pins **four version axes**:
+| Component | Description |
+|-----------|-------------|
+| **Verifier + scorer** | Independent replay and hash-contract checking for C2 and F1 certificate classes |
+| **Generators + oracles** | Seeded item construction with self-verification |
+| **Frozen cohort** | `v0.1-expanded-n100` — C2 and F1 mixed snapshots ($n{=}100$ per family) |
+| **Evaluation pipeline** | R0/R1/R2 tracks, attribution ablations, failure inspection |
+| **Paper-support analyses** | Verifier audit ($16/16$), hash-mismatch decomposition, bootstrap/McNemar exports |
+| **Empirical package** | [`docs/tmlr_empirical_package_v1/`](docs/tmlr_empirical_package_v1/) — tables/figures for the paper |
+| **Documentation** | Normative spec, reproducibility policies, dataset card |
 
-| Axis | Example |
-|------|---------|
-| `benchmark_version` | `1.0.0` |
-| `cohort_version` | `1.0-public` |
-| `schema_version` | `1.0.0` |
-| `verifier_version` | `1.0.0` |
+Families **F2–F4** and calibration **C1** remain specified but are **not** part of the v1.0.0
+empirical slice. Historical exploratory milestone: [`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md).
 
-Manifest: `releases/<benchmark_version>/release_manifest.json`
-
-**Quickstart (tarball users):** [`README-RELEASE.md`](README-RELEASE.md)
-
----
-
-## Benchmark spine (v2)
-
-### Flagship families (≥ 85% of cohort)
-
-| ID | Family |
-|----|--------|
-| F1 | Separation / Witness |
-| F2 | Non-materialized Composition |
-| F3 | Constructive Synthesis |
-| F4 | Formalization Fidelity |
-
-### Calibration (≤ 15%, non-headline)
-
-C1 trace/membership · C2 basic reachability
+Release manifest: [`releases/1.0.0/release_manifest.json`](releases/1.0.0/release_manifest.json)
 
 ---
 
-## Repository layers
+## Reproduce paper results (offline)
 
-```
-docs/specification/     ← normative benchmark spec
-docs/artifact/          ← release, reproducibility, archival policies
-spec/                   ← declarative generator/oracle parameters
-schema/                 ← JSON Schema contracts (schema_version)
-cohorts/                ← frozen manifests (data in Zenodo tarball)
-src/fsmreasonbench/
-  generator/            ← implementation (generator_version)
-  verifier/             ← implementation (verifier_version) — required for DOI
-  cohort/               ← integrity validation
-  evaluator/            ← scoring harness
-releases/               ← per-version manifests
-scripts/                ← offline reproduction scripts
-paper_reproduction/     ← archived submissions (supplement, not manuscript)
+Tarball quickstart: [`README-RELEASE.md`](README-RELEASE.md)
+
+From a development clone:
+
+```bash
+pip install -e ".[dev,plot]"
+PYTHONPATH=src python -m fsmreasonbench.cli.validate_cohort \
+  --cohort-dir cohorts/v0.1-expanded-n100/f1-mixed-level3
+PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package
+PYTHONPATH=src python -m fsmreasonbench.cli.artifact_health
 ```
 
-**Not in this repo:** paper prose (`../paper/`).
+Primary frozen runs and analysis paths are documented in
+[`docs/tmlr_empirical_package_v1/README.md`](docs/tmlr_empirical_package_v1/README.md) and
+[`docs/paper_results.md`](docs/paper_results.md). Regeneration uses frozen `scores.jsonl` files;
+**no model API calls** are required for audit, decomposition, or table export.
 
-Layout detail: [`docs/artifact/repository_layout.md`](docs/artifact/repository_layout.md)
+---
+
+## Repository layout
+
+```
+docs/specification/     Normative benchmark definition
+docs/artifact/          Release and reproducibility policies
+docs/tmlr_empirical_package_v1/   Paper tables, figures, uncertainty exports
+cohorts/v0.1-expanded-n100/       Frozen paper cohort (manifest + JSONL)
+src/fsmreasonbench/     Generator, verifier, evaluator, runners, cohort tools
+releases/1.0.0/         Published release manifest
+scripts/                Offline validation and scoring helpers
+```
+
+Detail: [`docs/artifact/repository_layout.md`](docs/artifact/repository_layout.md)
 
 ---
 
@@ -91,68 +79,14 @@ Layout detail: [`docs/artifact/repository_layout.md`](docs/artifact/repository_l
 
 | Document | Purpose |
 |----------|---------|
+| [`PROJECT_STATUS.md`](PROJECT_STATUS.md) | Current released components and assets |
 | [`docs/specification/BENCHMARK_SPEC.md`](docs/specification/BENCHMARK_SPEC.md) | Normative benchmark definition |
-| [`docs/artifact/release_policy.md`](docs/artifact/release_policy.md) | Zenodo deposit structure |
+| [`docs/zenodo/REPRODUCIBILITY.md`](docs/zenodo/REPRODUCIBILITY.md) | Replication tiers and commands |
+| [`docs/dataset_card.md`](docs/dataset_card.md) | Dataset overview |
 | [`docs/artifact/reproducibility_policy.md`](docs/artifact/reproducibility_policy.md) | R1–R4 reproduction tiers |
-| [`docs/artifact/contamination_policy.md`](docs/artifact/contamination_policy.md) | Leakage controls |
-| [`docs/artifact/archival_policy.md`](docs/artifact/archival_policy.md) | 5-year usability |
-| [`docs/versioning_policy.md`](docs/versioning_policy.md) | Four-axis version rules |
-| [`docs/artifact/github_vs_zenodo.md`](docs/artifact/github_vs_zenodo.md) | Design review |
-| [`docs/artifact/zenodo_checklist.md`](docs/artifact/zenodo_checklist.md) | Pre-upload gate |
-| [`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md) | **v0.1 exploratory milestone** (not Zenodo / not public v1.0) |
-
----
-
-## Evaluation tracks
-
-| Track | Name |
-|-------|------|
-| R0 | Pure reasoning |
-| R1 | Tool-augmented |
-| R2 | Solver delegation |
-
-Results = **capability surfaces**, not a single leaderboard score.
-
----
-
-## Current status
-
-**Development artifact on `main`:** see [`docs/releases/v0.1-exploratory.md`](docs/releases/v0.1-exploratory.md).
-
-| Component | Status |
-|-----------|--------|
-| Zenodo-first architecture docs | ✅ |
-| v2 spec (F1–F4, C1–C2) | ✅ draft |
-| C2 + F1 end-to-end (generator → verifier → scorer) | ✅ |
-| Exploratory cohort freeze (`0.1-exploratory`) | ✅ (2 committed snapshots) |
-| Evaluation pipeline + baselines + capability surface | ✅ |
-| **Public Zenodo release `v1.0.0` / cohort `1.0-public`** | ⬜ **not published** |
-| Families F2–F4, C1 | ⬜ specified only |
-| LICENSE / DOI in CITATION.cff | ⬜ placeholder |
-
-See [`PROJECT_STATUS.md`](PROJECT_STATUS.md).
-
----
-
-## Artifact health
-
-Quick sanity check before release prep or after cloning:
-
-```bash
-PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health
-PYTHONPATH=src python3.11 -m fsmreasonbench.cli.artifact_health --json
-```
-
-Verifies package import, required schemas, reference example self-verification, and core CLI imports. Exits non-zero on failure.
-
----
-
-## Citation
-
-Use `CITATION.cff` after DOI minting. Until then, do not cite `-draft` specifications.
 
 ---
 
 ## License
 
-TBD before Zenodo — see [`LICENSE`](LICENSE) and PROJECT_STATUS U10.
+Apache License 2.0 — see [`LICENSE`](LICENSE).

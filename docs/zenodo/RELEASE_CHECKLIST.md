@@ -1,10 +1,7 @@
 # Release checklist
 
-**Status:** pre-release draft  
-**Purpose:** gate checklist for a **future** FSMReasonBench Zenodo release
-
-This is a working checklist for maintainers. It does not assign version numbers, create
-Zenodo metadata, or freeze any dataset. Complete every section before minting a DOI.
+**Published:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Purpose:** gate checklist used for the v1.0.0 Zenodo release; retained for future versions
 
 Extended normative gate: [`docs/artifact/zenodo_checklist.md`](../artifact/zenodo_checklist.md).
 
