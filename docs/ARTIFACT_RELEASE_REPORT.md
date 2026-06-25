@@ -160,7 +160,8 @@ Commits on `main` forming this release (newest first):
 
 | Commit | Summary |
 |--------|---------|
-| *(this release)* | TOSEM artifact freeze: manifest paths, docs, exports, release report |
+| `2c7a4c4` | docs: TOSEM artifact release report, reproduction guide, frozen export refresh |
+| `5889c0e` | artifact: portable TOSEM manifest paths; restore `runs/` gitignore |
 | `d709107` | evaluator: export paired verdict-witness gap figures for TOSEM |
 | `4478ca2` | figures: add frontier certificate complexity comparison |
 | `9fc5746` | Add A1 statistical export with bootstrap, McNemar, and artifact docs |
