@@ -1,5 +1,9 @@
 # Frozen experimental results (paper-facing)
 
+**Companion paper:** ACM TOSEM — authoritative freeze [`../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../paper/EXPERIMENTAL_FREEZE_TOSEM.md)  
+**Artifact mirror:** [`EXPERIMENTAL_FREEZE_TOSEM.md`](EXPERIMENTAL_FREEZE_TOSEM.md)  
+**Regenerate tables (read-only):** [`../scripts/reproduce_tosem_tables.sh`](../scripts/reproduce_tosem_tables.sh)
+
 **Frozen:** 2026-06-20 · **PAPER FREEZE mode**  
 **Status:** Experimental state locked for manuscript drafting. Scoring, verifier, cohorts, prompts, and answer keys are **unchanged** unless a critical bug is found.
 
@@ -16,6 +20,11 @@ This document is the **canonical entry point** for n=100 empirical results cited
 |----------|----------|------:|----------|--------|----------|--------|---|--:|
 | **Local Ollama matrix** | `runs/local_matrix_n100_t02_v2` | **24/24** | Ollama | gemma2:9b, llama3.1:8b, mistral-nemo:12b, qwen2.5-coder:7b | C2, F1 | R0, R1, R2 | 0.2 | 100 |
 | **Claude Sonnet tools (frontier)** | `runs/frontier_claude_sonnet_tools_n100_v2` | **4/4** | Anthropic | claude-sonnet-4-5-20250929 | C2, F1 | R1, R2 | 0.2 | 100 |
+| **GPT-4.1 tools (frontier)** | `runs/frontier_gpt_tools_n100_v1` | **4/4** | OpenAI | gpt-4.1 | C2, F1 | R1, R2 | 0.2 | 100 |
+| **GPT F1 R2C ablation** | `runs/ablations_f1_r2c_gpt_n100_v1` | **1/1** | OpenAI | gpt-4.1 | F1 | R2C | 0.2 | 100 |
+| **Claude F1 R2 attribution** | `runs/ablations_f1_r2_attribution_claude_n100_v1` | **3/3** | Anthropic | claude-sonnet-4-5-20250929 | F1 | R2A, R2B, R2C | 0.2 | 100 |
+| **Claude F1 Oracle control** | `runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1` | **1/1** | Anthropic | claude-sonnet-4-5-20250929 | F1 | Oracle+Format | 0.2 | 100 |
+| **Claude C2 ablations** | `runs/ablations_c2_existential_universal_claude_n100_v1` | **5/5** | Anthropic | claude-sonnet-4-5-20250929 | C2 | R1, Oracle, R2A, R2B, R2C | 0.2 | 100 |
 
 **Cohorts (both campaigns):**
 

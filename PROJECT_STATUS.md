@@ -4,6 +4,7 @@
 **Last updated:** 2026-06-20  
 **Published release:** **FSMReasonBench v1.0.0**  
 **Zenodo DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Companion paper:** ACM TOSEM — [`../paper/`](../paper/), freeze [`../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../paper/EXPERIMENTAL_FREEZE_TOSEM.md)  
 **Author:** César Andrés (ORCID [0009-0001-8968-3404](https://orcid.org/0009-0001-8968-3404))  
 **Git branch:** `main` (development surface; cite Zenodo, not git)
 
@@ -23,7 +24,8 @@
 | Attribution ablation analyses | ✅ | `docs/ablation_*.md`, frozen runs under `runs/` (see paper package) |
 | Certificate-class complexity | ✅ | [`docs/certificate_class_complexity_analysis.json`](docs/certificate_class_complexity_analysis.json) |
 | Bootstrap / McNemar exports | ✅ | [`docs/tmlr_empirical_package_v1/uncertainty/`](docs/tmlr_empirical_package_v1/uncertainty/) |
-| TMLR empirical package | ✅ | [`docs/tmlr_empirical_package_v1/`](docs/tmlr_empirical_package_v1/) |
+| TOSEM empirical package | ✅ | [`docs/tosem_empirical_package_v1/`](docs/tosem_empirical_package_v1/) |
+| TMLR empirical package (historical) | ✅ | [`docs/tmlr_empirical_package_v1/`](docs/tmlr_empirical_package_v1/) — Claude ablations export |
 | Paper result inventory | ✅ | [`docs/paper_results.md`](docs/paper_results.md) |
 | Normative specification | ✅ (v2 design; v1.0.0 empirical slice) | [`docs/specification/BENCHMARK_SPEC.md`](docs/specification/BENCHMARK_SPEC.md) |
 
@@ -42,15 +44,16 @@ Paper headline analyses use this tier ($n{=}100$ per family, $T{=}0.2$).
 
 Validate: `python -m fsmreasonbench.cli.validate_cohort --cohort-dir <path>`
 
-### Primary frozen runs (paper evidence)
+### Primary frozen runs (TOSEM evidence)
 
-Documented in [`docs/tmlr_empirical_package_v1/README.md`](docs/tmlr_empirical_package_v1/README.md):
+Authoritative list: [`docs/EXPERIMENTAL_FREEZE_TOSEM.md`](docs/EXPERIMENTAL_FREEZE_TOSEM.md)
 
-- `runs/frontier_claude_sonnet_tools_n100_v2` — primary Claude Sonnet R1/R2 campaign
-- `runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1`
-- `runs/ablations_f1_r2_attribution_claude_n100_v1`
-- `runs/ablations_c2_existential_universal_claude_n100_v1`
-- `runs/local_matrix_n100_t02_v2` — optional local-model context (not primary paper claims)
+| Campaign | Run root |
+|----------|----------|
+| Claude Sonnet tools | `runs/frontier_claude_sonnet_tools_n100_v2` |
+| Claude F1/C2 ablations | `runs/ablations_f1_r2_attribution_claude_n100_v1`, Oracle control, `runs/ablations_c2_existential_universal_claude_n100_v1` |
+| GPT-4.1 tools + F1 R2C | `runs/frontier_gpt_tools_n100_v1`, `runs/ablations_f1_r2c_gpt_n100_v1` |
+| Local Ollama matrix | `runs/local_matrix_n100_t02_v2` |
 
 Run trees may be gitignored; they ship in the Zenodo tarball for v1.0.0.
 
@@ -67,11 +70,14 @@ development milestone. **Not** the citable v1.0.0 release; retained for smoke te
 | Asset | Purpose |
 |-------|---------|
 | [`README-RELEASE.md`](README-RELEASE.md) | Tarball quickstart |
+| [`docs/tosem/REPRODUCTION.md`](docs/tosem/REPRODUCTION.md) | TOSEM read-only workflow |
 | [`docs/zenodo/REPRODUCIBILITY.md`](docs/zenodo/REPRODUCIBILITY.md) | Replication tiers (R1–R4) |
 | [`docs/artifact/reproducibility_policy.md`](docs/artifact/reproducibility_policy.md) | Normative policy |
-| `python -m fsmreasonbench.cli.export_tmlr_empirical_package` | Regenerate paper tables/figures offline |
-| `python -m fsmreasonbench.cli.artifact_health` | Package integrity check |
-| `pytest` | Unit and integration tests |
+| [`scripts/reproduce_tosem_tables.sh`](scripts/reproduce_tosem_tables.sh) | One-shot TOSEM table regeneration |
+| `python3.12 -m fsmreasonbench.cli.export_tosem_empirical_package` | TOSEM LaTeX + JSON export |
+| `python3.12 -m fsmreasonbench.cli.export_tmlr_empirical_package` | Claude ablations + figure export |
+| `python3.12 -m fsmreasonbench.cli.artifact_health` | Package integrity check |
+| `pytest` | Unit and integration tests (Python ≥ 3.11) |
 
 ---
 
@@ -99,7 +105,6 @@ full correctness. See [`docs/specification/evaluation_protocol.md`](docs/specifi
 - Larger public cohort tier (`1.0-public` design target in spec)
 - Hugging Face dataset mirror
 - Complete `paper_reproduction/` submission archive layout
-- `scripts/reproduce_table.sh` full automation (partial stub remains)
 
 ---
 
@@ -108,10 +113,9 @@ full correctness. See [`docs/specification/evaluation_protocol.md`](docs/specifi
 ```bash
 pip install -e ".[dev,plot]"
 pytest -q
-PYTHONPATH=src python -m fsmreasonbench.cli.artifact_health
-PYTHONPATH=src python -m fsmreasonbench.cli.validate_cohort \
+./scripts/reproduce_tosem_tables.sh
+PYTHONPATH=src python3.12 -m fsmreasonbench.cli.validate_cohort \
   --cohort-dir cohorts/v0.1-expanded-n100/f1-mixed-level3
-PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package
 ```
 
 ---
@@ -121,4 +125,5 @@ PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package
 | Document | Role |
 |----------|------|
 | [`docs/release_v1_0_0_zenodo_audit.md`](docs/release_v1_0_0_zenodo_audit.md) | Pre-publication audit (superseded by published DOI) |
-| [`docs/PAPER_FREEZE_AUDIT.md`](docs/PAPER_FREEZE_AUDIT.md) | Paper run freeze inventory |
+| [`docs/PAPER_FREEZE_AUDIT.md`](docs/PAPER_FREEZE_AUDIT.md) | Pre-TOSEM audit trail ([`docs/historical/README.md`](docs/historical/README.md)) |
+| [`docs/tosem/ZENODO_RELEASE_NOTES.md`](docs/tosem/ZENODO_RELEASE_NOTES.md) | Next deposit preparation |

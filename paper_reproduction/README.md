@@ -1,11 +1,12 @@
 # Paper reproduction supplements
 
-Archived model submissions and table provenance for the v1.0.0 Zenodo release
+Archived model submissions and table provenance for the FSMReasonBench Zenodo release
 (DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)).
 
-Primary paper evidence is reproduced offline from frozen run directories documented in
-[`docs/tmlr_empirical_package_v1/README.md`](../docs/tmlr_empirical_package_v1/README.md) and
-[`docs/paper_results.md`](../docs/paper_results.md).
+**Companion paper:** ACM TOSEM — [`../../paper/`](../../paper/)
+
+Primary evidence is reproduced offline from frozen run directories listed in
+[`../docs/EXPERIMENTAL_FREEZE_TOSEM.md`](../docs/EXPERIMENTAL_FREEZE_TOSEM.md).
 
 Target layout for extended submission archives:
 
@@ -16,12 +17,13 @@ paper_reproduction/
 └── table_provenance.json   # maps tables → scripts + input files
 ```
 
-Regenerate paper tables without model APIs:
+Regenerate TOSEM manuscript tables without model APIs:
 
 ```bash
-PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package
+./scripts/reproduce_tosem_tables.sh
 ```
 
-Manuscript source: [`../paper/`](../paper/) (sibling directory in the monorepo layout).
+Manuscript source: [`../../paper/`](../../paper/) (sibling directory in the monorepo layout).
 
-See [`docs/artifact/reproducibility_policy.md`](../docs/artifact/reproducibility_policy.md).
+See [`../docs/tosem/REPRODUCTION.md`](../docs/tosem/REPRODUCTION.md) and
+[`../docs/artifact/reproducibility_policy.md`](../docs/artifact/reproducibility_policy.md).

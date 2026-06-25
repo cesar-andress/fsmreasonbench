@@ -48,21 +48,22 @@ PYTHONPATH=src python -m fsmreasonbench.cli.score_submission \
 
 Or `scripts/verify_submission.py` when packaged in the tarball layout.
 
-## 5. Reproduce paper tables (offline)
+## 5. Reproduce TOSEM paper tables (offline)
 
 ```bash
 pip install -e ".[dev,plot]"
-PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package
+./scripts/reproduce_tosem_tables.sh
 ```
 
-Output: `docs/tmlr_empirical_package_v1/`. Requires frozen run trees included in the tarball.
-No model API calls.
+Outputs: `../paper/tables/` (TOSEM manuscript) and `docs/tosem_empirical_package_v1/`.
+Requires frozen run trees included in the tarball. **No model API calls.**
 
 ## Documentation
 
+- TOSEM workflow: `docs/tosem/REPRODUCTION.md`
 - Normative spec: `docs/specification/BENCHMARK_SPEC.md`
 - Reproducibility: `docs/zenodo/REPRODUCIBILITY.md`
-- Paper package: `docs/tmlr_empirical_package_v1/README.md`
+- Historical TMLR package: `docs/tmlr_empirical_package_v1/README.md`
 
 ## Citation
 
