@@ -1,0 +1,43 @@
+{
+  "conditions": [
+    {
+      "abs_gpt_minus_claude_cert_rate": null,
+      "condition": "Oracle+Format",
+      "difference_exceeds_replicate_variability": false,
+      "replicate_noise_ceiling_f1_r2_std": null,
+      "status": "pending"
+    },
+    {
+      "abs_gpt_minus_claude_cert_rate": null,
+      "condition": "R2A",
+      "difference_exceeds_replicate_variability": false,
+      "replicate_noise_ceiling_f1_r2_std": null,
+      "status": "pending"
+    },
+    {
+      "abs_gpt_minus_claude_cert_rate": null,
+      "condition": "R2B",
+      "difference_exceeds_replicate_variability": false,
+      "replicate_noise_ceiling_f1_r2_std": null,
+      "status": "pending"
+    },
+    {
+      "abs_gpt_minus_claude_cert_rate": null,
+      "condition": "R2C",
+      "difference_exceeds_replicate_variability": false,
+      "replicate_noise_ceiling_f1_r2_std": null,
+      "status": "pending"
+    }
+  ],
+  "experiment": "run_stability_vs_cross_model_comparison",
+  "interpretation_note": "If abs(GPT-Claude certificate gap) exceeds the larger F1 R2 fully_correct replicate std from frontier tool campaigns, the cross-model gap likely exceeds run-to-run variability at the same protocol.",
+  "noise_floor": {
+    "claude_fully_correct_std": null,
+    "gpt_fully_correct_std": null
+  },
+  "replicate_noise_ceiling_f1_r2_std": null,
+  "replicate_studies": {
+    "claude": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/frontier_claude_sonnet_tools_n100_v2_replicates",
+    "gpt": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/frontier_gpt_tools_n100_v1_replicates"
+  }
+}

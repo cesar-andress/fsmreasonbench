@@ -1,0 +1,100 @@
+{
+  "claude": {
+    "conditions": {
+      "Oracle+Format": {
+        "certificate_valid_rate": 0.34,
+        "fully_correct_rate": 0.34,
+        "n": 100,
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1/scores.jsonl",
+        "status": "available",
+        "verdict_accuracy": 1.0
+      },
+      "R2A": {
+        "certificate_valid_rate": 0.49,
+        "fully_correct_rate": 0.49,
+        "n": 100,
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_claude_n100_v1/R2A/scores.jsonl",
+        "status": "available",
+        "verdict_accuracy": 1.0
+      },
+      "R2B": {
+        "certificate_valid_rate": 0.48,
+        "fully_correct_rate": 0.48,
+        "n": 100,
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_claude_n100_v1/R2B/scores.jsonl",
+        "status": "available",
+        "verdict_accuracy": 1.0
+      },
+      "R2C": {
+        "certificate_valid_rate": 1.0,
+        "fully_correct_rate": 0.99,
+        "n": 100,
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_claude_n100_v1/R2C/scores.jsonl",
+        "status": "available",
+        "verdict_accuracy": 1.0
+      }
+    },
+    "provider": "claude"
+  },
+  "experiment": "cross_model_attribution_comparison",
+  "gpt": {
+    "conditions": {
+      "Oracle+Format": {
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_oracle_verdict_format_control_gpt_n100_v1/scores.jsonl",
+        "status": "pending"
+      },
+      "R2A": {
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_gpt_n100_v1/R2A/scores.jsonl",
+        "status": "pending"
+      },
+      "R2B": {
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_gpt_n100_v1/R2B/scores.jsonl",
+        "status": "pending"
+      },
+      "R2C": {
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_gpt_n100_v1/R2C/scores.jsonl",
+        "status": "pending"
+      }
+    },
+    "provider": "gpt"
+  },
+  "gpt_frozen_partial": {
+    "conditions": {
+      "R2C": {
+        "certificate_valid_rate": 1.0,
+        "fully_correct_rate": 1.0,
+        "n": 100,
+        "scores_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2c_gpt_n100_v1/R2C/scores.jsonl",
+        "status": "available",
+        "verdict_accuracy": 1.0
+      }
+    },
+    "provider": "gpt_frozen_partial"
+  },
+  "paired_comparisons": [
+    {
+      "claude_scores": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1/scores.jsonl",
+      "condition": "Oracle+Format",
+      "gpt_scores": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_oracle_verdict_format_control_gpt_n100_v1/scores.jsonl",
+      "status": "pending"
+    },
+    {
+      "claude_scores": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_claude_n100_v1/R2A/scores.jsonl",
+      "condition": "R2A",
+      "gpt_scores": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_gpt_n100_v1/R2A/scores.jsonl",
+      "status": "pending"
+    },
+    {
+      "claude_scores": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_claude_n100_v1/R2B/scores.jsonl",
+      "condition": "R2B",
+      "gpt_scores": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_gpt_n100_v1/R2B/scores.jsonl",
+      "status": "pending"
+    },
+    {
+      "claude_scores": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_claude_n100_v1/R2C/scores.jsonl",
+      "condition": "R2C",
+      "gpt_scores": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/ablations_f1_r2_attribution_gpt_n100_v1/R2C/scores.jsonl",
+      "status": "pending"
+    }
+  ]
+}

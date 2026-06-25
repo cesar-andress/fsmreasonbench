@@ -1,0 +1,32 @@
+{
+  "cross_model_attribution": {
+    "cross_model_json": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/tosem_extension_experiments_v1/cross_model_attribution_comparison.json",
+    "cross_model_table_tex": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/tosem_extension_experiments_v1/extension_cross_model_attribution.tex",
+    "paper_cross_model_table": "/home/cesar/papers/fsmreasonbench/paper/tables/extension_cross_model_attribution.tex"
+  },
+  "generated_from": "extension experiment outputs only (does not overwrite frozen tables)",
+  "package_version": "tosem_extension_v1",
+  "paper_figures": {},
+  "paper_tables": {
+    "extension_cross_model_attribution.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/extension_cross_model_attribution.tex",
+    "extension_stability_vs_cross_model.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/extension_stability_vs_cross_model.tex"
+  },
+  "pending_studies": [
+    {
+      "label": "claude_frontier",
+      "reason": "aggregate_replicates.json not found (campaign not run yet)",
+      "study_root": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/frontier_claude_sonnet_tools_n100_v2_replicates"
+    },
+    {
+      "label": "gpt_frontier",
+      "reason": "aggregate_replicates.json not found (campaign not run yet)",
+      "study_root": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/runs/frontier_gpt_tools_n100_v1_replicates"
+    }
+  ],
+  "replicate_exports": {},
+  "run_stability_comparison": {
+    "paper_stability_vs_cross_model_table": "/home/cesar/papers/fsmreasonbench/paper/tables/extension_stability_vs_cross_model.tex",
+    "stability_vs_cross_model_json": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/tosem_extension_experiments_v1/run_stability_vs_cross_model.json",
+    "stability_vs_cross_model_table_tex": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/tosem_extension_experiments_v1/extension_stability_vs_cross_model.tex"
+  }
+}
