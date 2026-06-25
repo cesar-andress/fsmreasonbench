@@ -19,9 +19,17 @@ find the freeze without leaving the repository.
 | Claude C2 ablations | `runs/ablations_c2_existential_universal_claude_n100_v1/` | 5 |
 | GPT-4.1 tools | `runs/frontier_gpt_tools_n100_v1/` | 4 |
 | GPT F1 R2C | `runs/ablations_f1_r2c_gpt_n100_v1/` | 1 |
-| Local Ollama matrix | `runs/local_matrix_n100_t02_v2/` | 24 |
+| Constructible eq. witness (A1) — Claude | `runs/f1_constructible_equivalence_claude_n100_v1/` | **complete** |
+| Constructible eq. witness (A1) — GPT | `runs/f1_constructible_equivalence_gpt_n100_v1/` | **complete** |
 
 **Regenerate tables (read-only):** `./scripts/reproduce_tosem_tables.sh`
+
+**Main-text figures (written to `../paper/figures/`):**
+
+- `figure_verdict_witness_gap_comparison.pdf`
+- `figure_certificate_complexity_frontier_comparison.pdf`
+- `figure_attribution_fingerprint_comparison.pdf`
+- `extension_constructible_equivalence_comparison.pdf`
 
 **Excluded (audit only):** `runs/frontier_claude_sonnet_full_n100_v1/`, `runs/frontier_gemini_*`,
 superseded n=20 pilots — full table in the authoritative freeze doc.

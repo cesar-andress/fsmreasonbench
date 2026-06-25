@@ -459,7 +459,7 @@
     }
   ],
   "research_questions": {
-    "q1_hash_only_failure": "Hash equivalence-witness cert rate is 0.000 on R1 for both providers; bisimulation R1 cert=0.353 (Claude) with paired McNemar p=7.63e-06 on identical item IDs.",
+    "q1_hash_only_failure": "Hash equivalence-witness cert rate is 0.000 on R1 for both providers; bisimulation R1 cert=0.353 (Claude) with paired McNemar p=$\\ll 0.05$ on identical item IDs.",
     "q2_structural_witness_without_hash": "Constructible R1 cert=0.353 (Claude) and 0.510 (GPT) indicate replay-checkable state-pair witnesses without hash arithmetic.",
     "q3_r2c_benefit_after_hash_removal": "Constructible and hash R2C both reach cert=1.000 for both providers on the eq subset; generator-assisted access closes both contracts.",
     "q4_distinguishing_baseline": "Frozen distinguishing_trace R1 cert=0.939 on non-eq items provides a replay-checkable contrast class unaffected by hash requirements."

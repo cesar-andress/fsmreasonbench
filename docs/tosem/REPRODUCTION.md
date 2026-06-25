@@ -68,7 +68,7 @@ Still required for:
 
 - `paper/tables/f1_claude_ablations.tex`
 - `paper/tables/c2_claude_ablations.tex`
-- `paper/figures/figure1_complexity_vs_success.pdf`
+- `paper/figures/figure_certificate_complexity_frontier_comparison.pdf`
 - Bootstrap/McNemar appendix material under `docs/tmlr_empirical_package_v1/`
 
 Reads frozen runs:
@@ -140,10 +140,25 @@ before citing results.
 | GPT summaries | `docs/frontier_gpt_tools_n100_v1_summary.json`, `docs/frontier_gpt_tools_n100_v1_uncertainty.json` |
 | Local matrix bootstrap | `docs/local_matrix_n100_t02_bootstrap_summary.json` |
 | Manuscript tables | `../paper/tables/*_n100*.tex`, `results_paired_mcnemar.tex`, ablation tables |
-| Complexity figure | `../paper/figures/figure1_complexity_vs_success.pdf` |
+| Main-text figures | `../paper/figures/figure_verdict_witness_gap_comparison.pdf`, `figure_certificate_complexity_frontier_comparison.pdf`, `figure_attribution_fingerprint_comparison.pdf`, `extension_constructible_equivalence_comparison.pdf` |
 
 Numerical values must match the frozen `combined_summary.json` sources. If they diverge, check
 that run trees are complete and that export CLIs were run with `PYTHONPATH=src`.
+
+---
+
+## Runtime, hardware, and cost assumptions
+
+| Task | Expected runtime | Hardware | API cost |
+|------|------------------|----------|----------|
+| Tier 0 sanity (`artifact_health` + export unit tests) | < 1 min | Any Linux/macOS with Python ≥ 3.11 | $0 |
+| Tier 1 cohort validation | < 30 s | Same | $0 |
+| Tier 2 `./scripts/reproduce_tosem_tables.sh` | 2–5 min | Same; matplotlib for figures | $0 |
+| Tier 4 extension / re-inference campaigns | hours–days | GPU optional for Ollama; API keys for frontier | **Not frozen** — see extension plan |
+
+**Random seeds:** item generation uses fixed seeds in cohort manifests (`cohorts/v0.1-expanded-n100/*/manifest.json`). Inference cells use temperature `T=0.2` and one pass per item (`temp_0.2` directories).
+
+**Version pins:** `releases/1.0.0/release_manifest.json`, `CITATION.cff`, Zenodo DOI `10.5281/zenodo.20836348`.
 
 ---
 
