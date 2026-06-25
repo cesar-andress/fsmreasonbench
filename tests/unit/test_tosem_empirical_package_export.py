@@ -14,6 +14,7 @@ def test_export_tosem_empirical_package_writes_gpt_tables(tmp_path, monkeypatch)
     manifest = export_tosem_empirical_package(
         repo_root,
         paper_tables_dir=paper_tables,
+        paper_figures_dir=tmp_path / "figures",
     )
 
     assert (paper_tables / "gpt_tools_n100_summary.tex").is_file()
@@ -36,3 +37,7 @@ def test_export_tosem_empirical_package_writes_gpt_tables(tmp_path, monkeypatch)
     assert uncertainty["paired_track_comparisons"]
 
     assert manifest["gpt_frontier_export"]["cells_exported"] == 4
+
+    gap_figure = manifest["paper_figures"].get("figure_verdict_witness_gap_comparison.pdf")
+    assert gap_figure is not None
+    assert Path(gap_figure).is_file()

@@ -503,6 +503,218 @@ def render_paired_mcnemar_latex(rows: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+HEADLINE_GAP_CATEGORIES: tuple[tuple[str, str], ...] = (
+    ("C2", "R1"),
+    ("C2", "R2"),
+    ("F1", "R1"),
+    ("F1", "R2"),
+)
+GPT_GAP_EXTRA_CATEGORIES: tuple[tuple[str, str], ...] = (("F1", "R2C"),)
+
+CLAUDE_ATTRIBUTION_CONDITIONS: tuple[str, ...] = (
+    "R1",
+    "Oracle+Format",
+    "R2A",
+    "R2B",
+    "R2C",
+)
+CLAUDE_ATTRIBUTION_LABELS: dict[str, str] = {
+    "R1": "R1",
+    "Oracle+Format": "Oracle",
+    "R2A": "R2A",
+    "R2B": "R2B",
+    "R2C": "R2C",
+}
+
+
+def _lookup_gap_cell(
+    rows: list[dict[str, Any]],
+    model: str,
+    family: str,
+    track: str,
+) -> dict[str, Any] | None:
+    for row in rows:
+        if row["model"] == model and row["family"] == family and row["track"] == track:
+            return row
+    return None
+
+
+def _category_labels(categories: Iterable[tuple[str, str]]) -> list[str]:
+    return [f"{family}/{track}" for family, track in categories]
+
+
+def _panel_rates(
+    rows: list[dict[str, Any]],
+    model: str,
+    categories: Iterable[tuple[str, str]],
+) -> tuple[list[float | None], list[float | None]]:
+    verdict_rates: list[float | None] = []
+    full_rates: list[float | None] = []
+    for family, track in categories:
+        cell = _lookup_gap_cell(rows, model, family, track)
+        if cell is None:
+            verdict_rates.append(None)
+            full_rates.append(None)
+        else:
+            verdict_rates.append(cell["verdict"])
+            full_rates.append(cell["full"])
+    return verdict_rates, full_rates
+
+
+def write_figure_verdict_witness_gap_comparison(
+    gap_rows: list[dict[str, Any]],
+    figures_dir: Path,
+) -> Path | None:
+    """Three-panel verdict vs full comparison: Claude, GPT-4.1, local open-weight."""
+    try:
+        import matplotlib.pyplot as plt
+        from matplotlib.gridspec import GridSpec
+    except ImportError:
+        return None
+
+    from fsmreasonbench.evaluator.paper_figure_style import (
+        configure_paper_figure_style,
+        plot_verdict_full_pairs,
+    )
+
+    configure_paper_figure_style()
+    figures_dir.mkdir(parents=True, exist_ok=True)
+
+    local_models = sorted(
+        {row["model"] for row in gap_rows if row["model"] not in {"Claude Sonnet", "GPT-4.1"}}
+    )
+    headline = list(HEADLINE_GAP_CATEGORIES)
+    gpt_categories = headline + list(GPT_GAP_EXTRA_CATEGORIES)
+
+    fig = plt.figure(figsize=(11.2, 4.4))
+    gs = GridSpec(1, 3, figure=fig, width_ratios=[1.0, 1.05, 1.25], wspace=0.38)
+
+    ax_claude = fig.add_subplot(gs[0, 0])
+    verdict, full = _panel_rates(gap_rows, "Claude Sonnet", headline)
+    plot_verdict_full_pairs(
+        ax_claude,
+        categories=headline,
+        verdict_rates=verdict,
+        full_rates=full,
+        category_labels=_category_labels(headline),
+        title="Claude Sonnet 4.5",
+    )
+
+    ax_gpt = fig.add_subplot(gs[0, 1])
+    verdict, full = _panel_rates(gap_rows, "GPT-4.1", gpt_categories)
+    plot_verdict_full_pairs(
+        ax_gpt,
+        categories=gpt_categories,
+        verdict_rates=verdict,
+        full_rates=full,
+        category_labels=_category_labels(gpt_categories),
+        title="GPT-4.1",
+    )
+
+    inner = gs[0, 2].subgridspec(2, 2, hspace=0.55, wspace=0.35)
+    for index, model in enumerate(local_models[:4]):
+        ax = fig.add_subplot(inner[index // 2, index % 2])
+        verdict, full = _panel_rates(gap_rows, model, headline)
+        short_label = model.split(":")[0].replace("mistral-nemo", "mistral")
+        plot_verdict_full_pairs(
+            ax,
+            categories=headline,
+            verdict_rates=verdict,
+            full_rates=full,
+            category_labels=_category_labels(headline),
+            title=short_label,
+        )
+
+    handles, labels = ax_claude.get_legend_handles_labels()
+    fig.legend(
+        handles,
+        labels,
+        loc="lower center",
+        ncol=2,
+        frameon=False,
+        bbox_to_anchor=(0.5, -0.02),
+    )
+    fig.subplots_adjust(bottom=0.22, top=0.92)
+    out_path = figures_dir / "figure_verdict_witness_gap_comparison.pdf"
+    fig.savefig(out_path, bbox_inches="tight")
+    plt.close(fig)
+    return out_path
+
+
+def write_figure_attribution_fingerprint_comparison(
+    repo_root: Path,
+    gpt_rows: list[dict[str, Any]],
+    figures_dir: Path,
+) -> Path | None:
+    """Two-panel fingerprint witness validity across attribution conditions."""
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        return None
+
+    from fsmreasonbench.evaluator.paper_figure_style import (
+        STAGE_BAR_COLORS,
+        configure_paper_figure_style,
+        style_axes,
+    )
+
+    claude_json = repo_root / "docs/f1_claude_ablation_stratified_analysis.json"
+    if not claude_json.is_file():
+        return None
+    claude_payload = _load_json(claude_json)
+    claude_summary = claude_payload.get("stratified_subtype_summary") or {}
+
+    configure_paper_figure_style()
+    figures_dir.mkdir(parents=True, exist_ok=True)
+
+    fig, axes = plt.subplots(1, 2, figsize=(10.2, 3.8), sharey=True)
+
+    claude_labels: list[str] = []
+    claude_rates: list[float] = []
+    for condition in CLAUDE_ATTRIBUTION_CONDITIONS:
+        block = claude_summary.get(condition) or {}
+        eq = block.get("equivalence_witness") or {}
+        if "cert" not in eq:
+            continue
+        claude_labels.append(CLAUDE_ATTRIBUTION_LABELS.get(condition, condition))
+        claude_rates.append(float(eq["cert"]))
+
+    axes[0].bar(
+        claude_labels,
+        claude_rates,
+        color=STAGE_BAR_COLORS[0],
+        edgecolor="0.0",
+        linewidth=0.6,
+    )
+    axes[0].set_title("Claude Sonnet 4.5")
+    axes[0].set_ylabel("Fingerprint witness validity ($n{=}51$)")
+    axes[0].set_ylim(0.0, 1.05)
+    axes[0].tick_params(axis="x", rotation=25)
+    style_axes(axes[0])
+
+    gpt_labels = ["R1", "R2", "R2C"]
+    gpt_rates = [
+        float(next(row for row in gpt_rows if row["condition"] == condition)["equivalence_witness_cert"])
+        for condition in GPT_F1_CONDITION_ORDER
+    ]
+    axes[1].bar(
+        gpt_labels,
+        gpt_rates,
+        color=STAGE_BAR_COLORS[2],
+        edgecolor="0.0",
+        linewidth=0.6,
+    )
+    axes[1].set_title("GPT-4.1")
+    axes[1].tick_params(axis="x", rotation=0)
+    style_axes(axes[1])
+
+    fig.tight_layout()
+    out_path = figures_dir / "figure_attribution_fingerprint_comparison.pdf"
+    fig.savefig(out_path, bbox_inches="tight")
+    plt.close(fig)
+    return out_path
+
+
 def _paper_tables_dir(repo_root: Path) -> Path:
     candidate = repo_root.parent / "paper" / "tables"
     if candidate.is_dir():
@@ -514,6 +726,7 @@ def export_tosem_empirical_package(
     repo_root: str | Path,
     *,
     paper_tables_dir: str | Path | None = None,
+    paper_figures_dir: str | Path | None = None,
 ) -> dict[str, Any]:
     root = Path(repo_root)
     tables_dir = Path(paper_tables_dir) if paper_tables_dir is not None else _paper_tables_dir(root)
@@ -591,6 +804,21 @@ def export_tosem_empirical_package(
         latex_out=tables_dir / "local_matrix_n100_summary.tex",
     )
 
+    figures_dir = (
+        Path(paper_figures_dir)
+        if paper_figures_dir is not None
+        else root.parent / "paper" / "figures"
+    )
+    paper_figures: dict[str, str] = {}
+    gap_figure = write_figure_verdict_witness_gap_comparison(gap_rows, figures_dir)
+    if gap_figure is not None:
+        paper_figures["figure_verdict_witness_gap_comparison.pdf"] = str(gap_figure)
+    attribution_figure = write_figure_attribution_fingerprint_comparison(
+        root, gpt_ablation_rows, figures_dir
+    )
+    if attribution_figure is not None:
+        paper_figures["figure_attribution_fingerprint_comparison.pdf"] = str(attribution_figure)
+
     manifest = {
         "package_version": "tosem_v1",
         "generated_from": "frozen runs only (no inference)",
@@ -620,6 +848,7 @@ def export_tosem_empirical_package(
             "campaign_id": gpt_payload["campaign_id"],
             "cells_exported": gpt_payload["cells_exported"],
         },
+        "paper_figures": paper_figures,
     }
     (package_dir / "package_manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"

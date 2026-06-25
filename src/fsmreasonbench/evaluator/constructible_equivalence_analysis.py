@@ -554,6 +554,14 @@ def _render_a1_figure(report: dict[str, Any], figures_dir: Path) -> bool:
     except ImportError:
         return False
 
+    from fsmreasonbench.evaluator.paper_figure_style import (
+        STAGE_BAR_COLORS,
+        configure_paper_figure_style,
+        style_axes,
+    )
+
+    configure_paper_figure_style()
+
     def _rate(provider: str, witness_key: str, track: str) -> float:
         row = next(
             r for r in report["rows"] if r["provider"] == provider and r["track"] == track
@@ -570,7 +578,7 @@ def _render_a1_figure(report: dict[str, Any], figures_dir: Path) -> bool:
         ("Bisimulation R1", lambda p: _rate(p, "constructible_bisimulation_witness", "R1")),
         ("Bisimulation R2C", lambda p: _rate(p, "constructible_bisimulation_witness", "R2C")),
     ]
-    colors = ("0.75", "0.45", "0.10")
+    colors = STAGE_BAR_COLORS
     x = list(range(len(providers)))
     width = 0.22
     fig, ax = plt.subplots(figsize=(6.5, 3.8))
@@ -587,11 +595,10 @@ def _render_a1_figure(report: dict[str, Any], figures_dir: Path) -> bool:
             linewidth=0.6,
         )
     ax.set_xticks(x, provider_labels)
-    ax.set_ylabel("Certificate valid rate (eq subset, $n{=}51$)")
+    ax.set_ylabel("Witness validity (eq subset, $n{=}51$)")
     ax.set_ylim(0, 1.05)
     ax.legend(loc="upper left", frameon=False, fontsize=9)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
+    style_axes(ax)
     fig.tight_layout()
     figures_dir.mkdir(parents=True, exist_ok=True)
     out_path = figures_dir / f"{EXTENSION_TABLE_PREFIX}constructible_equivalence_comparison.pdf"
