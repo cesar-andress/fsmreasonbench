@@ -1,0 +1,9 @@
+{
+  "study_id": "gpt_frontier_replicates_n100_v1",
+  "base_campaign_config": "configs/frontier/frontier_gpt_tools_n100_v1.json",
+  "study_root": "runs/frontier_gpt_tools_n100_v1_replicates",
+  "replicates": 3,
+  "bootstrap_resamples": 1000,
+  "bootstrap_seed": 5253,
+  "notes": "Experiment A: run-to-run stability for GPT-4.1 frontier tools. Pass --model gpt-4.1 to match frozen TOSEM runs."
+}

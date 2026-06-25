@@ -1,0 +1,9 @@
+{
+  "study_id": "claude_frontier_replicates_n100_v1",
+  "base_campaign_config": "configs/frontier/frontier_claude_sonnet_tools_n100_v2.json",
+  "study_root": "runs/frontier_claude_sonnet_tools_n100_v2_replicates",
+  "replicates": 3,
+  "bootstrap_resamples": 1000,
+  "bootstrap_seed": 4242,
+  "notes": "Experiment A: run-to-run stability for Claude Sonnet frontier tools (identical frozen cohort, prompts, T=0.2, verifier)."
+}
