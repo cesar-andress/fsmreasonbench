@@ -1,7 +1,8 @@
 # FSMReasonBench — Zenodo archive documentation
 
 **Published release:** FSMReasonBench **v1.0.0**  
-**Zenodo DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)
+**Zenodo DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Companion paper:** ACM TOSEM — see [`../../paper/`](../../paper/) and [`../tosem/README.md`](../tosem/README.md)
 
 This folder documents how the published artifact is packaged, structured, and reproduced.
 Git `main` remains a development surface; **cite the Zenodo DOI**, not the git URL.
@@ -42,6 +43,7 @@ Archival policies: [`docs/artifact/`](../artifact/)
 | [`DATASET_STRUCTURE.md`](DATASET_STRUCTURE.md) | JSON record layouts |
 | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) | Replication commands and tiers |
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | Pre-release gate checklist (completed for v1.0.0) |
+| [`../tosem/ZENODO_RELEASE_NOTES.md`](../tosem/ZENODO_RELEASE_NOTES.md) | TOSEM companion deposit preparation |
 
 ---
 
@@ -50,5 +52,6 @@ Archival policies: [`docs/artifact/`](../artifact/)
 | Document | Role |
 |----------|------|
 | [`README-RELEASE.md`](../../README-RELEASE.md) | Tarball quickstart |
-| [`docs/tmlr_empirical_package_v1/README.md`](../tmlr_empirical_package_v1/README.md) | Paper tables and frozen runs |
+| [`docs/tosem/REPRODUCTION.md`](../tosem/REPRODUCTION.md) | TOSEM read-only table workflow |
+| [`docs/tmlr_empirical_package_v1/README.md`](../tmlr_empirical_package_v1/README.md) | Historical Claude ablation exports |
 | [`docs/artifact/release_policy.md`](../artifact/release_policy.md) | Deposit structure |

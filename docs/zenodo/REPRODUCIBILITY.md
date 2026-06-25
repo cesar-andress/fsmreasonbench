@@ -10,6 +10,9 @@ artifact** and in development clones. Normative tiers and tarball-only workflows
 Citable reproducibility claims for the companion paper refer to frozen cohort
 `v0.1-expanded-n100`, archived runs, and offline analysis exports — not live model API calls.
 
+**ACM TOSEM companion:** start with [`docs/tosem/REPRODUCTION.md`](../tosem/REPRODUCTION.md) and
+[`scripts/reproduce_tosem_tables.sh`](../../scripts/reproduce_tosem_tables.sh).
+
 ---
 
 ## Reproducibility pillars (current implementation)

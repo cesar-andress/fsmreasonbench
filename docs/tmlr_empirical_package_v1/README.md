@@ -1,18 +1,14 @@
 # TMLR Empirical Package v1
 
-Frozen empirical artifacts for the companion FSMReasonBench paper. Part of the published
-**v1.0.0** Zenodo release (DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)).
+Frozen empirical artifacts for the FSMReasonBench paper submission.
 
 ## Final thesis
 
-Knowing the verdict is not enough: language models can construct replay-style FSM certificates,
-but fail sharply on **canonical hash-based certificates** that require verifier-identical
-symbolic synthesis.
+Knowing the verdict is not enough: LLMs can construct replay-style FSM certificates, but fail sharply on **canonical hash-based certificates** that require verifier-identical symbolic synthesis.
 
 ## No new model calls
 
-This package is generated entirely from frozen runs and existing analysis exports.
-**No API calls are made during package generation.**
+This package is generated entirely from frozen runs and existing analysis exports. **No API calls were made during package generation.**
 
 ## Frozen run policy
 
@@ -39,7 +35,7 @@ This package is generated entirely from frozen runs and existing analysis export
 
 - Invalid Claude credit-exhaustion / infrastructure-failure cells (excluded from conclusions).
 - Invalid Gemini quota-failure runs (excluded from conclusions).
-- Contaminated legacy frontier run `frontier_claude_sonnet_full_n100_v1` (never used).
+- Contaminated legacy frontier run frontier_claude_sonnet_full_n100_v1 (never used).
 - Smoke-test duplicate score rows in C2 ablation were deduplicated to n=100 unique item_ids.
 
 ## Key claims (supported)
@@ -52,10 +48,10 @@ This package is generated entirely from frozen runs and existing analysis export
 
 ## Non-claims
 
-- No general existential-vs-universal certification asymmetry is claimed (C2 refutes this for Claude).
-- The verifier is not claimed to be buggy (16/16 hostile audit checks pass).
-- Oracle verdict alone does not enable certificate construction.
-- Hash mismatch on eq-witness does not prove model refuted equivalence when semantic check passes.
+- We do **not** claim a general existential-vs-universal certification asymmetry (C2 refutes this for Claude).
+- We do **not** claim the verifier is buggy (16/16 hostile audit checks pass).
+- We do **not** claim oracle verdict alone enables certificate construction.
+- Hash mismatch on eq-witness does **not** prove model refuted equivalence when semantic check passes.
 
 ## Tables and figures
 
@@ -75,7 +71,7 @@ This package is generated entirely from frozen runs and existing analysis export
 ## Regenerate
 
 ```bash
-cd fsmreasonbench
+cd {repo_root.name}
 PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package
 ```
 
