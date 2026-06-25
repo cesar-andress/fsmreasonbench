@@ -29,13 +29,13 @@ from fsmreasonbench.runners.r2_attribution_prompts import R2AttributionMode
 DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929"
 DEFAULT_OPENAI_MODEL = "gpt-4.1"
 DEFAULT_PARENT_DIR_ANTHROPIC = "runs/ablations_f1_r2_attribution_claude_n100_v1"
-DEFAULT_PARENT_DIR_OPENAI = "runs/ablations_f1_r2c_gpt_n100_v1"
+DEFAULT_PARENT_DIR_OPENAI = "runs/ablations_f1_r2_attribution_gpt_n100_v1"
 DEFAULT_BASELINE_ANTHROPIC = "runs/frontier_claude_sonnet_tools_n100_v2"
 DEFAULT_BASELINE_OPENAI = "runs/frontier_gpt_tools_n100_v1"
-DEFAULT_ORACLE = "runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1"
+DEFAULT_ORACLE_CLAUDE = "runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1"
+DEFAULT_ORACLE_OPENAI = "runs/ablations_f1_oracle_verdict_format_control_gpt_n100_v1"
 DEFAULT_TIMEOUT = 86400.0
 DEFAULT_MAX_TOKENS = 2048
-OPENAI_R2C_ONLY = frozenset({R2AttributionMode.R2C})
 
 
 def _parse_mode(value: str) -> R2AttributionMode:
@@ -56,21 +56,17 @@ def _modes_from_args(args: argparse.Namespace) -> list[R2AttributionMode]:
     return [args.mode]
 
 
-def _validate_openai_modes(modes: list[R2AttributionMode]) -> None:
-    unsupported = [mode.value for mode in modes if mode not in OPENAI_R2C_ONLY]
-    if unsupported:
-        raise SystemExit(
-            "provider=openai supports R2C only; "
-            f"unsupported mode(s): {', '.join(unsupported)}"
-        )
-
-
 def _default_parent_dir(provider: ProviderId, repo_root: Path) -> Path:
     rel = (
         DEFAULT_PARENT_DIR_OPENAI
         if provider == "openai"
         else DEFAULT_PARENT_DIR_ANTHROPIC
     )
+    return repo_root / rel
+
+
+def _default_oracle_dir(provider: ProviderId, repo_root: Path) -> Path:
+    rel = DEFAULT_ORACLE_OPENAI if provider == "openai" else DEFAULT_ORACLE_CLAUDE
     return repo_root / rel
 
 
@@ -161,7 +157,7 @@ def main(argv: list[str] | None = None) -> int:
         "--provider",
         choices=("anthropic", "openai"),
         default="anthropic",
-        help="Model backend (default: anthropic; openai supports R2C only)",
+        help="Model backend (default: anthropic; openai uses identical R2A/R2B/R2C protocol)",
     )
     parser.add_argument(
         "--parent-dir",
@@ -182,7 +178,7 @@ def main(argv: list[str] | None = None) -> int:
         "--all",
         dest="all_modes",
         action="store_true",
-        help="Run all three modes sequentially (anthropic only)",
+        help="Run all three modes sequentially (R2A, R2B, R2C)",
     )
     parser.add_argument(
         "--baseline-dir",
@@ -193,8 +189,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--oracle-dir",
         type=Path,
-        default=repo_root / DEFAULT_ORACLE,
-        help=f"Frozen oracle-verdict ablation (default: {DEFAULT_ORACLE})",
+        default=None,
+        help=(
+            "Oracle-verdict ablation for comparison "
+            f"(default: {DEFAULT_ORACLE_CLAUDE} or {DEFAULT_ORACLE_OPENAI})"
+        ),
     )
     parser.add_argument(
         "--cohort-root",
@@ -228,11 +227,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     provider: ProviderId = args.provider
-    if provider == "openai" and args.all_modes:
-        raise SystemExit("provider=openai does not support --all; use --mode R2C")
-
     parent_dir = args.parent_dir or _default_parent_dir(provider, repo_root)
     baseline_dir = args.baseline_dir or _default_baseline_dir(provider, repo_root)
+    oracle_dir = args.oracle_dir or _default_oracle_dir(provider, repo_root)
     model_arg = args.model or _default_model(provider)
     resolved_model = resolve_provider_model(provider, model_arg)
     max_items = _resolve_max_items(args)
@@ -246,12 +243,12 @@ def main(argv: list[str] | None = None) -> int:
         combined = finalize_r2_attribution_study(
             parent_dir,
             frozen_tools_root=baseline_dir,
-            oracle_ablation_root=args.oracle_dir,
+            oracle_ablation_root=oracle_dir,
             cohort_id=f1_cohort_id,
             temperature=args.temperature,
             provider=provider,
             resolved_model=resolved_model,
-            expected_modes=tuple(OPENAI_R2C_ONLY if provider == "openai" else R2AttributionMode),
+            expected_modes=tuple(R2AttributionMode),
         )
         print(
             json.dumps(
@@ -268,9 +265,6 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     modes = _modes_from_args(args)
-    if provider == "openai":
-        _validate_openai_modes(modes)
-
     cost_warning = OPENAI_COST_WARNING if provider == "openai" else ANTHROPIC_COST_WARNING
     print(cost_warning, file=sys.stderr)
 
@@ -344,13 +338,13 @@ def main(argv: list[str] | None = None) -> int:
                 "infrastructure_failures": result.infrastructure_failures,
             }
         )
-        if args.smoke and provider == "openai" and mode == R2AttributionMode.R2C:
+        if args.smoke and mode == R2AttributionMode.R2C:
             _assert_openai_r2c_smoke_passed(mode_dir)
 
     combined = finalize_r2_attribution_study(
         parent_dir,
         frozen_tools_root=baseline_dir,
-        oracle_ablation_root=args.oracle_dir,
+        oracle_ablation_root=oracle_dir,
         cohort_id=f1_cohort_id,
         temperature=args.temperature,
         provider=provider,
