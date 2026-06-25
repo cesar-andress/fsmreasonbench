@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Reproduce deterministic paper tables from archived submissions (R4 tier).
-# Status: stub — not yet implemented.
+# Delegates to the TOSEM read-only export workflow (no model API calls).
 set -euo pipefail
-echo "ERROR: reproduce_table.sh not yet implemented." >&2
-echo "See docs/artifact/reproducibility_policy.md" >&2
-exit 2
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "${SCRIPT_DIR}/reproduce_tosem_tables.sh" "$@"
