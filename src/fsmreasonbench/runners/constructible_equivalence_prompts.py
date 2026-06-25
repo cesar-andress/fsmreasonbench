@@ -6,35 +6,24 @@ import json
 from typing import Any
 
 from fsmreasonbench.items.assembly import BenchmarkItem
-from fsmreasonbench.runners.track_prompt_schemas import (
-    FINAL_SUBMISSION_CHECKLIST,
-    FINAL_SUBMISSION_ENVELOPE,
-    INVALID_PAYLOAD_EXAMPLES,
-    SCHEMA_RULE,
+from fsmreasonbench.runners.constructible_final_answer_contract import (
+    R1_EXECUTOR_MAX_STEP_CALLS,
+    R1_MAX_STEP_CALLS,
+    STUDY_CONDITION_ID,
+    WITNESS_CONTRACT,
+    render_final_answer_contract_block,
 )
+from fsmreasonbench.runners.track_prompt_schemas import INVALID_PAYLOAD_EXAMPLES, SCHEMA_RULE
 from fsmreasonbench.tracks.models import TrackId
 
-STUDY_CONDITION_ID = "F1-constructible-equivalence-v1"
-WITNESS_CONTRACT = "bisimulation_witness"
-
-F1_BISIMULATION_WITNESS_EXAMPLE = """{
-  "certificate_type": "bisimulation_witness",
-  "version": "1.0",
-  "fsm_ids": ["<fsm_a.fsm_id>", "<fsm_b.fsm_id>"],
-  "verdict_supported": true,
-  "payload": {
-    "equivalent": true,
-    "pairs": [
-      {"state_a": "q0", "state_b": "s0"},
-      {"state_a": "q1", "state_b": "s1"}
-    ]
-  }
-}"""
-
-_CONSTRUCTIBLE_CHECKLIST = FINAL_SUBMISSION_CHECKLIST.replace(
-    "9. F1 verdict=true requires equivalence_witness; verdict=false requires distinguishing_trace",
-    "9. F1 verdict=true requires bisimulation_witness with state pairs; this study uses equivalent items only",
-)
+__all__ = [
+    "STUDY_CONDITION_ID",
+    "WITNESS_CONTRACT",
+    "R1_MAX_STEP_CALLS",
+    "constructible_prompt_metadata",
+    "render_constructible_tool_plan_prompt",
+    "render_constructible_final_prompt",
+]
 
 
 def constructible_prompt_metadata(item: BenchmarkItem) -> dict[str, str]:
@@ -53,7 +42,12 @@ def render_constructible_tool_plan_prompt(item: BenchmarkItem, track: TrackId) -
             '- "step": inputs {"fsm_id": string, "state": string, "symbol": string}\n'
             "  Returns {success, next_state?, error?}. Use only this tool."
         )
-        tool_phase = "Explore both DFAs with step to discover matching states and transitions."
+        tool_phase = (
+            "Explore both DFAs with step to discover matching states and transitions. "
+            f"Prefer at most {R1_MAX_STEP_CALLS} step calls in phase 1; the executor "
+            f"accepts up to {R1_EXECUTOR_MAX_STEP_CALLS} if needed. Phase 2 must emit "
+            "the final JSON answer."
+        )
     elif track == TrackId.R2:
         tools_doc = (
             '- "solver.check_separation": inputs {"fsm_id_a", "fsm_id_b"}\n'
@@ -71,23 +65,25 @@ def render_constructible_tool_plan_prompt(item: BenchmarkItem, track: TrackId) -
 
 ## Study: constructible equivalence witness (no hash fields)
 
-This item is from the F1 **equivalence subset** (verdict=true). You must eventually submit
-`certificate_type=bisimulation_witness` with an explicit state-pair relation — **not**
-`equivalence_witness` and **not** minimized hash digests.
+This item is from the F1 **equivalence subset** (verdict=true). Phase 2 must submit
+`certificate_type="{WITNESS_CONTRACT}"` with explicit state pairs — never
+`equivalence_witness`, never hash fields, never placeholder strings.
 
 ## Item (evaluatee-visible)
 
 {evaluatee}
 
-## Phase 1: tool_plan
+## Phase 1: tool_plan ONLY
 
 {tool_phase}
 
 Allowed tools:
 {tools_doc}
 
-Emit:
+Emit exactly:
 {{"phase": "tool_plan", "tool_calls": [{{"call_id": "1", "tool": "...", "inputs": {{...}}}}]}}
+
+Do NOT emit final_submission in phase 1.
 
 {SCHEMA_RULE}
 """
@@ -101,7 +97,12 @@ def render_constructible_final_prompt(
     canonical_certificate: dict[str, Any] | None = None,
     canonical_verdict: bool | None = None,
 ) -> str:
+    if item.fsm_b is None:
+        raise ValueError("F1 constructible prompt requires fsm_b")
+
     outputs_block = json.dumps(tool_outputs, indent=2, sort_keys=True)
+    contract_block = render_final_answer_contract_block(item)
+
     canonical_block = ""
     if canonical_certificate is not None and canonical_verdict is not None:
         canonical_block = f"""
@@ -112,32 +113,18 @@ certificate:
 {json.dumps(canonical_certificate, indent=2, sort_keys=True)}
 """
 
-    return f"""Respond with a single JSON object only (no prose outside JSON).
+    return f"""Respond with a single JSON object only (no prose, no markdown fences, no commentary).
 
-## Phase 2: final_submission
+## Phase 2: final_submission ONLY
 
 Tool outputs from phase 1:
 {outputs_block}
 {canonical_block}
-## Final submission envelope (exact)
-
-{FINAL_SUBMISSION_ENVELOPE}
-
-{SCHEMA_RULE}
-
-## Valid certificate for this study (verdict=true)
-
-### bisimulation_witness
-{F1_BISIMULATION_WITNESS_EXAMPLE}
-
-Each pair must relate states from fsm_a and fsm_b with matching acceptance and paired transitions.
-Include the initial state pair. Do not emit hash fields.
+{contract_block}
 
 ## Invalid payload examples (do NOT emit)
 
 {INVALID_PAYLOAD_EXAMPLES}
 
-## Pre-submit checklist
-
-{_CONSTRUCTIBLE_CHECKLIST}
+{SCHEMA_RULE}
 """

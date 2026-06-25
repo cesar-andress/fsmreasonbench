@@ -37,6 +37,10 @@ echo "==> export_tmlr_empirical_package (Claude ablations, complexity figure, bo
 "$PYTHON" -m fsmreasonbench.cli.export_tmlr_empirical_package
 
 echo
+echo "==> export_constructible_equivalence_analysis (Experiment A1 tables, stats, figure)"
+"$PYTHON" -m fsmreasonbench.cli.export_constructible_equivalence_analysis
+
+echo
 echo "==> artifact_health"
 "$PYTHON" -m fsmreasonbench.cli.artifact_health
 

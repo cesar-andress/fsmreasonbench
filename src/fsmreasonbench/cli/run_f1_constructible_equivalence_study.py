@@ -13,7 +13,10 @@ from fsmreasonbench.experiments.constructible_equivalence_study import (
     load_constructible_equivalence_study_config,
     resolve_study_items,
 )
-from fsmreasonbench.runners.constructible_equivalence_batch import run_constructible_equivalence_batch
+from fsmreasonbench.runners.constructible_equivalence_batch import (
+    run_constructible_equivalence_batch,
+    validate_constructible_smoke_gate,
+)
 from fsmreasonbench.runners.ollama_batch import OllamaBatchConfig
 from fsmreasonbench.runners.providers.base import (
     ANTHROPIC_COST_WARNING,
@@ -141,12 +144,23 @@ def main(argv: list[str] | None = None) -> int:
                 "summary": str(out_dir / "summary.json"),
                 "combined_summary": str(study_root / "combined_summary.json"),
                 "n_items": result.summary.get("n"),
+                "extractability_rate": result.summary.get("extractability_rate"),
                 "certificate_valid_rate": result.summary.get("certificate_valid_rate"),
                 "cells_in_report": len(combined.get("track_rows", [])),
             },
             indent=2,
         )
     )
+    if args.smoke:
+        passed, smoke_report = validate_constructible_smoke_gate(
+            result,
+            track=args.track,
+        )
+        print(json.dumps({"smoke_gate": smoke_report}, indent=2))
+        if not passed:
+            print("constructible-equivalence smoke gate FAILED", file=sys.stderr)
+            return 1
+        print("constructible-equivalence smoke gate PASSED", file=sys.stderr)
     return 0
 
 

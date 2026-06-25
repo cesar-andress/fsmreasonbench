@@ -53,5 +53,6 @@ Archival policies: [`docs/artifact/`](../artifact/)
 |----------|------|
 | [`README-RELEASE.md`](../../README-RELEASE.md) | Tarball quickstart |
 | [`docs/tosem/REPRODUCTION.md`](../tosem/REPRODUCTION.md) | TOSEM read-only table workflow |
+| [`docs/a1_constructible_equivalence_v1/README.md`](../a1_constructible_equivalence_v1/README.md) | Experiment A1 analysis export |
 | [`docs/tmlr_empirical_package_v1/README.md`](../tmlr_empirical_package_v1/README.md) | Historical Claude ablation exports |
 | [`docs/artifact/release_policy.md`](../artifact/release_policy.md) | Deposit structure |

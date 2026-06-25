@@ -40,6 +40,7 @@ pip install -e ".[dev,plot]"
 This regenerates:
 
 - TOSEM manuscript LaTeX tables under `../paper/tables/` (Claude+GPT frontier, gap, failure stages, local matrix with bootstrap CIs, McNemar)
+- Experiment A1 constructible-equivalence tables, statistics, and figure (`export_constructible_equivalence_analysis`)
 - JSON summaries under `docs/` and `docs/tosem_empirical_package_v1/`
 - Claude ablation tables and complexity figure via the historical TMLR export path (still required until merged)
 

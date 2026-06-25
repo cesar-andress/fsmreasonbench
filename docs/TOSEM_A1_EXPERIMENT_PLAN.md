@@ -62,33 +62,42 @@ Semantic gate + structural closure:
 
 ## Run commands
 
+**Protocol fix (2026-06):** The invalid GPT R1 run (`extractability 0/51`) was a prompt/parser issue: phase-2 prompts reused static placeholders (`<must match item>`, `<fsm_a.fsm_id>`) that GPT copied literally. Prompts now embed real item IDs; study-local normalization repairs placeholder literals and missing `fsm_ids`. **Do not rerun full cells until the smoke gate passes** (`extractability_rate=1.0`, exit code 0).
+
 ```bash
 cd fsmreasonbench
 export PYTHONPATH=src
 
+# Unit tests (no API)
+PYTHONPATH=src python3.12 -m pytest tests/unit/test_constructible_equivalence_protocol.py -q
+
 # Verifier audit (no API)
 python3.12 -m fsmreasonbench.cli.export_f1_bisimulation_witness_verifier_audit
 
-# Smoke then full cells
-./scripts/run_a1_constructible_equivalence.sh claude-r1-smoke
-./scripts/run_a1_constructible_equivalence.sh claude-r1
-./scripts/run_a1_constructible_equivalence.sh claude-r2c
-./scripts/run_a1_constructible_equivalence.sh gpt-r1
-./scripts/run_a1_constructible_equivalence.sh gpt-r2c
+# Smoke gates (require API keys; must pass before full rerun)
+python3.12 -m fsmreasonbench.cli.run_f1_constructible_equivalence_study \
+  --provider openai --model gpt-4.1 --track R1 --smoke --force
+python3.12 -m fsmreasonbench.cli.run_f1_constructible_equivalence_study \
+  --provider openai --model gpt-4.1 --track R2C --smoke --force
 
-# Aggregate + analysis
-./scripts/run_a1_constructible_equivalence.sh report
-./scripts/run_a1_constructible_equivalence.sh export-analysis
+# Full reruns (manual only after smoke OK)
+python3.12 -m fsmreasonbench.cli.run_f1_constructible_equivalence_study \
+  --provider openai --model gpt-4.1 --track R1 --force
+python3.12 -m fsmreasonbench.cli.run_f1_constructible_equivalence_study \
+  --provider openai --model gpt-4.1 --track R2C --force
 ```
 
-Direct CLI:
+Shell shortcuts (same gates):
 
 ```bash
-python3.12 -m fsmreasonbench.cli.run_f1_constructible_equivalence_study \
-  --provider anthropic --track R1
-
-python3.12 -m fsmreasonbench.cli.run_f1_constructible_equivalence_study \
-  --provider openai --model gpt-4.1 --track R2C
+./scripts/run_a1_constructible_equivalence.sh gpt-r1-smoke   # must exit 0
+./scripts/run_a1_constructible_equivalence.sh gpt-r1         # after smoke OK
+./scripts/run_a1_constructible_equivalence.sh gpt-r2c-smoke
+./scripts/run_a1_constructible_equivalence.sh gpt-r2c
+./scripts/run_a1_constructible_equivalence.sh claude-r1-smoke
+./scripts/run_a1_constructible_equivalence.sh claude-r1
+./scripts/run_a1_constructible_equivalence.sh report
+./scripts/run_a1_constructible_equivalence.sh export-analysis
 ```
 
 ---
@@ -161,6 +170,7 @@ Analysis exports:
 ```bash
 pip install -e ".[dev,plot]"
 PYTHONPATH=src python3.12 -m pytest \
+  tests/unit/test_constructible_equivalence_protocol.py \
   tests/unit/test_bisimulation_witness.py \
   tests/unit/test_f1_bisimulation_witness_verifier_audit.py -q
 PYTHONPATH=src python3.12 -m fsmreasonbench.cli.export_constructible_equivalence_analysis

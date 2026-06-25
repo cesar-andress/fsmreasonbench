@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,9 @@ from fsmreasonbench.runners.constructible_equivalence_prompts import (
 )
 from fsmreasonbench.runners.constructible_equivalence_r2c import (
     ensure_f1_constructible_r2c_certificate_synthesis,
+)
+from fsmreasonbench.runners.constructible_submission_normalize import (
+    extract_constructible_final_submission,
 )
 from fsmreasonbench.runners.experiment_cells import (
     RESULTS_JSONL,
@@ -43,11 +47,9 @@ from fsmreasonbench.runners.ollama_batch import (
 )
 from fsmreasonbench.runners.ollama_track_batch import LLMTrackTranscript, _failed_item_run
 from fsmreasonbench.runners.provider_errors import classify_generate_failure
-from fsmreasonbench.runners.response_extract import extract_submission_payload
 from fsmreasonbench.runners.tool_executor import F1_R2_CONSTRUCTIBLE_EQUIVALENCE_TOOLS, execute_tool_plan
 from fsmreasonbench.runners.track_protocol import (
     TrackProtocolError,
-    parse_final_submission,
     parse_tool_plan,
 )
 from fsmreasonbench.tracks.audit import AuditLogBuilder
@@ -178,6 +180,8 @@ def run_constructible_equivalence_batch(
             "scoring_record": scoring_dict,
             "protocol_errors": list(run["transcript"].protocol_errors),
             "track_failure_class": run["track_failure_class"],
+            "audit_log": run["transcript"].audit_log,
+            "final_submission_diagnostics": run.get("final_submission_diagnostics"),
         }
         append_jsonl(results_path, run_record)
         append_jsonl(scores_path, scoring_dict)
@@ -208,6 +212,103 @@ def run_constructible_equivalence_batch(
         out_dir=root,
         infrastructure_failures=infrastructure_failures,
     )
+
+
+def validate_constructible_smoke_gate(
+    result: OllamaBatchResult,
+    *,
+    track: str,
+) -> tuple[bool, dict[str, Any]]:
+    """
+    Return (passed, report) for a 1-item constructible-equivalence smoke run.
+    """
+    summary = result.summary
+    failures: list[str] = []
+    if summary.get("n", 0) != 1:
+        failures.append(f"expected n=1 smoke item, got n={summary.get('n')}")
+    if summary.get("extractability_rate") != 1.0:
+        failures.append(
+            f"extractability_rate must be 1.0, got {summary.get('extractability_rate')}"
+        )
+    if summary.get("provider_error_count", 0) != 0:
+        failures.append(
+            "provider_error_count must be 0, got "
+            f"{summary.get('provider_error_count')}"
+        )
+    if not result.results:
+        failures.append("no results rows recorded")
+        return False, {"failures": failures, "track": track}
+
+    row = result.results[0]
+    diagnostics = row.get("final_submission_diagnostics") or {}
+    scoring = row.get("scoring_record") or {}
+    if not diagnostics.get("final_json_found"):
+        failures.append("final JSON was not extracted from model response")
+    if not scoring.get("extractable"):
+        failures.append("scoring_record.extractable is false")
+    if scoring.get("failure_stage") == "not_extractable":
+        failures.append("failure_stage must not be not_extractable after extraction")
+    if not diagnostics.get("certificate_type_recognized"):
+        failures.append(
+            "certificate_type must be recognized as bisimulation_witness "
+            f"(got {diagnostics.get('certificate_type')!r})"
+        )
+    if diagnostics.get("certificate_type") != "bisimulation_witness":
+        failures.append(
+            "final answer certificate_type must be bisimulation_witness "
+            f"(got {diagnostics.get('certificate_type')!r})"
+        )
+    if not diagnostics.get("verifier_invoked"):
+        failures.append("verifier was not invoked (certificate_valid is null)")
+    elif scoring.get("certificate_valid") is None:
+        failures.append("certificate_valid must be true or false after verifier run")
+
+    if track == "R2C":
+        audit_log = row.get("audit_log") or {}
+        assembly = audit_log.get("certificate_assembly") or []
+        if not assembly:
+            failures.append("R2C audit_log.certificate_assembly is empty")
+
+    report = {
+        "passed": not failures,
+        "failures": failures,
+        "track": track,
+        "extractability_rate": summary.get("extractability_rate"),
+        "provider_error_count": summary.get("provider_error_count"),
+        "certificate_type": diagnostics.get("certificate_type"),
+        "certificate_type_recognized": diagnostics.get("certificate_type_recognized"),
+        "final_json_found": diagnostics.get("final_json_found"),
+        "verifier_invoked": diagnostics.get("verifier_invoked"),
+        "certificate_valid": diagnostics.get("certificate_valid"),
+        "failure_stage": diagnostics.get("failure_stage"),
+        "parse_errors": diagnostics.get("parse_errors"),
+        "parse_path": diagnostics.get("parse_path"),
+        "repairs_applied": diagnostics.get("repairs_applied"),
+        "final_submission_diagnostics": {
+            key: diagnostics.get(key)
+            for key in (
+                "raw_final_response_text",
+                "protocol_error",
+                "top_level_keys",
+                "submission_keys",
+                "phase",
+                "certificate_type",
+                "certificate_type_recognized",
+                "item_id_seen",
+                "item_id_expected",
+                "placeholder_literals_detected",
+                "final_json_found",
+                "parse_errors",
+                "parse_path",
+                "repairs_applied",
+                "verifier_invoked",
+                "certificate_valid",
+                "failure_stage",
+                "certificate_errors",
+            )
+        },
+    }
+    return not failures, report
 
 
 def _evaluate_constructible_item(
@@ -294,14 +395,63 @@ def _evaluate_constructible_item(
     )
 
     raw_response: Any
+    final_submission_diagnostics: dict[str, Any]
     try:
-        submission = parse_final_submission(final_text)
-        raw_response = submission
-    except TrackProtocolError:
-        raw_response = extract_submission_payload(final_text)
-        protocol_errors.append("final phase did not match protocol; used best-effort extraction")
+        raw_response, final_submission_diagnostics = extract_constructible_final_submission(
+            final_text,
+            item,
+        )
+        if final_submission_diagnostics.get("protocol_error"):
+            protocol_errors.append(
+                f"final submission protocol fallback: {final_submission_diagnostics['protocol_error']}"
+            )
+    except Exception as exc:  # noqa: BLE001
+        raw_response = final_text
+        final_submission_diagnostics = {
+            "raw_final_response_text": final_text,
+            "parse_path": "failed",
+            "parse_errors": [str(exc)],
+        }
+        protocol_errors.append(str(exc))
+
+    audit.scratchpad(
+        "final_submission_diagnostics",
+        json.dumps(
+            {
+                key: final_submission_diagnostics.get(key)
+                for key in (
+                    "parse_path",
+                    "protocol_error",
+                    "top_level_keys",
+                    "submission_keys",
+                    "phase",
+                    "certificate_type",
+                    "certificate_type_recognized",
+                    "item_id_seen",
+                    "item_id_expected",
+                    "placeholder_literals_detected",
+                    "repairs_applied",
+                    "parse_errors",
+                    "final_json_found",
+                    "verifier_invoked",
+                    "certificate_valid",
+                    "failure_stage",
+                )
+            },
+            sort_keys=True,
+        ),
+    )
 
     scoring_record = score_item(item, raw_response)
+    final_submission_diagnostics["verifier_invoked"] = (
+        scoring_record.certificate_valid is not None
+    )
+    final_submission_diagnostics["certificate_valid"] = scoring_record.certificate_valid
+    final_submission_diagnostics["failure_stage"] = scoring_record.failure_stage.value
+    final_submission_diagnostics["certificate_errors"] = list(
+        scoring_record.certificate_errors or ()
+    )
+
     audit_log = audit.build()
     replay_audit_log(audit_log, fsm_by_id=_fsm_index(item))
 
@@ -338,4 +488,5 @@ def _evaluate_constructible_item(
         "transcript": transcript,
         "raw_response_text": final_text,
         "track_failure_class": track_failure_class,
+        "final_submission_diagnostics": final_submission_diagnostics,
     }

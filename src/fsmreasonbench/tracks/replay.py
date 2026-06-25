@@ -59,6 +59,16 @@ def replay_tool_invocation(
             "verdict_supported": certificate["verdict_supported"],
         }
 
+    if invocation.tool_name == "solver.bisimulation_certificate":
+        fsm_a = fsm_by_id[invocation.inputs["fsm_id_a"]]
+        fsm_b = fsm_by_id[invocation.inputs["fsm_id_b"]]
+        certificate = solvers.bisimulation_certificate(fsm_a, fsm_b)
+        return {
+            "certificate_type": certificate["certificate_type"],
+            "verdict_supported": certificate["verdict_supported"],
+            "pair_count": len(certificate.get("payload", {}).get("pairs", [])),
+        }
+
     if invocation.tool_name == "solver.distinguishing_certificate":
         fsm_a = fsm_by_id[invocation.inputs["fsm_id_a"]]
         fsm_b = fsm_by_id[invocation.inputs["fsm_id_b"]]
