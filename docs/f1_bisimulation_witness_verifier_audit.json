@@ -1,0 +1,79 @@
+{
+  "experiment": "f1_bisimulation_witness_verifier_audit",
+  "code_paths": {
+    "parser": "src/fsmreasonbench/evaluator/parser.py::_validate_bisimulation_witness_payload",
+    "scorer": "src/fsmreasonbench/evaluator/scorer_f1.py::score_f1_item \u2192 verify_f1_certificate",
+    "semantic_verifier": "src/fsmreasonbench/verifier/separation.py::verify_bisimulation_witness_certificate",
+    "relation_builder": "src/fsmreasonbench/runtime/bisimulation.py::compute_bisimulation_pairs",
+    "certificate_builder": "src/fsmreasonbench/certificates/separation.py::build_bisimulation_witness_certificate"
+  },
+  "checks": [
+    {
+      "check_id": "A",
+      "title": "Oracle bisimulation_witness passes",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "B",
+      "title": "Independently rebuilt witness passes",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "C",
+      "title": "Missing initial state pair fails",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "D",
+      "title": "Non-equivalent DFAs fail semantically",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "E",
+      "title": "Acceptance mismatch in pair fails",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "F",
+      "title": "Incomplete relation fails",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "G",
+      "title": "Swapped fsm_ids fails",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "H",
+      "title": "Malformed pairs payload fails",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "I",
+      "title": "Extra invalid unreachable pair fails",
+      "passed": true,
+      "detail": "passed"
+    },
+    {
+      "check_id": "J",
+      "title": "Wrong certificate_type fails",
+      "passed": true,
+      "detail": "passed"
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "all_passed": true
+  },
+  "paper_validity_sentence": "An F1 bisimulation_witness is valid iff the benchmark DFAs are semantically equivalent and the submitter supplies a state-pair relation containing the initial pair, preserving acceptance on every pair, and closed under paired transitions on the shared alphabet \u2014 with no hash digest required."
+}
