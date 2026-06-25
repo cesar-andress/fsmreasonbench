@@ -24,10 +24,12 @@ Equivalent via the GPT campaign wrapper:
 | GPT tools summary JSON | `docs/frontier_gpt_tools_n100_v1_summary.json` |
 | GPT F1 ablation JSON | `docs/f1_gpt_ablation_stratified_analysis.json` |
 | GPT uncertainty JSON | `docs/frontier_gpt_tools_n100_v1_uncertainty.json` |
+| Local matrix bootstrap JSON | `docs/local_matrix_n100_t02_bootstrap_summary.json` |
 | Paper LaTeX tables | `../paper/tables/*.tex` |
 
 Generated tables include Claude and GPT frontier summaries, unified frontier comparison,
-verdict--witness gap, failure stages, GPT F1 ablations, and paired McNemar comparisons.
+verdict--witness gap, failure stages, GPT F1 ablations, paired McNemar comparisons, and the
+local open-weight matrix with bootstrap 95% CIs (`local_matrix_n100_summary.tex`).
 
 ## Frozen inputs
 

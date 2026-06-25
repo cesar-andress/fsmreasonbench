@@ -21,6 +21,8 @@ def test_export_tosem_empirical_package_writes_gpt_tables(tmp_path, monkeypatch)
     assert (paper_tables / "frontier_tools_comparison_n100.tex").is_file()
     assert (paper_tables / "knowing_showing_gap_n100.tex").is_file()
     assert (paper_tables / "results_paired_mcnemar.tex").is_file()
+    assert (paper_tables / "local_matrix_n100_summary.tex").is_file()
+    assert "[0." in (paper_tables / "local_matrix_n100_summary.tex").read_text(encoding="utf-8")
 
     gpt_json = json.loads(
         (repo_root / "docs/f1_gpt_ablation_stratified_analysis.json").read_text(encoding="utf-8")

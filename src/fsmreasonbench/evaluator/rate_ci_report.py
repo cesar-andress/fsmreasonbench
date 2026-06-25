@@ -50,6 +50,12 @@ def _certificate_valid_rate(records: list[ScoringRecord]) -> float:
     return valid / len(extractable)
 
 
+def _extractability_rate(records: list[ScoringRecord]) -> float:
+    if not records:
+        return 0.0
+    return sum(1 for record in records if record.extractable) / len(records)
+
+
 def bootstrap_rate_cis(
     records: list[ScoringRecord],
     *,
@@ -57,17 +63,20 @@ def bootstrap_rate_cis(
     seed: int = 0,
     alpha: float = DEFAULT_BOOTSTRAP_ALPHA,
 ) -> dict[str, float]:
-    """Compute percentile bootstrap CIs for verdict, certificate, and full correctness."""
+    """Compute percentile bootstrap CIs for layered headline rates."""
     if n_resamples < 1:
         raise ValueError("n_resamples must be >= 1")
     if not 0.0 < alpha < 1.0:
         raise ValueError("alpha must be in (0, 1)")
 
+    point_extractability = _extractability_rate(records)
     point_verdict = _verdict_accuracy(records)
     point_certificate = _certificate_valid_rate(records)
     point_fully_correct = _fully_correct_rate(records)
     if not records:
         return {
+            "extractability_rate_ci_low": point_extractability,
+            "extractability_rate_ci_high": point_extractability,
             "verdict_accuracy_ci_low": point_verdict,
             "verdict_accuracy_ci_high": point_verdict,
             "certificate_valid_rate_ci_low": point_certificate,
@@ -79,12 +88,14 @@ def bootstrap_rate_cis(
     rng = random.Random(seed)
     population = tuple(records)
     sample_size = len(population)
+    extractability_samples: list[float] = []
     verdict_samples: list[float] = []
     certificate_samples: list[float] = []
     fully_correct_samples: list[float] = []
 
     for _ in range(n_resamples):
         sample = [population[rng.randrange(sample_size)] for _ in range(sample_size)]
+        extractability_samples.append(_extractability_rate(sample))
         verdict_samples.append(_verdict_accuracy(sample))
         certificate_samples.append(_certificate_valid_rate(sample))
         fully_correct_samples.append(_fully_correct_rate(sample))
@@ -92,6 +103,8 @@ def bootstrap_rate_cis(
     low_q = alpha / 2.0
     high_q = 1.0 - alpha / 2.0
     return {
+        "extractability_rate_ci_low": _percentile(extractability_samples, low_q),
+        "extractability_rate_ci_high": _percentile(extractability_samples, high_q),
         "verdict_accuracy_ci_low": _percentile(verdict_samples, low_q),
         "verdict_accuracy_ci_high": _percentile(verdict_samples, high_q),
         "certificate_valid_rate_ci_low": _percentile(certificate_samples, low_q),

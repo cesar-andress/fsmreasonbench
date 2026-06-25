@@ -19,6 +19,9 @@ from fsmreasonbench.evaluator.frontier_tools_analysis import (
     export_frontier_tools_n100_package,
     render_frontier_tools_latex_table,
 )
+from fsmreasonbench.evaluator.local_matrix_bootstrap_export import (
+    export_local_matrix_bootstrap_package,
+)
 
 PACKAGE_DIR = "docs/tosem_empirical_package_v1"
 
@@ -37,6 +40,7 @@ GPT_F1_CONDITION_RUNS: dict[str, str] = {
 
 GPT_F1_CONDITION_ORDER: tuple[str, ...] = ("R1", "R2", "R2C")
 
+LOCAL_MATRIX_BOOTSTRAP_JSON = "docs/local_matrix_n100_t02_bootstrap_summary.json"
 CLAUDE_MCNEMAR_JSON = "docs/tmlr_empirical_package_v1/uncertainty/bootstrap_mcnemar_summary.json"
 GPT_UNCERTAINTY_JSON = "docs/frontier_gpt_tools_n100_v1_uncertainty.json"
 
@@ -581,6 +585,12 @@ def export_tosem_empirical_package(
         render_paired_mcnemar_latex(mcnemar_rows), encoding="utf-8"
     )
 
+    local_bootstrap = export_local_matrix_bootstrap_package(
+        root,
+        json_out=root / LOCAL_MATRIX_BOOTSTRAP_JSON,
+        latex_out=tables_dir / "local_matrix_n100_summary.tex",
+    )
+
     manifest = {
         "package_version": "tosem_v1",
         "generated_from": "frozen runs only (no inference)",
@@ -594,12 +604,17 @@ def export_tosem_empirical_package(
             "failure_stage_n100.tex": str(tables_dir / "failure_stage_n100.tex"),
             "f1_gpt_ablations.tex": str(tables_dir / "f1_gpt_ablations.tex"),
             "results_paired_mcnemar.tex": str(tables_dir / "results_paired_mcnemar.tex"),
+            "local_matrix_n100_summary.tex": str(tables_dir / "local_matrix_n100_summary.tex"),
         },
         "analysis_json": {
             "gpt_tools_summary": "docs/frontier_gpt_tools_n100_v1_summary.json",
             "gpt_uncertainty": GPT_UNCERTAINTY_JSON,
             "gpt_f1_ablation_stratified": "docs/f1_gpt_ablation_stratified_analysis.json",
             "gpt_f1_frontier_subtypes": "docs/f1_gpt_frontier_subtype_stratified_analysis.json",
+            "local_matrix_bootstrap": LOCAL_MATRIX_BOOTSTRAP_JSON,
+        },
+        "local_matrix_export": {
+            "cells_exported": len(local_bootstrap["cells"]),
         },
         "gpt_frontier_export": {
             "campaign_id": gpt_payload["campaign_id"],
