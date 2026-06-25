@@ -59,6 +59,57 @@ EXCLUDED_RUNS = [
     "Smoke-test duplicate score rows in C2 ablation were deduplicated to n=100 unique item_ids.",
 ]
 
+F1_CERTIFICATE_TYPES = ("distinguishing_trace", "equivalence_witness")
+C2_CERTIFICATE_TYPES = ("trace_witness", "unreachability_witness")
+
+FRONTIER_COHORTS = {
+    "F1": "cohorts/v0.1-expanded-n100/f1-mixed-level3/items.jsonl",
+    "C2": "cohorts/v0.1-expanded-n100/c2-reachability-level3/items.jsonl",
+}
+
+FRONTIER_R1_RUNS: dict[str, dict[str, str]] = {
+    "claude": {
+        "F1": (
+            "runs/frontier_claude_sonnet_tools_n100_v2/"
+            "claude-sonnet-4-5-20250929/F1/temp_0.2/R1/scores.jsonl"
+        ),
+        "C2": (
+            "runs/frontier_claude_sonnet_tools_n100_v2/"
+            "claude-sonnet-4-5-20250929/C2/temp_0.2/R1/scores.jsonl"
+        ),
+    },
+    "gpt": {
+        "F1": "runs/frontier_gpt_tools_n100_v1/gpt-4.1/F1/temp_0.2/R1/scores.jsonl",
+        "C2": "runs/frontier_gpt_tools_n100_v1/gpt-4.1/C2/temp_0.2/R1/scores.jsonl",
+    },
+}
+
+FIGURE1_LABEL_LAYOUT: dict[str, dict[str, Any]] = {
+    "trace_witness": {
+        "label": "trace witness",
+        "text_xy": (3.5, 0.76),
+        "ha": "center",
+    },
+    "distinguishing_trace": {
+        "label": "distinguishing trace",
+        "text_xy": (4.5, 0.58),
+        "ha": "center",
+    },
+    "unreachability_witness": {
+        "label": "unreachability witness",
+        "text_xy": (6.2, 0.84),
+        "ha": "left",
+    },
+    "equivalence_witness": {
+        "label": "equivalence witness",
+        "text_xy": (9.5, 0.28),
+        "ha": "center",
+    },
+}
+
+FIGURE1_XLIM = (3.1, 10.2)
+FIGURE1_YLIM = (-0.05, 1.08)
+
 
 @dataclass(frozen=True, slots=True)
 class RateWithCI:
@@ -152,6 +203,57 @@ def build_table1(repo_root: Path) -> list[dict[str, Any]]:
                 "Claude_R1_cert": round(rate, 3),
             }
         )
+    return rows
+
+
+def _cert_rate_for_type(
+    outcomes: dict[str, ItemOutcome],
+    metadata: dict[str, Any],
+    cert_type: str,
+) -> float:
+    filtered = _filter_outcomes_by_cert_type(outcomes, metadata, cert_type)
+    if not filtered:
+        raise ValueError(f"no items for certificate_type={cert_type!r}")
+    successes = sum(1 for outcome in filtered.values() if outcome.certificate_valid)
+    return round(successes / len(filtered), 3)
+
+
+def build_frontier_r1_cert_rates_by_type(repo_root: Path, provider: str) -> dict[str, float]:
+    """R1 certificate-valid rates by witness class from frozen frontier tool runs."""
+    if provider not in FRONTIER_R1_RUNS:
+        raise ValueError(f"unsupported provider {provider!r}; expected claude or gpt")
+    runs = FRONTIER_R1_RUNS[provider]
+    rates: dict[str, float] = {}
+
+    f1_scores = repo_root / runs["F1"]
+    f1_cohort = repo_root / FRONTIER_COHORTS["F1"]
+    f1_outcomes = load_condition_outcomes(f1_scores)
+    f1_meta = load_item_metadata(f1_cohort)
+    for cert_type in F1_CERTIFICATE_TYPES:
+        rates[cert_type] = _cert_rate_for_type(f1_outcomes, f1_meta, cert_type)
+
+    c2_scores = repo_root / runs["C2"]
+    c2_cohort = repo_root / FRONTIER_COHORTS["C2"]
+    c2_outcomes = load_condition_outcomes(c2_scores)
+    c2_meta = load_c2_item_metadata(c2_cohort)
+    for cert_type in C2_CERTIFICATE_TYPES:
+        rates[cert_type] = _cert_rate_for_type(c2_outcomes, c2_meta, cert_type)
+
+    return rates
+
+
+def build_table1_frontier_comparison(repo_root: Path) -> list[dict[str, Any]]:
+    """Table 1 rows with Claude and GPT R1 rates from matching frontier tool campaigns."""
+    table1 = build_table1(repo_root)
+    claude_rates = build_frontier_r1_cert_rates_by_type(repo_root, "claude")
+    gpt_rates = build_frontier_r1_cert_rates_by_type(repo_root, "gpt")
+    rows: list[dict[str, Any]] = []
+    for row in table1:
+        cert_type = row["certificate_type"]
+        updated = dict(row)
+        updated["Claude_R1_cert"] = claude_rates[cert_type]
+        updated["GPT_R1_cert"] = gpt_rates[cert_type]
+        rows.append(updated)
     return rows
 
 
@@ -643,51 +745,41 @@ def write_tables(
     )
 
 
-def write_figures(
-    out_dir: Path,
-    *,
-    table1: list[dict[str, Any]],
-    table2: list[dict[str, Any]],
-    table3: list[dict[str, Any]],
-    table4: list[dict[str, Any]],
-) -> None:
+def _configure_complexity_figure_style() -> None:
     import matplotlib.pyplot as plt
-    import numpy as np
 
-    figures_dir = out_dir / "figures"
-    figures_dir.mkdir(parents=True, exist_ok=True)
+    plt.rcParams.update(
+        {
+            "figure.facecolor": "white",
+            "axes.facecolor": "white",
+            "savefig.facecolor": "white",
+            "text.color": "black",
+            "axes.labelcolor": "black",
+            "xtick.color": "black",
+            "ytick.color": "black",
+        }
+    )
 
-    # Figure 1: complexity vs Claude R1 cert
-    figure1_label_layout: dict[str, dict[str, Any]] = {
-        "trace_witness": {
-            "label": "trace witness",
-            "text_xy": (3.5, 0.76),
-            "ha": "center",
-        },
-        "distinguishing_trace": {
-            "label": "distinguishing trace",
-            "text_xy": (4.5, 0.58),
-            "ha": "center",
-        },
-        "unreachability_witness": {
-            "label": "unreachability witness",
-            "text_xy": (6.2, 0.84),
-            "ha": "left",
-        },
-        "equivalence_witness": {
-            "label": "equivalence witness",
-            "text_xy": (9.5, 0.28),
-            "ha": "center",
-        },
-    }
 
-    fig, ax = plt.subplots(figsize=(7.2, 5.0))
-    for row in table1:
+def _plot_complexity_vs_cert_panel(
+    ax: Any,
+    rows: list[dict[str, Any]],
+    *,
+    cert_rate_key: str,
+    ylabel: str,
+    title: str | None = None,
+    annotate: bool = True,
+) -> None:
+    for row in rows:
+        if row.get(cert_rate_key) is None:
+            continue
         cert_type = row["certificate_type"]
         x = row["complexity_score"]
-        y = row["Claude_R1_cert"]
-        ax.scatter(x, y, s=120, zorder=3)
-        layout = figure1_label_layout.get(
+        y = row[cert_rate_key]
+        ax.scatter(x, y, s=120, c="black", edgecolors="0.35", linewidths=0.6, zorder=3)
+        if not annotate:
+            continue
+        layout = FIGURE1_LABEL_LAYOUT.get(
             cert_type,
             {
                 "label": cert_type.replace("_", " "),
@@ -719,15 +811,152 @@ def write_figures(
             zorder=4,
         )
     ax.set_xlabel("Structural complexity score")
-    ax.set_ylabel("Claude R1 certificate\nvalid rate")
-    ax.set_title("Certificate complexity vs Claude R1 success")
-    ax.set_xlim(3.1, 10.2)
-    ax.set_ylim(-0.05, 1.08)
-    ax.grid(True, alpha=0.3)
+    ax.set_ylabel(ylabel)
+    if title:
+        ax.set_title(title)
+    ax.set_xlim(*FIGURE1_XLIM)
+    ax.set_ylim(*FIGURE1_YLIM)
+    ax.grid(True, alpha=0.3, color="0.85")
+
+
+def write_figure1_complexity_vs_success(
+    figures_dir: Path,
+    table1: list[dict[str, Any]],
+) -> tuple[Path, Path]:
+    import matplotlib.pyplot as plt
+
+    _configure_complexity_figure_style()
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(7.2, 5.0))
+    _plot_complexity_vs_cert_panel(
+        ax,
+        table1,
+        cert_rate_key="Claude_R1_cert",
+        ylabel="Claude R1 certificate\nvalid rate",
+        title="Certificate complexity vs Claude R1 success",
+    )
     fig.subplots_adjust(top=0.90, bottom=0.13, left=0.17, right=0.98)
-    fig.savefig(figures_dir / "figure1_complexity_vs_success.png", dpi=200)
-    fig.savefig(figures_dir / "figure1_complexity_vs_success.pdf")
+    png_path = figures_dir / "figure1_complexity_vs_success.png"
+    pdf_path = figures_dir / "figure1_complexity_vs_success.pdf"
+    fig.savefig(png_path, dpi=200)
+    fig.savefig(pdf_path)
     plt.close(fig)
+    return png_path, pdf_path
+
+
+def write_figure_certificate_complexity_frontier_comparison(
+    figures_dir: Path,
+    table1: list[dict[str, Any]],
+) -> tuple[Path, Path]:
+    import matplotlib.pyplot as plt
+
+    _configure_complexity_figure_style()
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.8), sharex=True, sharey=True)
+    _plot_complexity_vs_cert_panel(
+        axes[0],
+        table1,
+        cert_rate_key="Claude_R1_cert",
+        ylabel="R1 certificate\nvalid rate",
+        title="Claude Sonnet 4.5 R1",
+    )
+    _plot_complexity_vs_cert_panel(
+        axes[1],
+        table1,
+        cert_rate_key="GPT_R1_cert",
+        ylabel="R1 certificate\nvalid rate",
+        title="GPT-4.1 R1",
+    )
+    axes[0].set_ylabel("R1 certificate\nvalid rate")
+    axes[1].set_ylabel("")
+    fig.subplots_adjust(top=0.88, bottom=0.16, left=0.10, right=0.98, wspace=0.22)
+    png_path = figures_dir / "figure_certificate_complexity_frontier_comparison.png"
+    pdf_path = figures_dir / "figure_certificate_complexity_frontier_comparison.pdf"
+    fig.savefig(png_path, dpi=200)
+    fig.savefig(pdf_path)
+    plt.close(fig)
+    return png_path, pdf_path
+
+
+def write_certificate_complexity_figures(
+    repo_root: Path,
+    out_dir: Path,
+    *,
+    model: str = "both",
+    paper_figures_dir: Path | None = None,
+) -> list[str]:
+    """Export certificate-complexity scatter figure(s) from frozen summaries."""
+    if model not in {"claude", "gpt", "both"}:
+        raise ValueError(f"unsupported model {model!r}; expected claude, gpt, or both")
+
+    figures_dir = out_dir / "figures"
+    written: list[str] = []
+
+    if model in {"claude", "both"}:
+        table1_claude = build_table1(repo_root)
+        write_figure1_complexity_vs_success(figures_dir, table1_claude)
+        written.extend(
+            [
+                "figures/figure1_complexity_vs_success.png",
+                "figures/figure1_complexity_vs_success.pdf",
+            ]
+        )
+
+    if model in {"gpt", "both"}:
+        table1_frontier = build_table1_frontier_comparison(repo_root)
+        if model == "gpt":
+            import matplotlib.pyplot as plt
+
+            _configure_complexity_figure_style()
+            fig, ax = plt.subplots(figsize=(7.2, 5.0))
+            _plot_complexity_vs_cert_panel(
+                ax,
+                table1_frontier,
+                cert_rate_key="GPT_R1_cert",
+                ylabel="GPT-4.1 R1 certificate\nvalid rate",
+                title="Certificate complexity vs GPT-4.1 R1 success",
+            )
+            fig.subplots_adjust(top=0.90, bottom=0.13, left=0.17, right=0.98)
+            stem = "figure_certificate_complexity_gpt_r1"
+            fig.savefig(figures_dir / f"{stem}.png", dpi=200)
+            fig.savefig(figures_dir / f"{stem}.pdf")
+            plt.close(fig)
+            written.extend([f"figures/{stem}.png", f"figures/{stem}.pdf"])
+        if model == "both":
+            write_figure_certificate_complexity_frontier_comparison(figures_dir, table1_frontier)
+            written.extend(
+                [
+                    "figures/figure_certificate_complexity_frontier_comparison.png",
+                    "figures/figure_certificate_complexity_frontier_comparison.pdf",
+                ]
+            )
+
+    if paper_figures_dir is not None:
+        paper_figures_dir.mkdir(parents=True, exist_ok=True)
+        for relative in written:
+            source = out_dir / relative
+            if source.is_file():
+                target = paper_figures_dir / source.name
+                target.write_bytes(source.read_bytes())
+
+    return written
+
+
+def write_figures(
+    out_dir: Path,
+    *,
+    table1: list[dict[str, Any]],
+    table2: list[dict[str, Any]],
+    table3: list[dict[str, Any]],
+    table4: list[dict[str, Any]],
+) -> None:
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    figures_dir = out_dir / "figures"
+    figures_dir.mkdir(parents=True, exist_ok=True)
+
+    write_figure1_complexity_vs_success(figures_dir, table1)
 
     # Figure 2: F1 slopegraph
     conds = [row["condition"] for row in table2]
@@ -975,10 +1204,16 @@ The audit documents an independent semantic check (`are_equivalent_dfas`) **plus
     (out_dir / "narrative_memo.md").write_text(memo, encoding="utf-8")
 
 
-def export_tmlr_empirical_package(repo_root: str | Path | None = None) -> dict[str, Any]:
+def export_tmlr_empirical_package(
+    repo_root: str | Path | None = None,
+    *,
+    model: str = "both",
+    paper_figures_dir: str | Path | None = None,
+) -> dict[str, Any]:
     repo_root = Path(repo_root) if repo_root is not None else find_repo_root()
     out_dir = repo_root / PACKAGE_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
+    paper_dir = Path(paper_figures_dir) if paper_figures_dir is not None else repo_root.parent / "paper" / "figures"
 
     table1 = build_table1(repo_root)
     table2 = build_table2(repo_root)
@@ -1002,6 +1237,12 @@ def export_tmlr_empirical_package(repo_root: str | Path | None = None) -> dict[s
         table3=table3,
         table4=table4,
     )
+    complexity_figures = write_certificate_complexity_figures(
+        repo_root,
+        out_dir,
+        model=model,
+        paper_figures_dir=paper_dir,
+    )
     write_uncertainty_docs(out_dir, uncertainty)
     write_readme(out_dir, repo_root)
     write_narrative_memo(out_dir)
@@ -1017,6 +1258,7 @@ def export_tmlr_empirical_package(repo_root: str | Path | None = None) -> dict[s
             "table3": table3,
             "table4": table4,
             "appendix": appendix,
+            "table1_frontier_comparison": build_table1_frontier_comparison(repo_root),
         },
         "uncertainty": _dataclass_to_json(uncertainty),
         "figures": [
@@ -1028,6 +1270,7 @@ def export_tmlr_empirical_package(repo_root: str | Path | None = None) -> dict[s
             "figures/figure3_c2_ablation_slopegraph.pdf",
             "figures/figure4_local_f1_heatmap.png",
             "figures/figure4_local_f1_heatmap.pdf",
+            *complexity_figures,
         ],
     }
     (out_dir / "package_manifest.json").write_text(

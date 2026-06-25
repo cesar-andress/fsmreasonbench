@@ -22,9 +22,27 @@ def main(argv: list[str] | None = None) -> int:
         default=str(repo_root / PACKAGE_DIR),
         help=f"Output directory (default: {PACKAGE_DIR})",
     )
+    parser.add_argument(
+        "--model",
+        choices=("claude", "gpt", "both"),
+        default="both",
+        help=(
+            "Certificate-complexity figure mode: claude (legacy single panel), "
+            "gpt (GPT-only panel), or both (two-panel frontier comparison + Claude panel)."
+        ),
+    )
+    parser.add_argument(
+        "--paper-figures-dir",
+        default=str(repo_root.parent / "paper" / "figures"),
+        help="Copy generated complexity figure PDFs/PNGs into the paper tree.",
+    )
     args = parser.parse_args(argv)
 
-    manifest = export_tmlr_empirical_package(repo_root)
+    manifest = export_tmlr_empirical_package(
+        repo_root,
+        model=args.model,
+        paper_figures_dir=args.paper_figures_dir,
+    )
     print(
         json.dumps(
             {
@@ -32,6 +50,8 @@ def main(argv: list[str] | None = None) -> int:
                 "package_version": manifest["package_version"],
                 "figures": len(manifest["figures"]),
                 "tables": list(manifest["tables"].keys()),
+                "model": args.model,
+                "paper_figures_dir": args.paper_figures_dir,
             },
             indent=2,
         )

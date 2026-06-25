@@ -13,7 +13,11 @@
     "figures/figure3_c2_ablation_slopegraph.png",
     "figures/figure3_c2_ablation_slopegraph.pdf",
     "figures/figure4_local_f1_heatmap.png",
-    "figures/figure4_local_f1_heatmap.pdf"
+    "figures/figure4_local_f1_heatmap.pdf",
+    "figures/figure1_complexity_vs_success.png",
+    "figures/figure1_complexity_vs_success.pdf",
+    "figures/figure_certificate_complexity_frontier_comparison.png",
+    "figures/figure_certificate_complexity_frontier_comparison.pdf"
   ],
   "output_dir": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/tmlr_empirical_package_v1",
   "package_version": "v1",
@@ -140,6 +144,48 @@
       },
       {
         "Claude_R1_cert": 1.0,
+        "canonical_hashing": false,
+        "certificate_type": "unreachability_witness",
+        "complexity_score": 5.0,
+        "family": "C2",
+        "multiple_valid_forms": false,
+        "required_fields": 7
+      }
+    ],
+    "table1_frontier_comparison": [
+      {
+        "Claude_R1_cert": 0.939,
+        "GPT_R1_cert": 0.143,
+        "canonical_hashing": false,
+        "certificate_type": "distinguishing_trace",
+        "complexity_score": 4.5,
+        "family": "F1",
+        "multiple_valid_forms": true,
+        "required_fields": 8
+      },
+      {
+        "Claude_R1_cert": 0.0,
+        "GPT_R1_cert": 0.0,
+        "canonical_hashing": true,
+        "certificate_type": "equivalence_witness",
+        "complexity_score": 9.5,
+        "family": "F1",
+        "multiple_valid_forms": false,
+        "required_fields": 9
+      },
+      {
+        "Claude_R1_cert": 1.0,
+        "GPT_R1_cert": 0.214,
+        "canonical_hashing": false,
+        "certificate_type": "trace_witness",
+        "complexity_score": 3.5,
+        "family": "C2",
+        "multiple_valid_forms": true,
+        "required_fields": 7
+      },
+      {
+        "Claude_R1_cert": 0.931,
+        "GPT_R1_cert": 0.486,
         "canonical_hashing": false,
         "certificate_type": "unreachability_witness",
         "complexity_score": 5.0,
