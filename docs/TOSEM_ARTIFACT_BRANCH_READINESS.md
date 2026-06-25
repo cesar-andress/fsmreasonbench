@@ -10,7 +10,7 @@
 
 | Commit | Message |
 |--------|---------|
-| `1504f73` | docs: TOSEM artifact branch readiness report |
+| `c336366` | docs: TOSEM artifact branch readiness report |
 | `7360638` | tests: validate read-only TOSEM reproduction scripts |
 | `d25024a` | cleanup: mark TMLR-era docs and mark inference-only GPT modes |
 | `29b9f6d` | repro: add read-only table regeneration workflow |
