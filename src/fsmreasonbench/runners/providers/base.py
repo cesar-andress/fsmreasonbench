@@ -26,16 +26,24 @@ from fsmreasonbench.runners.providers.gemini import (
     resolve_gemini_model,
 )
 from fsmreasonbench.runners.providers.ollama import build_ollama_generate
+from fsmreasonbench.runners.providers.openai import (
+    HttpOpenAIClient,
+    OpenAIConfig,
+    build_openai_chat_completions_request,
+    require_openai_api_key,
+    resolve_openai_model,
+)
 from fsmreasonbench.runners.prompts import render_prompt
 from fsmreasonbench.runners.track_prompts import render_track_prompt
 from fsmreasonbench.tracks.models import TrackId
 
-ProviderId = Literal["ollama", "anthropic", "gemini"]
+ProviderId = Literal["ollama", "anthropic", "gemini", "openai"]
 TOOL_TRACKS = frozenset({"R1", "R2"})
 ANTHROPIC_SUPPORTED_TRACKS = frozenset({"R0", "R1", "R2"})
+OPENAI_SUPPORTED_TRACKS = frozenset({"R0", "R1", "R2"})
 GEMINI_SUPPORTED_TRACKS = frozenset({"R0"})
 API_R0_ONLY_PROVIDERS = frozenset({"gemini"})
-API_PROVIDERS_WITH_MAX_TOKENS = frozenset({"anthropic", "gemini"})
+API_PROVIDERS_WITH_MAX_TOKENS = frozenset({"anthropic", "gemini", "openai"})
 
 ANTHROPIC_COST_WARNING = (
     "WARNING: provider=anthropic uses the paid Anthropic API. "
@@ -43,6 +51,10 @@ ANTHROPIC_COST_WARNING = (
 )
 GEMINI_COST_WARNING = (
     "WARNING: provider=gemini uses the paid Google Gemini API. "
+    "Respect --max-items and --max-cells; review --estimate-only before large runs."
+)
+OPENAI_COST_WARNING = (
+    "WARNING: provider=openai uses the paid OpenAI API. "
     "Respect --max-items and --max-cells; review --estimate-only before large runs."
 )
 
@@ -64,6 +76,8 @@ def _provider_cost_warning(provider: str) -> str | None:
         return ANTHROPIC_COST_WARNING
     if provider == "gemini":
         return GEMINI_COST_WARNING
+    if provider == "openai":
+        return OPENAI_COST_WARNING
     return None
 
 
@@ -72,6 +86,8 @@ def resolve_provider_model(provider: str, model: str) -> str:
         return resolve_anthropic_model(model)
     if provider == "gemini":
         return resolve_gemini_model(model)
+    if provider == "openai":
+        return resolve_openai_model(model)
     return model
 
 
@@ -91,6 +107,14 @@ def validate_provider_tracks(provider: str, tracks: tuple[str, ...]) -> None:
             raise ValueError(
                 "provider=anthropic supports tracks "
                 f"{sorted(ANTHROPIC_SUPPORTED_TRACKS)}; unsupported: {unsupported}."
+            )
+        return
+    if provider == "openai":
+        unsupported = [track for track in tracks if track not in OPENAI_SUPPORTED_TRACKS]
+        if unsupported:
+            raise ValueError(
+                "provider=openai supports tracks "
+                f"{sorted(OPENAI_SUPPORTED_TRACKS)}; unsupported: {unsupported}."
             )
         return
 
@@ -150,6 +174,25 @@ def build_generate_factory(backend: GenerateBackendConfig) -> GenerateFactory:
             return client.generate
 
         return gemini_factory
+    if backend.provider == "openai":
+        if backend.provider_dry_run:
+            raise ValueError("provider_dry_run must not invoke build_generate_factory")
+        api_key = require_openai_api_key()
+
+        def openai_factory(model: str, temperature: float) -> GenerateFn:
+            resolved_model = resolve_openai_model(model)
+            client = HttpOpenAIClient(
+                OpenAIConfig(
+                    api_key=api_key,
+                    model=resolved_model,
+                    temperature=temperature,
+                    timeout=backend.timeout,
+                    max_tokens=backend.max_tokens,
+                )
+            )
+            return client.generate
+
+        return openai_factory
     raise ValueError(f"unsupported provider: {backend.provider!r}")
 
 
@@ -196,6 +239,13 @@ def _build_provider_request_payload(
                 temperature=temperature,
             ),
         }
+    if provider == "openai":
+        return build_openai_chat_completions_request(
+            prompt=prompt,
+            model=resolved_model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
     return {
         "endpoint": "ollama:/api/generate",
         "model": model,
@@ -280,6 +330,8 @@ def estimate_frontier_run(
             "and current Google Gemini pricing."
         )
     elif provider == "anthropic":
+        note = "Estimate only; actual billed usage depends on prompt/output token counts."
+    elif provider == "openai":
         note = "Estimate only; actual billed usage depends on prompt/output token counts."
     else:
         note = "Ollama runs are local; no API billing."

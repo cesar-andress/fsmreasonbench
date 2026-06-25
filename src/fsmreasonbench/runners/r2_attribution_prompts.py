@@ -97,6 +97,14 @@ def _mode_rules(mode: R2AttributionMode) -> str:
 - The tool `{R2B_REPAIR_TOOL}` may fix **formatting and schema wrappers only** (JSON fences, smart quotes, certificate encoded as string).
 - The repair tool **must not** alter semantic certificate payload fields; rejected repairs indicate your content is already formatted or non-repairable.
 - **Forbidden:** solver certificate generators and validation-only shortcuts that bypass your construction."""
+    if mode == R2AttributionMode.R2C:
+        return """## R2C generator-assisted attribution rules
+
+- Allowed solver tools: `solver.check_separation`, `solver.equivalence_certificate`, `solver.distinguishing_certificate`.
+- When DFAs are equivalent, call `solver.equivalence_certificate` to obtain the canonical `equivalence_witness` certificate (minimized_hash_A / minimized_hash_B from the benchmark builder).
+- When DFAs are not equivalent, call `solver.distinguishing_certificate` for the canonical `distinguishing_trace` certificate.
+- `solver.check_separation` reports equivalence only; it does **not** supply verifier-ready witness hashes.
+- In final submission, copy the `certificate` object from the solver certificate-builder tool output **verbatim** (do not recompute minimized hashes)."""
     raise ValueError(f"unsupported mode for attribution prompts: {mode}")
 
 
@@ -109,6 +117,13 @@ def _tools_doc(mode: R2AttributionMode) -> str:
         return f"""- `{R2B_REPAIR_TOOL}`: inputs {{"submission": {{ "item_id", "verdict", "certificate" }} }}
   Returns {{"submission": {{ ... }} }} with harmless formatting repairs only.
   Does **not** change semantic certificate payload fields."""
+    if mode == R2AttributionMode.R2C:
+        return (
+            '- "solver.check_separation": inputs {"fsm_id_a", "fsm_id_b"}\n'
+            '- "solver.equivalence_certificate": inputs {"fsm_id_a", "fsm_id_b"}\n'
+            '- "solver.distinguishing_certificate": inputs {"fsm_id_a", "fsm_id_b"}\n'
+            "Use only these registered solver tools."
+        )
     raise ValueError(mode)
 
 
@@ -142,11 +157,29 @@ def render_r2_attribution_final_prompt(
     item: BenchmarkItem,
     mode: R2AttributionMode,
     tool_results: list[dict[str, Any]],
+    *,
+    canonical_certificate: dict[str, Any] | None = None,
+    canonical_verdict: bool | None = None,
 ) -> str:
     evaluatee = json.dumps(item.to_evaluatee_dict(), indent=2, sort_keys=True)
     results_json = json.dumps(tool_results, indent=2, sort_keys=True)
     schema_block = _phase2_schema_block(item)
     track_label = MODE_TRACK_LABELS[mode]
+    copy_instruction = ""
+    if mode == R2AttributionMode.R2C and canonical_certificate is not None:
+        cert_json = json.dumps(canonical_certificate, indent=2, sort_keys=True)
+        verdict_label = "true" if canonical_verdict else "false"
+        copy_instruction = f"""
+Canonical solver certificate (copy verbatim into final_submission.certificate):
+{cert_json}
+
+Required verdict for this solver certificate: {verdict_label}
+"""
+    construction_note = (
+        "copy the solver certificate-builder output verbatim"
+        if mode == R2AttributionMode.R2C
+        else "you constructed (not copied from forbidden solver generators)"
+    )
     return f"""You are solving an FSMReasonBench {item.family} task under R2 attribution condition {mode.value} ({track_label}).
 
 Evaluatee item (JSON):
@@ -154,10 +187,10 @@ Evaluatee item (JSON):
 
 Tool execution results from your plan:
 {results_json}
-
+{copy_instruction}
 {_mode_rules(mode)}
 
-Phase 2: emit final_submission ONLY with a certificate **you** constructed (not copied from forbidden solver generators).
+Phase 2: emit final_submission ONLY with a certificate {construction_note}.
 
 {schema_block}
 

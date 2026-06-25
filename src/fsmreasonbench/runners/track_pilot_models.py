@@ -155,6 +155,7 @@ class TrackPilotModelsConfig:
     max_tokens: int = 8192
     provider_dry_run: bool = False
     estimate_only: bool = False
+    model_args: tuple[str, ...] | None = None
     ollama_base_url: str = "http://localhost:11434"
     c2_cohort_id: str = DEFAULT_C2_COHORT_ID
     f1_cohort_id: str = DEFAULT_F1_COHORT_ID
@@ -818,6 +819,8 @@ def finalize_matrix_run(
     payload = {
         "experiment": "local_matrix" if config.matrix_layout else "track_pilot",
         "models": list(config.models),
+        "model_args": list(config.model_args or config.models),
+        "resolved_models": list(config.models),
         "families": list(config.families),
         "tracks": list(config.tracks),
         "temperatures": list(config.temperatures),
@@ -970,6 +973,7 @@ def run_track_pilot_models(
     item_timeout = resolved_item_timeout(config)
     cells_executed = 0
     consecutive_failures = 0
+    openai_startup_done = False
 
     for plan in run_plans:
         if config.max_cells is not None and cells_executed >= config.max_cells:
@@ -1036,6 +1040,17 @@ def run_track_pilot_models(
             )
 
         try:
+            if config.provider == "openai" and not openai_startup_done:
+                from fsmreasonbench.runners.providers.openai import (
+                    print_openai_startup_validation,
+                )
+
+                print_openai_startup_validation(
+                    model=plan.model,
+                    max_tokens=config.max_tokens,
+                    temperature=plan.temperature,
+                )
+                openai_startup_done = True
             _log_cell_startup(
                 model=plan.model,
                 family=plan.family,

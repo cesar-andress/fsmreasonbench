@@ -34,11 +34,11 @@ from fsmreasonbench.runners.ollama_batch import (
 )
 from fsmreasonbench.runners.ollama_track_batch import (
     LLMTrackTranscript,
-    _evaluate_item_with_tools,
     _failed_item_run,
 )
 from fsmreasonbench.runners.provider_errors import classify_generate_failure
 from fsmreasonbench.runners.prompts import prompt_metadata
+from fsmreasonbench.runners.r2c_certificate_synthesis import ensure_f1_r2c_certificate_synthesis
 from fsmreasonbench.runners.r2_attribution_prompts import (
     MODE_CONDITION_IDS,
     MODE_TRACK_LABELS,
@@ -53,6 +53,7 @@ from fsmreasonbench.runners.r2_attribution_tools import (
     execute_r2_attribution_tool_plan,
 )
 from fsmreasonbench.runners.response_extract import extract_submission_payload
+from fsmreasonbench.runners.tool_executor import execute_tool_plan
 from fsmreasonbench.runners.track_protocol import (
     TrackProtocolError,
     parse_final_submission,
@@ -75,7 +76,7 @@ def _allowed_tools(mode: R2AttributionMode) -> frozenset[str]:
         return F1_R2A_ALLOWED_TOOLS
     if mode == R2AttributionMode.R2B:
         return F1_R2B_ALLOWED_TOOLS
-    raise ValueError(f"mode {mode} uses standard R2 tools via _evaluate_item_with_tools")
+    raise ValueError(f"mode {mode} uses dedicated R2C generator-assisted evaluator")
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +86,140 @@ class R2AttributionBatchResult:
     out_dir: Path
     mode: R2AttributionMode
     infrastructure_failures: int = 0
+
+
+def _evaluate_f1_r2c_generator_assisted_item(
+    item: BenchmarkItem,
+    generate: GenerateFn,
+    config: OllamaBatchConfig,
+    *,
+    timestamp: str,
+    watchdog: ItemWatchdogConfig,
+) -> dict[str, Any]:
+    """R2C: two-phase LLM protocol with mandatory solver certificate synthesis."""
+    mode = R2AttributionMode.R2C
+    track = TrackId.R2
+    track_label = MODE_TRACK_LABELS[mode]
+    audit = AuditLogBuilder(track)
+    audit.scratchpad("r2_attribution_mode", mode.value)
+    audit.scratchpad("ablation_condition", MODE_CONDITION_IDS[mode])
+    messages: list[dict[str, Any]] = []
+    protocol_errors: list[str] = []
+
+    plan_prompt = render_r2_attribution_tool_plan_prompt(item, mode)
+    plan_text = call_generate_with_watchdog(
+        generate,
+        prompt=plan_prompt,
+        model=config.model,
+        temperature=config.temperature,
+        timeout=config.timeout,
+        config=watchdog,
+    )
+    messages.append({"role": "user", "phase": "tool_plan", "content": plan_prompt})
+    messages.append({"role": "assistant", "phase": "tool_plan", "content": plan_text})
+
+    tool_calls_requested: list[dict[str, Any]] = []
+    tool_outputs: list[dict[str, Any]] = []
+    tool_execution_error: str | None = None
+    tool_plan_valid = False
+    try:
+        tool_calls_requested, notes = parse_tool_plan(plan_text)
+        tool_plan_valid = True
+        if notes:
+            audit.scratchpad("model_notes", notes)
+        tool_outputs = execute_tool_plan(item, track, tool_calls_requested, audit)
+    except TrackProtocolError as exc:
+        protocol_errors.append(str(exc))
+        audit.scratchpad("protocol_error", str(exc))
+    except (ValueError, RuntimeError) as exc:
+        tool_execution_error = str(exc)
+        protocol_errors.append(str(exc))
+        audit.scratchpad("tool_execution_error", str(exc))
+
+    synthesis = ensure_f1_r2c_certificate_synthesis(item, tool_outputs, audit)
+    tool_outputs = synthesis.tool_outputs
+
+    results_prompt = render_r2_attribution_final_prompt(
+        item,
+        mode,
+        tool_outputs,
+        canonical_certificate=synthesis.certificate,
+        canonical_verdict=synthesis.verdict,
+    )
+    final_text = call_generate_with_watchdog(
+        generate,
+        prompt=results_prompt,
+        model=config.model,
+        temperature=config.temperature,
+        timeout=config.timeout,
+        config=watchdog,
+    )
+    messages.append({"role": "user", "phase": "final_submission", "content": results_prompt})
+    messages.append(
+        {"role": "assistant", "phase": "final_submission", "content": final_text}
+    )
+
+    raw_response: Any
+    try:
+        submission = parse_final_submission(final_text)
+        raw_response = submission
+    except TrackProtocolError:
+        raw_response = extract_submission_payload(final_text)
+        protocol_errors.append("final phase did not match protocol; used best-effort extraction")
+
+    scoring_record = score_item(item, raw_response)
+    parsed_submission = None
+    if scoring_record.extractable and isinstance(raw_response, dict):
+        parsed_submission = {
+            "item_id": raw_response.get("item_id"),
+            "verdict": raw_response.get("verdict"),
+            "certificate": raw_response.get("certificate"),
+        }
+
+    audit_log = audit.build()
+    replay_audit_log(audit_log, fsm_by_id=_fsm_index(item))
+
+    executed = [row for row in tool_outputs if row.get("status") == "executed"]
+    transcript = LLMTrackTranscript(
+        transcript_version="1.1",
+        tracks_version=TRACKS_VERSION,
+        track=track_label,
+        model=config.model,
+        temperature=config.temperature,
+        timestamp=timestamp,
+        item=item.to_full_dict(),
+        messages=tuple(messages),
+        tool_calls_requested=tuple(tool_calls_requested),
+        tool_calls_executed=tuple(executed),
+        tool_outputs=tuple(tool_outputs),
+        raw_response=raw_response,
+        parsed_submission=parsed_submission,
+        scoring_record=scoring_record,
+        audit_log=audit_log.to_dict(),
+        protocol_errors=tuple(protocol_errors),
+    )
+    scoring_dict = scoring_record.to_dict()
+    scoring_dict["track"] = track_label
+    scoring_dict["model"] = config.model
+    scoring_dict["resolved_model"] = config.model
+    scoring_dict["provider"] = config.provider
+    scoring_dict["tool_invocation_count"] = len(audit_log.tool_invocations)
+    scoring_dict["ablation_condition"] = MODE_CONDITION_IDS[mode]
+    scoring_dict["r2_attribution_mode"] = mode.value
+    scoring_dict["track_failure_class"] = classify_track_failure(
+        track=track.value,
+        scoring_record=scoring_dict,
+        tool_calls_requested=tool_calls_requested,
+        tool_outputs=tool_outputs,
+        tool_plan_valid=tool_plan_valid,
+        tool_execution_error=tool_execution_error,
+    )
+    return {
+        "transcript": transcript,
+        "raw_response_text": final_text,
+        "track_failure_class": scoring_dict["track_failure_class"],
+        "scoring_dict": scoring_dict,
+    }
 
 
 def _evaluate_r2_attribution_item(
@@ -97,11 +232,10 @@ def _evaluate_r2_attribution_item(
     watchdog: ItemWatchdogConfig,
 ) -> dict[str, Any]:
     if mode == R2AttributionMode.R2C:
-        return _evaluate_item_with_tools(
+        return _evaluate_f1_r2c_generator_assisted_item(
             item,
             generate,
             config,
-            TrackId.R2,
             timestamp=timestamp,
             watchdog=watchdog,
         )
@@ -205,6 +339,8 @@ def _evaluate_r2_attribution_item(
     scoring_dict = scoring_record.to_dict()
     scoring_dict["track"] = track_label
     scoring_dict["model"] = config.model
+    scoring_dict["resolved_model"] = config.model
+    scoring_dict["provider"] = config.provider
     scoring_dict["tool_invocation_count"] = len(executed)
     scoring_dict["ablation_condition"] = MODE_CONDITION_IDS[mode]
     scoring_dict["r2_attribution_mode"] = mode.value
@@ -320,6 +456,8 @@ def run_r2_attribution_batch(
                 )
         scoring_dict["track"] = track_label
         scoring_dict["model"] = config.model
+        scoring_dict["resolved_model"] = config.model
+        scoring_dict["provider"] = config.provider
         scoring_dict["ablation_condition"] = MODE_CONDITION_IDS[mode]
         scoring_dict["r2_attribution_mode"] = mode.value
         if "track_failure_class" not in scoring_dict:
@@ -377,6 +515,8 @@ def run_r2_attribution_batch(
             "r2_attribution_mode": mode.value,
             "track_label": track_label,
             "family": "F1",
+            "provider": config.provider,
+            "resolved_model": config.model,
             "description": _mode_description(mode),
         },
     )

@@ -17,18 +17,25 @@ from fsmreasonbench.evaluator.jsonl import load_items_jsonl
 from fsmreasonbench.runners.ollama_batch import OllamaBatchConfig
 from fsmreasonbench.runners.providers.base import (
     ANTHROPIC_COST_WARNING,
+    OPENAI_COST_WARNING,
     GenerateBackendConfig,
+    ProviderId,
     build_generate_factory,
+    resolve_provider_model,
 )
 from fsmreasonbench.runners.r2_attribution_batch import run_r2_attribution_batch
 from fsmreasonbench.runners.r2_attribution_prompts import R2AttributionMode
 
-DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
-DEFAULT_PARENT_DIR = "runs/ablations_f1_r2_attribution_claude_n100_v1"
-DEFAULT_BASELINE = "runs/frontier_claude_sonnet_tools_n100_v2"
+DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929"
+DEFAULT_OPENAI_MODEL = "gpt-4.1"
+DEFAULT_PARENT_DIR_ANTHROPIC = "runs/ablations_f1_r2_attribution_claude_n100_v1"
+DEFAULT_PARENT_DIR_OPENAI = "runs/ablations_f1_r2c_gpt_n100_v1"
+DEFAULT_BASELINE_ANTHROPIC = "runs/frontier_claude_sonnet_tools_n100_v2"
+DEFAULT_BASELINE_OPENAI = "runs/frontier_gpt_tools_n100_v1"
 DEFAULT_ORACLE = "runs/ablations_f1_oracle_verdict_format_control_claude_n100_v1"
 DEFAULT_TIMEOUT = 86400.0
 DEFAULT_MAX_TOKENS = 2048
+OPENAI_R2C_ONLY = frozenset({R2AttributionMode.R2C})
 
 
 def _parse_mode(value: str) -> R2AttributionMode:
@@ -49,16 +56,121 @@ def _modes_from_args(args: argparse.Namespace) -> list[R2AttributionMode]:
     return [args.mode]
 
 
+def _validate_openai_modes(modes: list[R2AttributionMode]) -> None:
+    unsupported = [mode.value for mode in modes if mode not in OPENAI_R2C_ONLY]
+    if unsupported:
+        raise SystemExit(
+            "provider=openai supports R2C only; "
+            f"unsupported mode(s): {', '.join(unsupported)}"
+        )
+
+
+def _default_parent_dir(provider: ProviderId, repo_root: Path) -> Path:
+    rel = (
+        DEFAULT_PARENT_DIR_OPENAI
+        if provider == "openai"
+        else DEFAULT_PARENT_DIR_ANTHROPIC
+    )
+    return repo_root / rel
+
+
+def _default_baseline_dir(provider: ProviderId, repo_root: Path) -> Path:
+    rel = (
+        DEFAULT_BASELINE_OPENAI
+        if provider == "openai"
+        else DEFAULT_BASELINE_ANTHROPIC
+    )
+    return repo_root / rel
+
+
+def _default_model(provider: ProviderId) -> str:
+    return DEFAULT_OPENAI_MODEL if provider == "openai" else DEFAULT_ANTHROPIC_MODEL
+
+
+def _resolve_max_items(args: argparse.Namespace) -> int:
+    if args.smoke:
+        return 1 if args.provider == "openai" else 5
+    return args.max_items
+
+
+def _enrich_r2_attribution_summary(
+    summary: dict[str, object],
+    *,
+    provider: ProviderId,
+    resolved_model: str,
+    model_arg: str,
+    temperature: float,
+) -> dict[str, object]:
+    enriched = dict(summary)
+    enriched["provider"] = provider
+    enriched["resolved_model"] = resolved_model
+    enriched["temperature"] = temperature
+    if model_arg != resolved_model:
+        enriched["model_arg"] = model_arg
+    return enriched
+
+
+def _assert_openai_r2c_smoke_passed(mode_dir: Path) -> None:
+    scores_path = mode_dir / "scores.jsonl"
+    if not scores_path.exists():
+        raise SystemExit(f"smoke failed: missing {scores_path}")
+    rows = [
+        json.loads(line)
+        for line in scores_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    if not rows:
+        raise SystemExit("smoke failed: scores.jsonl is empty")
+    row = rows[0]
+    if row.get("provider_error_count", 0) or row.get("failure_stage") == "provider_error":
+        raise SystemExit(
+            f"smoke failed: provider error on item {row.get('item_id')!r}"
+        )
+    if not row.get("certificate_valid"):
+        raise SystemExit(
+            "smoke failed: certificate_valid=false "
+            f"(item_id={row.get('item_id')!r}, errors={row.get('certificate_errors')})"
+        )
+    transcript_path = mode_dir / "transcripts" / f"{row['item_id']}.json"
+    if not transcript_path.exists():
+        raise SystemExit(f"smoke failed: missing transcript {transcript_path}")
+    transcript = json.loads(transcript_path.read_text(encoding="utf-8"))
+    audit = transcript.get("audit_log") or {}
+    tool_names = [
+        inv.get("tool_name")
+        for inv in audit.get("tool_invocations") or []
+        if isinstance(inv, dict)
+    ]
+    if "solver.equivalence_certificate" not in tool_names and (
+        "solver.distinguishing_certificate" not in tool_names
+    ):
+        raise SystemExit(
+            "smoke failed: audit_log missing solver certificate-builder invocation "
+            f"(tools={tool_names})"
+        )
+    if not audit.get("certificate_assembly"):
+        raise SystemExit("smoke failed: audit_log.certificate_assembly is empty")
+
+
 def main(argv: list[str] | None = None) -> int:
     repo_root = find_repo_root()
     parser = argparse.ArgumentParser(
         description="F1 R2 attribution ablation: decompose certificate construction vs tools",
     )
     parser.add_argument(
+        "--provider",
+        choices=("anthropic", "openai"),
+        default="anthropic",
+        help="Model backend (default: anthropic; openai supports R2C only)",
+    )
+    parser.add_argument(
         "--parent-dir",
         type=Path,
-        default=repo_root / DEFAULT_PARENT_DIR,
-        help=f"Study root (default: {DEFAULT_PARENT_DIR})",
+        default=None,
+        help=(
+            "Study root (default: "
+            f"{DEFAULT_PARENT_DIR_ANTHROPIC} or {DEFAULT_PARENT_DIR_OPENAI})"
+        ),
     )
     parser.add_argument(
         "--mode",
@@ -70,13 +182,13 @@ def main(argv: list[str] | None = None) -> int:
         "--all",
         dest="all_modes",
         action="store_true",
-        help="Run all three modes sequentially",
+        help="Run all three modes sequentially (anthropic only)",
     )
     parser.add_argument(
         "--baseline-dir",
         type=Path,
-        default=repo_root / DEFAULT_BASELINE,
-        help=f"Frozen Claude tools run (default: {DEFAULT_BASELINE})",
+        default=None,
+        help="Frozen tools run for comparison (provider-specific default)",
     )
     parser.add_argument(
         "--oracle-dir",
@@ -89,7 +201,11 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         default=repo_root / EXPANDED_COHORT_ROOT,
     )
-    parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument(
+        "--model",
+        default=None,
+        help="Model alias or id (default: Claude Sonnet or gpt-4.1 by provider)",
+    )
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--max-items", type=int, default=100)
     parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT)
@@ -107,29 +223,43 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--smoke",
         action="store_true",
-        help="Smoke mode: n=5 per condition",
+        help="Smoke mode: n=5 per condition (anthropic) or n=1 (openai)",
     )
     args = parser.parse_args(argv)
+
+    provider: ProviderId = args.provider
+    if provider == "openai" and args.all_modes:
+        raise SystemExit("provider=openai does not support --all; use --mode R2C")
+
+    parent_dir = args.parent_dir or _default_parent_dir(provider, repo_root)
+    baseline_dir = args.baseline_dir or _default_baseline_dir(provider, repo_root)
+    model_arg = args.model or _default_model(provider)
+    resolved_model = resolve_provider_model(provider, model_arg)
+    max_items = _resolve_max_items(args)
 
     bundle = resolve_cohort_bundle(args.cohort_root)
     _c2_items_path, f1_items_path, _c2_cohort_id, f1_cohort_id = bundle
     items = load_items_jsonl(f1_items_path)
-    max_items = 5 if args.smoke else args.max_items
-    args.parent_dir.mkdir(parents=True, exist_ok=True)
+    parent_dir.mkdir(parents=True, exist_ok=True)
 
     if args.report_only:
         combined = finalize_r2_attribution_study(
-            args.parent_dir,
-            frozen_tools_root=args.baseline_dir,
+            parent_dir,
+            frozen_tools_root=baseline_dir,
             oracle_ablation_root=args.oracle_dir,
             cohort_id=f1_cohort_id,
             temperature=args.temperature,
+            provider=provider,
+            resolved_model=resolved_model,
+            expected_modes=tuple(OPENAI_R2C_ONLY if provider == "openai" else R2AttributionMode),
         )
         print(
             json.dumps(
                 {
-                    "report": str(args.parent_dir / "report.md"),
-                    "combined_summary": str(args.parent_dir / "combined_summary.json"),
+                    "provider": provider,
+                    "resolved_model": resolved_model,
+                    "report": str(parent_dir / "report.md"),
+                    "combined_summary": str(parent_dir / "combined_summary.json"),
                     "modes_completed": len(combined.get("track_rows", [])),
                 },
                 indent=2,
@@ -138,23 +268,37 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     modes = _modes_from_args(args)
-    print(ANTHROPIC_COST_WARNING, file=sys.stderr)
+    if provider == "openai":
+        _validate_openai_modes(modes)
+
+    cost_warning = OPENAI_COST_WARNING if provider == "openai" else ANTHROPIC_COST_WARNING
+    print(cost_warning, file=sys.stderr)
+
+    if provider == "openai":
+        from fsmreasonbench.runners.providers.openai import print_openai_startup_validation
+
+        print_openai_startup_validation(
+            model=resolved_model,
+            max_tokens=args.max_tokens,
+            temperature=args.temperature,
+        )
+
     generate_factory = build_generate_factory(
         GenerateBackendConfig(
-            provider="anthropic",
+            provider=provider,
             timeout=args.timeout,
             max_tokens=args.max_tokens,
         )
     )
-    generate = generate_factory(args.model, args.temperature)
+    generate = generate_factory(resolved_model, args.temperature)
     batch_config = OllamaBatchConfig(
-        model=args.model,
+        model=resolved_model,
         temperature=args.temperature,
         timeout=args.timeout,
         max_items=max_items,
         resume_items=not args.force,
         force_cell=args.force,
-        provider="anthropic",
+        provider=provider,
         max_tokens=args.max_tokens,
         provider_retries=args.provider_retries,
         provider_retry_backoff_seconds=args.provider_retry_backoff,
@@ -164,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
 
     run_results: list[dict[str, object]] = []
     for mode in modes:
-        mode_dir = args.parent_dir / mode.value
+        mode_dir = parent_dir / mode.value
         result = run_r2_attribution_batch(
             items,
             generate,
@@ -172,38 +316,57 @@ def main(argv: list[str] | None = None) -> int:
             batch_config,
             mode,
         )
+        summary = _enrich_r2_attribution_summary(
+            result.summary,
+            provider=provider,
+            resolved_model=resolved_model,
+            model_arg=model_arg,
+            temperature=args.temperature,
+        )
         finalize_r2_attribution_mode_run(
             mode_dir,
-            summary=result.summary,
+            summary=summary,
             cohort_id=f1_cohort_id,
             temperature=args.temperature,
+            provider=provider,
+            resolved_model=resolved_model,
+            model_arg=model_arg if model_arg != resolved_model else None,
         )
         run_results.append(
             {
                 "mode": mode.value,
                 "out_dir": str(result.out_dir),
-                "n": result.summary.get("n"),
-                "certificate_valid_rate": result.summary.get("certificate_valid_rate"),
-                "fully_correct_rate": result.summary.get("fully_correct_rate"),
+                "n": summary.get("n"),
+                "certificate_valid_rate": summary.get("certificate_valid_rate"),
+                "fully_correct_rate": summary.get("fully_correct_rate"),
+                "provider_error_count": summary.get("provider_error_count", 0),
+                "resolved_model": resolved_model,
                 "infrastructure_failures": result.infrastructure_failures,
             }
         )
+        if args.smoke and provider == "openai" and mode == R2AttributionMode.R2C:
+            _assert_openai_r2c_smoke_passed(mode_dir)
 
     combined = finalize_r2_attribution_study(
-        args.parent_dir,
-        frozen_tools_root=args.baseline_dir,
+        parent_dir,
+        frozen_tools_root=baseline_dir,
         oracle_ablation_root=args.oracle_dir,
         cohort_id=f1_cohort_id,
         temperature=args.temperature,
+        provider=provider,
+        resolved_model=resolved_model,
+        expected_modes=tuple(modes),
     )
     print(
         json.dumps(
             {
-                "parent_dir": str(args.parent_dir),
+                "provider": provider,
+                "resolved_model": resolved_model,
+                "parent_dir": str(parent_dir),
                 "max_items_requested": max_items,
                 "modes": run_results,
-                "report": str(args.parent_dir / "report.md"),
-                "combined_summary": str(args.parent_dir / "combined_summary.json"),
+                "report": str(parent_dir / "report.md"),
+                "combined_summary": str(parent_dir / "combined_summary.json"),
                 "modes_in_report": len(combined.get("track_rows", [])),
             },
             indent=2,

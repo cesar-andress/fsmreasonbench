@@ -77,16 +77,27 @@ def render_r2_attribution_comparison_report(
     mode_summaries: list[dict[str, Any]],
     frozen_tools_root: Path,
     oracle_ablation_root: Path,
+    provider: str | None = None,
+    resolved_model: str | None = None,
+    temperature: float | None = None,
 ) -> str:
     frozen = _load_f1_track_rows(frozen_tools_root)
     oracle = _load_json(oracle_ablation_root / "summary.json")
+    model_label = resolved_model or (
+        mode_summaries[0].get("resolved_model") if mode_summaries else None
+    ) or (mode_summaries[0].get("model") if mode_summaries else None) or "unknown"
+    provider_label = provider or (
+        mode_summaries[0].get("provider") if mode_summaries else None
+    ) or "anthropic"
+    temp_label = temperature if temperature is not None else 0.2
 
     lines = [
         "# F1 R2 Attribution Ablation Report",
         "",
         f"- **Run root:** `{parent_dir}`",
-        f"- **Model:** `claude-sonnet-4-5-20250929` (frozen Claude tools config)",
-        f"- **Temperature:** 0.2",
+        f"- **Provider:** `{provider_label}`",
+        f"- **Resolved model:** `{model_label}`",
+        f"- **Temperature:** {temp_label:g}",
         f"- **n:** 100 per condition (unless smoke)",
         "",
         "## Comparison table (Cert / Full)",
@@ -202,7 +213,7 @@ def render_r2_attribution_comparison_report(
             "## Notes",
             "",
             "- Frozen baselines are read from disk; this experiment does not re-run them.",
-            "- R2C uses the same `_evaluate_item_with_tools` path as frozen F1 R2.",
+            "- R2C uses a dedicated generator-assisted evaluator: mandatory solver certificate synthesis (reference `_r2_solve_f1`) plus two-phase LLM submission.",
             "- Do not modify frozen run directories.",
             "",
         ]
@@ -216,9 +227,22 @@ def finalize_r2_attribution_mode_run(
     summary: dict[str, Any],
     cohort_id: str | None = None,
     temperature: float | None = None,
+    provider: str | None = None,
+    resolved_model: str | None = None,
+    model_arg: str | None = None,
 ) -> dict[str, Any]:
     """Write per-mode taxonomy and combined_summary for one R2 attribution cell."""
     run_dir = Path(run_dir)
+    resolved = resolved_model or summary.get("resolved_model") or summary.get("model")
+    provider_label = provider or summary.get("provider")
+    enriched_summary = dict(summary)
+    enriched_summary["resolved_model"] = resolved
+    if provider_label is not None:
+        enriched_summary["provider"] = provider_label
+    if model_arg:
+        enriched_summary["model_arg"] = model_arg
+    dump_json(run_dir / "summary.json", enriched_summary)
+
     taxonomy_payload = analyze_failure_taxonomy(
         run_dir / SCORES_JSONL,
         run_dir / RESULTS_JSONL,
@@ -227,6 +251,8 @@ def finalize_r2_attribution_mode_run(
 
     track_row = {
         "model": summary.get("model"),
+        "resolved_model": resolved,
+        "provider": provider_label,
         "family": "F1",
         "track": summary.get("track"),
         "temperature": temperature,
@@ -243,11 +269,16 @@ def finalize_r2_attribution_mode_run(
         "ablation_condition": summary.get("ablation_condition"),
         "r2_attribution_mode": summary.get("r2_attribution_mode"),
     }
+    if model_arg:
+        track_row["model_arg"] = model_arg
     combined = {
         "experiment": "r2_attribution_ablation",
+        "provider": provider_label,
+        "resolved_model": resolved,
         "ablation_condition": summary.get("ablation_condition"),
         "r2_attribution_mode": summary.get("r2_attribution_mode"),
         "models": [summary.get("model")],
+        "resolved_models": [resolved],
         "families": ["F1"],
         "tracks": [summary.get("track")],
         "temperatures": [temperature] if temperature is not None else [],
@@ -256,6 +287,8 @@ def finalize_r2_attribution_mode_run(
         "track_rows": [track_row],
         "cell_status_counts": {"completed": 1, "expected": 1},
     }
+    if model_arg:
+        combined["model_args"] = [model_arg]
     dump_json(run_dir / "combined_summary.json", combined)
 
     report_lines = [
@@ -284,13 +317,17 @@ def finalize_r2_attribution_study(
     oracle_ablation_root: Path,
     cohort_id: str | None = None,
     temperature: float | None = None,
+    provider: str | None = None,
+    resolved_model: str | None = None,
+    expected_modes: tuple[R2AttributionMode, ...] | None = None,
 ) -> dict[str, Any]:
     """Aggregate R2A/R2B/R2C into parent combined_summary.json and report.md."""
     parent_dir = Path(parent_dir)
     mode_summaries: list[dict[str, Any]] = []
     track_rows: list[dict[str, Any]] = []
+    mode_order = expected_modes or tuple(R2AttributionMode)
 
-    for mode in R2AttributionMode:
+    for mode in mode_order:
         mode_dir = parent_dir / mode.value
         row = _mode_summary_row(mode_dir, mode)
         if row is None:
@@ -299,6 +336,8 @@ def finalize_r2_attribution_study(
         track_rows.append(
             {
                 "model": row.get("model"),
+                "resolved_model": row.get("resolved_model", row.get("model")),
+                "provider": row.get("provider"),
                 "family": "F1",
                 "track": row.get("track"),
                 "temperature": temperature,
@@ -317,17 +356,28 @@ def finalize_r2_attribution_study(
             }
         )
 
+    study_resolved = resolved_model or (
+        track_rows[0].get("resolved_model") if track_rows else None
+    )
+    study_provider = provider or (track_rows[0].get("provider") if track_rows else None)
+
     report = render_r2_attribution_comparison_report(
         parent_dir=parent_dir,
         mode_summaries=mode_summaries,
         frozen_tools_root=frozen_tools_root,
         oracle_ablation_root=oracle_ablation_root,
+        provider=study_provider,
+        resolved_model=study_resolved,
+        temperature=temperature,
     )
     (parent_dir / "report.md").write_text(report, encoding="utf-8")
 
     combined = {
         "experiment": "r2_attribution_ablation",
+        "provider": study_provider,
+        "resolved_model": study_resolved,
         "models": [track_rows[0]["model"]] if track_rows else [],
+        "resolved_models": [study_resolved] if study_resolved else [],
         "families": ["F1"],
         "tracks": [row["track"] for row in track_rows],
         "temperatures": [temperature] if temperature is not None else [],
@@ -336,10 +386,10 @@ def finalize_r2_attribution_study(
         "track_rows": track_rows,
         "cell_status_counts": {
             "completed": len(track_rows),
-            "expected": len(R2AttributionMode),
+            "expected": len(mode_order),
         },
         "frozen_baselines": {
-            "claude_tools": str(frozen_tools_root),
+            "tools": str(frozen_tools_root),
             "oracle_verdict_format_control": str(oracle_ablation_root),
         },
     }

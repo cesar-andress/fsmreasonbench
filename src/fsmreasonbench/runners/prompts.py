@@ -22,8 +22,8 @@ def render_prompt(item: BenchmarkItem, *, provider: str | None = None) -> str:
         raise ValueError(f"unsupported family for prompts: {item.family!r}")
     if provider == "gemini":
         prompt += _gemini_strict_output_contract(item)
-    elif provider == "anthropic" and item.family == "F1":
-        prompt += _anthropic_f1_strict_output_contract(item)
+    elif provider in {"anthropic", "openai"} and item.family == "F1":
+        prompt += _frontier_api_f1_strict_output_contract(item)
     return prompt
 
 
@@ -74,8 +74,8 @@ If verdict=false (NOT equivalent), certificate_type MUST be distinguishing_trace
     )
 
 
-_ANTHROPIC_F1_STRICT_HEADER = """
-Anthropic output contract (strict — violations make the submission unscorable):
+_FRONTIER_API_F1_STRICT_HEADER = """
+Frontier API output contract (strict — violations make the submission unscorable):
 - Return ONLY one JSON object. No markdown code fences (no ```), no prose before or after the JSON.
 - Top-level keys must be exactly: item_id, verdict, certificate.
 - certificate MUST be a JSON object, never null, never a string, never an array.
@@ -83,11 +83,11 @@ Anthropic output contract (strict — violations make the submission unscorable)
 """
 
 
-def _anthropic_f1_strict_output_contract(item: BenchmarkItem) -> str:
+def _frontier_api_f1_strict_output_contract(item: BenchmarkItem) -> str:
     if item.fsm_b is None:
         raise ValueError("F1 item requires fsm_b")
     return (
-        _ANTHROPIC_F1_STRICT_HEADER
+        _FRONTIER_API_F1_STRICT_HEADER
         + f"""
 Required F1 submission shape:
 {{

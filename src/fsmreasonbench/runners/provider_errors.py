@@ -25,11 +25,11 @@ NON_RETRYABLE_PROVIDER_ERROR_TYPES = frozenset({"quota_exceeded", "insufficient_
 DEFAULT_MAX_PROVIDER_RETRY_DELAY_SECONDS = 120.0
 
 _PROVIDER_HTTP_RUNTIME = re.compile(
-    r"(?P<provider>anthropic|gemini) request failed with HTTP (?P<status>\d+):\s*(?P<detail>.*)",
+    r"(?P<provider>anthropic|gemini|openai) request failed with HTTP (?P<status>\d+):\s*(?P<detail>.*)",
     re.DOTALL,
 )
 _PROVIDER_HTTP_TRANSIENT = re.compile(
-    r"provider_http_(?P<status>\d+):\s*(?P<provider>anthropic|gemini)\s+transient API error "
+    r"provider_http_(?P<status>\d+):\s*(?P<provider>anthropic|gemini|openai)\s+transient API error "
     r"HTTP \d+ \((?P<error_type>[a-z_]+)\)",
     re.IGNORECASE,
 )
@@ -86,6 +86,8 @@ def _parse_provider_error_json_type(detail: str) -> str | None:
     error_type = error.get("type")
     if error_type == "rate_limit_error":
         return "rate_limit"
+    if error_type in {"insufficient_quota", "rate_limit_exceeded"}:
+        return "quota_exceeded" if "quota" in str(error_type) else "rate_limit"
     if error_type in {"invalid_request_error", "authentication_error"}:
         message = str(error.get("message", "")).lower()
         if any(keyword in message for keyword in INSUFFICIENT_CREDIT_KEYWORDS):

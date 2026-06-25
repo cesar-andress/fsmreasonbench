@@ -13,8 +13,10 @@ from fsmreasonbench.runners.experiment_cells import DEFAULT_STALE_RUNNING_SECOND
 from fsmreasonbench.runners.providers.base import (
     ANTHROPIC_COST_WARNING,
     GEMINI_COST_WARNING,
+    OPENAI_COST_WARNING,
     GenerateBackendConfig,
     build_generate_factory,
+    resolve_provider_model,
 )
 from fsmreasonbench.runners.track_pilot_models import (
     DEFAULT_C2_COHORT_ID,
@@ -53,11 +55,11 @@ def _add_bool_flag(parser: argparse.ArgumentParser, name: str, default: bool, he
 def main(argv: list[str] | None = None) -> int:
     repo_root = find_repo_root()
     parser = argparse.ArgumentParser(
-        description="Run R0/R1/R2 track pilot across Ollama, Anthropic, or Gemini backends",
+        description="Run R0/R1/R2 track pilot across Ollama, Anthropic, OpenAI, or Gemini backends",
     )
     parser.add_argument(
         "--provider",
-        choices=("ollama", "anthropic", "gemini"),
+        choices=("ollama", "anthropic", "openai", "gemini"),
         default="ollama",
         help="Model backend (default: ollama)",
     )
@@ -261,7 +263,7 @@ def main(argv: list[str] | None = None) -> int:
         "--max-tokens",
         type=int,
         default=8192,
-        help="Anthropic max_tokens per request (default: 8192)",
+        help="Anthropic/OpenAI max_tokens per request (default: 8192)",
     )
     parser.add_argument(
         "--provider-dry-run",
@@ -320,11 +322,18 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--provider-dry-run cannot be combined with --report-only")
     if args.provider == "anthropic" and not args.report_only:
         print(ANTHROPIC_COST_WARNING, file=sys.stderr)
+    if args.provider == "openai" and not args.report_only:
+        print(OPENAI_COST_WARNING, file=sys.stderr)
     if args.provider == "gemini" and not args.report_only:
         print(GEMINI_COST_WARNING, file=sys.stderr)
 
     try:
         models = _parse_csv(args.models)
+        model_args = models
+        if args.provider in {"anthropic", "openai", "gemini"}:
+            models = tuple(resolve_provider_model(args.provider, model) for model in models)
+        else:
+            models = tuple(models)
         families = _parse_csv(args.families)
         tracks = _parse_csv(args.tracks)
         temperatures = (
@@ -377,6 +386,7 @@ def main(argv: list[str] | None = None) -> int:
     config = apply_incremental_safe(
         TrackPilotModelsConfig(
             models=models,
+            model_args=tuple(model_args),
             families=families,
             tracks=tracks,
             c2_items_path=c2_items_path,
