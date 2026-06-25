@@ -1,0 +1,23 @@
+{
+  "campaign_id": "frontier_gpt_tools_n100_v1",
+  "provider": "openai",
+  "model": "gpt",
+  "model_arg": "gpt",
+  "resolved_model_note": "At runtime resolves to OPENAI_MODEL or gpt-5; scores record resolved id.",
+  "families": ["C2", "F1"],
+  "tracks": ["R1", "R2"],
+  "temperatures": [0.2],
+  "max_items": 100,
+  "max_tokens": 8192,
+  "timeout": 3600,
+  "cohort_root": "cohorts/v0.1-expanded-n100",
+  "out_dir": "runs/frontier_gpt_tools_n100_v1",
+  "matrix_layout": true,
+  "incremental_safe": true,
+  "retry_failed": true,
+  "provider_retries": 3,
+  "provider_backoff_base": 5.0,
+  "provider_max_retry_delay": 120.0,
+  "provider_sleep_between_items": 0.0,
+  "notes": "Primary GPT frontier campaign mirroring frontier_claude_sonnet_tools_n100_v2. Model resolves via OPENAI_MODEL (default gpt-5) or pass --model gpt-4.1."
+}

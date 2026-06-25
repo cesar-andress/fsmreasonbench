@@ -28,7 +28,8 @@ Companion empirical paper (separate): [`../paper/`](../paper/)
 | **Frozen cohort** | `v0.1-expanded-n100` — C2 and F1 mixed snapshots ($n{=}100$ per family) |
 | **Evaluation pipeline** | R0/R1/R2 tracks, attribution ablations, failure inspection |
 | **Paper-support analyses** | Verifier audit ($16/16$), hash-mismatch decomposition, bootstrap/McNemar exports |
-| **Empirical package** | [`docs/tmlr_empirical_package_v1/`](docs/tmlr_empirical_package_v1/) — tables/figures for the paper |
+| **Empirical package** | [`docs/tmlr_empirical_package_v1/`](docs/tmlr_empirical_package_v1/) — Claude tables/figures |
+| **TOSEM package** | [`docs/tosem_empirical_package_v1/`](docs/tosem_empirical_package_v1/) — Claude+GPT manuscript tables |
 | **Documentation** | Normative spec, reproducibility policies, dataset card |
 
 Families **F2–F4** and calibration **C1** remain specified but are **not** part of the v1.0.0
@@ -49,6 +50,7 @@ pip install -e ".[dev,plot]"
 PYTHONPATH=src python -m fsmreasonbench.cli.validate_cohort \
   --cohort-dir cohorts/v0.1-expanded-n100/f1-mixed-level3
 PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package
+PYTHONPATH=src python -m fsmreasonbench.cli.export_tosem_empirical_package
 PYTHONPATH=src python -m fsmreasonbench.cli.artifact_health
 ```
 

@@ -1,0 +1,44 @@
+{
+  "provider": "openai",
+  "model": "gpt-4.1",
+  "conditions": [
+    "R1",
+    "R2",
+    "R2C"
+  ],
+  "condition_runs": {
+    "R1": "runs/frontier_gpt_tools_n100_v1/gpt-4.1/F1/temp_0.2/R1/scores.jsonl",
+    "R2": "runs/frontier_gpt_tools_n100_v1/gpt-4.1/F1/temp_0.2/R2/scores.jsonl",
+    "R2C": "runs/ablations_f1_r2c_gpt_n100_v1/R2C/scores.jsonl"
+  },
+  "rows": [
+    {
+      "condition": "R1",
+      "distinguishing_trace_cert": 0.14285714285714285,
+      "distinguishing_trace_full": 0.14285714285714285,
+      "equivalence_witness_cert": 0.0,
+      "equivalence_witness_full": 0.0,
+      "overall_cert": 0.07,
+      "overall_full": 0.07
+    },
+    {
+      "condition": "R2",
+      "distinguishing_trace_cert": 1.0,
+      "distinguishing_trace_full": 1.0,
+      "equivalence_witness_cert": 0.0,
+      "equivalence_witness_full": 0.0,
+      "overall_cert": 0.49,
+      "overall_full": 0.49
+    },
+    {
+      "condition": "R2C",
+      "distinguishing_trace_cert": 1.0,
+      "distinguishing_trace_full": 1.0,
+      "equivalence_witness_cert": 1.0,
+      "equivalence_witness_full": 1.0,
+      "overall_cert": 1.0,
+      "overall_full": 1.0
+    }
+  ],
+  "note": "Partial GPT attribution ladder: R1/R2 from frontier tools campaign; R2C from ablation export."
+}

@@ -1,0 +1,9 @@
+{
+  "campaign_id": "frontier_gpt_tools_n100_v1",
+  "provider": "openai",
+  "model": "gpt",
+  "resolved_model": "gpt-5",
+  "cohort_items_path": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/cohorts/v0.1-expanded-n100/f1-mixed-level3/items.jsonl",
+  "tracks_analyzed": [],
+  "by_track": {}
+}

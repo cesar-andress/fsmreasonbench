@@ -1,0 +1,34 @@
+{
+  "package_version": "tosem_v1",
+  "generated_from": "frozen runs only (no inference)",
+  "combined_summaries": {
+    "local_matrix": "runs/local_matrix_n100_t02_v2/combined_summary.json",
+    "claude_tools": "runs/frontier_claude_sonnet_tools_n100_v2/combined_summary.json",
+    "gpt_tools": "runs/frontier_gpt_tools_n100_v1/combined_summary.json",
+    "gpt_r2c": "runs/ablations_f1_r2c_gpt_n100_v1/combined_summary.json"
+  },
+  "gpt_f1_condition_runs": {
+    "R1": "runs/frontier_gpt_tools_n100_v1/gpt-4.1/F1/temp_0.2/R1/scores.jsonl",
+    "R2": "runs/frontier_gpt_tools_n100_v1/gpt-4.1/F1/temp_0.2/R2/scores.jsonl",
+    "R2C": "runs/ablations_f1_r2c_gpt_n100_v1/R2C/scores.jsonl"
+  },
+  "paper_tables": {
+    "claude_sonnet_tools_n100_summary.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/claude_sonnet_tools_n100_summary.tex",
+    "gpt_tools_n100_summary.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/gpt_tools_n100_summary.tex",
+    "frontier_tools_comparison_n100.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/frontier_tools_comparison_n100.tex",
+    "knowing_showing_gap_n100.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/knowing_showing_gap_n100.tex",
+    "failure_stage_n100.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/failure_stage_n100.tex",
+    "f1_gpt_ablations.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/f1_gpt_ablations.tex",
+    "results_paired_mcnemar.tex": "/home/cesar/papers/fsmreasonbench/paper/tables/results_paired_mcnemar.tex"
+  },
+  "analysis_json": {
+    "gpt_tools_summary": "docs/frontier_gpt_tools_n100_v1_summary.json",
+    "gpt_uncertainty": "docs/frontier_gpt_tools_n100_v1_uncertainty.json",
+    "gpt_f1_ablation_stratified": "docs/f1_gpt_ablation_stratified_analysis.json",
+    "gpt_f1_frontier_subtypes": "docs/f1_gpt_frontier_subtype_stratified_analysis.json"
+  },
+  "gpt_frontier_export": {
+    "campaign_id": "frontier_gpt_tools_n100_v1",
+    "cells_exported": 4
+  }
+}
