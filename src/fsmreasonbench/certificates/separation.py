@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fsmreasonbench.models.fsm import ExecutableFSM
+from fsmreasonbench.runtime.bisimulation import compute_bisimulation_pairs
 from fsmreasonbench.runtime.dfa_minimize import minimized_dfa_hash
 from fsmreasonbench.oracle.separation import (
     DistinguishingTraceWitness,
@@ -32,7 +33,7 @@ def build_equivalence_witness_certificate(
     *,
     version: str = "1.0",
 ) -> dict[str, Any]:
-    """Build gold certificate for F1 DFA equivalence."""
+    """Build gold certificate for F1 DFA equivalence (hash witness contract)."""
     return {
         "certificate_type": "equivalence_witness",
         "version": version,
@@ -42,6 +43,26 @@ def build_equivalence_witness_certificate(
             "equivalent": True,
             "minimized_hash_A": minimized_dfa_hash(fsm_a),
             "minimized_hash_B": minimized_dfa_hash(fsm_b),
+        },
+    }
+
+
+def build_bisimulation_witness_certificate(
+    fsm_a: ExecutableFSM,
+    fsm_b: ExecutableFSM,
+    *,
+    version: str = "1.0",
+) -> dict[str, Any]:
+    """Build gold certificate for F1 DFA equivalence (constructible bisimulation contract)."""
+    pairs = compute_bisimulation_pairs(fsm_a, fsm_b)
+    return {
+        "certificate_type": "bisimulation_witness",
+        "version": version,
+        "fsm_ids": [fsm_a.fsm_id, fsm_b.fsm_id],
+        "verdict_supported": True,
+        "payload": {
+            "equivalent": True,
+            "pairs": [{"state_a": a, "state_b": b} for a, b in pairs],
         },
     }
 

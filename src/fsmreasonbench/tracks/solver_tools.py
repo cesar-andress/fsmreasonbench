@@ -6,6 +6,7 @@ from typing import Any
 
 from fsmreasonbench.certificates.reachability import build_reachability_certificate
 from fsmreasonbench.certificates.separation import (
+    build_bisimulation_witness_certificate,
     build_distinguishing_trace_certificate,
     build_equivalence_witness_certificate,
 )
@@ -22,6 +23,7 @@ REGISTERED_TOOL_NAMES: frozenset[str] = frozenset(
         "solver.reachability_certificate",
         "solver.check_separation",
         "solver.equivalence_certificate",
+        "solver.bisimulation_certificate",
         "solver.distinguishing_certificate",
     }
 )
@@ -118,6 +120,28 @@ class SolverToolRegistry:
             },
             tool_version=SOLVER_REGISTRY_VERSION,
             provenance="certificates.separation.build_equivalence_witness_certificate",
+        )
+        return certificate
+
+    def bisimulation_certificate(
+        self,
+        fsm_a: ExecutableFSM,
+        fsm_b: ExecutableFSM,
+    ) -> dict[str, Any]:
+        certificate = build_bisimulation_witness_certificate(fsm_a, fsm_b)
+        self._audit.record_tool(
+            "solver.bisimulation_certificate",
+            {
+                "fsm_id_a": fsm_a.fsm_id,
+                "fsm_id_b": fsm_b.fsm_id,
+            },
+            {
+                "certificate_type": certificate["certificate_type"],
+                "verdict_supported": certificate["verdict_supported"],
+                "pair_count": len(certificate.get("payload", {}).get("pairs", [])),
+            },
+            tool_version=SOLVER_REGISTRY_VERSION,
+            provenance="certificates.separation.build_bisimulation_witness_certificate",
         )
         return certificate
 

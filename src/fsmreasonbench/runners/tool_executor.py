@@ -21,7 +21,14 @@ F1_R2_ALLOWED_TOOLS: frozenset[str] = frozenset(
     {
         "solver.check_separation",
         "solver.equivalence_certificate",
+        "solver.bisimulation_certificate",
         "solver.distinguishing_certificate",
+    }
+)
+F1_R2_CONSTRUCTIBLE_EQUIVALENCE_TOOLS: frozenset[str] = frozenset(
+    {
+        "solver.check_separation",
+        "solver.bisimulation_certificate",
     }
 )
 MAX_TOOL_CALLS_PER_ROUND = 64
@@ -47,6 +54,8 @@ def execute_tool_plan(
     track: TrackId,
     tool_calls: list[dict[str, Any]],
     audit: AuditLogBuilder,
+    *,
+    r2_allowed_tools: frozenset[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Execute or reject tool calls; return per-call results for phase-2 prompt."""
     if len(tool_calls) > MAX_TOOL_CALLS_PER_ROUND:
@@ -55,7 +64,7 @@ def execute_tool_plan(
     if track == TrackId.R1:
         allowed = R1_ALLOWED_TOOLS
     elif track == TrackId.R2:
-        allowed = allowed_r2_tools_for_family(item.family)
+        allowed = r2_allowed_tools or allowed_r2_tools_for_family(item.family)
     else:
         raise ValueError(f"track {track.value} does not support tool execution")
     fsm_by_id = _fsm_index(item)
@@ -165,6 +174,14 @@ def _execute_r2_call(
             fsm_a = fsm_by_id[inputs["fsm_id_a"]]
             fsm_b = fsm_by_id[inputs["fsm_id_b"]]
             certificate = solvers.equivalence_certificate(fsm_a, fsm_b)
+            outputs = {
+                "certificate_type": certificate["certificate_type"],
+                "certificate": certificate,
+            }
+        elif tool == "solver.bisimulation_certificate":
+            fsm_a = fsm_by_id[inputs["fsm_id_a"]]
+            fsm_b = fsm_by_id[inputs["fsm_id_b"]]
+            certificate = solvers.bisimulation_certificate(fsm_a, fsm_b)
             outputs = {
                 "certificate_type": certificate["certificate_type"],
                 "certificate": certificate,

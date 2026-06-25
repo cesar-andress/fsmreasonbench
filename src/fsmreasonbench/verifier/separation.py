@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fsmreasonbench.models.fsm import ExecutableFSM, FSMType
+from fsmreasonbench.runtime.bisimulation import pairs_from_payload, verify_bisimulation_relation
 from fsmreasonbench.runtime.dfa_minimize import are_equivalent_dfas, minimized_dfa_hash
 from fsmreasonbench.runtime.acceptance import accepts_trace
 from fsmreasonbench.runtime.simulation import simulate
@@ -22,6 +23,8 @@ def verify_f1_certificate(
         return verify_distinguishing_trace_certificate(fsm_a, fsm_b, certificate)
     if cert_type == "equivalence_witness":
         return verify_equivalence_witness_certificate(fsm_a, fsm_b, certificate)
+    if cert_type == "bisimulation_witness":
+        return verify_bisimulation_witness_certificate(fsm_a, fsm_b, certificate)
     return VerifyResult.fail(f"unsupported certificate_type: {cert_type!r}")
 
 
@@ -142,4 +145,44 @@ def verify_equivalence_witness_certificate(
     if recomputed_a != recomputed_b:
         return VerifyResult.fail("minimized hashes differ for equivalent DFAs")
 
+    return VerifyResult.ok()
+
+
+def verify_bisimulation_witness_certificate(
+    fsm_a: ExecutableFSM,
+    fsm_b: ExecutableFSM,
+    certificate: dict[str, Any],
+) -> VerifyResult:
+    """Verify a constructible bisimulation equivalence witness (no hash fields)."""
+    if fsm_a.fsm_type != FSMType.DFA or fsm_b.fsm_type != FSMType.DFA:
+        return VerifyResult.fail("bisimulation_witness verification requires DFA inputs")
+    if fsm_a.input_alphabet != fsm_b.input_alphabet:
+        return VerifyResult.fail("DFA alphabets must match")
+
+    cert_type = certificate.get("certificate_type")
+    if cert_type != "bisimulation_witness":
+        return VerifyResult.fail(f"unsupported certificate_type: {cert_type!r}")
+
+    fsm_ids = certificate.get("fsm_ids")
+    if not isinstance(fsm_ids, list) or len(fsm_ids) != 2:
+        return VerifyResult.fail("fsm_ids must be an array of length 2")
+    if fsm_ids != [fsm_a.fsm_id, fsm_b.fsm_id]:
+        return VerifyResult.fail(
+            f"fsm_ids mismatch: expected {[fsm_a.fsm_id, fsm_b.fsm_id]!r}, got {fsm_ids!r}"
+        )
+
+    payload = certificate.get("payload")
+    if not isinstance(payload, dict):
+        return VerifyResult.fail("certificate payload must be an object")
+    if payload.get("equivalent") is not True:
+        return VerifyResult.fail("payload.equivalent must be true")
+
+    try:
+        relation = pairs_from_payload(payload)
+    except ValueError as exc:
+        return VerifyResult.fail(str(exc))
+
+    valid, errors = verify_bisimulation_relation(fsm_a, fsm_b, relation)
+    if not valid:
+        return VerifyResult.fail(*errors)
     return VerifyResult.ok()

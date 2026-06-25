@@ -8,7 +8,9 @@ from typing import Any
 from fsmreasonbench.evaluator.models import ParseResult, ParsedSubmission
 
 _C2_CERTIFICATE_TYPES = frozenset({"trace_witness", "unreachability_witness"})
-_F1_CERTIFICATE_TYPES = frozenset({"distinguishing_trace", "equivalence_witness"})
+_F1_CERTIFICATE_TYPES = frozenset(
+    {"distinguishing_trace", "equivalence_witness", "bisimulation_witness"}
+)
 
 
 def parse_submission(raw_response: Any, family: str) -> ParseResult:
@@ -110,8 +112,8 @@ def _validate_f1_certificate(certificate: dict[str, Any]) -> list[str]:
     cert_type = certificate.get("certificate_type")
     if cert_type not in _F1_CERTIFICATE_TYPES:
         errors.append(
-            "certificate_type must be distinguishing_trace or equivalence_witness, "
-            f"got {cert_type!r}"
+            "certificate_type must be distinguishing_trace, equivalence_witness, "
+            f"or bisimulation_witness, got {cert_type!r}"
         )
     fsm_ids = certificate.get("fsm_ids")
     if not isinstance(fsm_ids, list) or len(fsm_ids) != 2:
@@ -124,6 +126,8 @@ def _validate_f1_certificate(certificate: dict[str, Any]) -> list[str]:
         errors.extend(_validate_distinguishing_trace_payload(certificate["payload"]))
     elif cert_type == "equivalence_witness":
         errors.extend(_validate_equivalence_witness_payload(certificate["payload"]))
+    elif cert_type == "bisimulation_witness":
+        errors.extend(_validate_bisimulation_witness_payload(certificate["payload"]))
     return errors
 
 
@@ -149,4 +153,26 @@ def _validate_equivalence_witness_payload(payload: dict[str, Any]) -> list[str]:
         value = payload.get(field)
         if not isinstance(value, str) or not value:
             errors.append(f"equivalence_witness.payload.{field} must be a non-empty string")
+    return errors
+
+
+def _validate_bisimulation_witness_payload(payload: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if payload.get("equivalent") is not True:
+        errors.append("bisimulation_witness.payload.equivalent must be true")
+    pairs = payload.get("pairs")
+    if not isinstance(pairs, list) or not pairs:
+        errors.append("bisimulation_witness.payload.pairs must be a non-empty array")
+    elif pairs:
+        for index, entry in enumerate(pairs):
+            if not isinstance(entry, dict):
+                errors.append(f"bisimulation_witness.payload.pairs[{index}] must be an object")
+                continue
+            for field in ("state_a", "state_b"):
+                value = entry.get(field)
+                if not isinstance(value, str) or not value:
+                    errors.append(
+                        f"bisimulation_witness.payload.pairs[{index}].{field} "
+                        "must be a non-empty string"
+                    )
     return errors
