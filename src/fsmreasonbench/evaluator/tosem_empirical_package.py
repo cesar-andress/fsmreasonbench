@@ -722,6 +722,20 @@ def _paper_tables_dir(repo_root: Path) -> Path:
     return repo_root / "docs" / "paper_tables"
 
 
+def _repo_rel(path: Path, repo_root: Path) -> str:
+    """Path relative to repository root for portable manifests."""
+    resolved = path.resolve()
+    root = repo_root.resolve()
+    try:
+        return str(resolved.relative_to(root))
+    except ValueError:
+        paper_root = (root.parent / "paper").resolve()
+        try:
+            return str(Path("..") / "paper" / resolved.relative_to(paper_root))
+        except ValueError:
+            return str(path)
+
+
 def export_tosem_empirical_package(
     repo_root: str | Path,
     *,
@@ -812,12 +826,14 @@ def export_tosem_empirical_package(
     paper_figures: dict[str, str] = {}
     gap_figure = write_figure_verdict_witness_gap_comparison(gap_rows, figures_dir)
     if gap_figure is not None:
-        paper_figures["figure_verdict_witness_gap_comparison.pdf"] = str(gap_figure)
+        paper_figures["figure_verdict_witness_gap_comparison.pdf"] = _repo_rel(gap_figure, root)
     attribution_figure = write_figure_attribution_fingerprint_comparison(
         root, gpt_ablation_rows, figures_dir
     )
     if attribution_figure is not None:
-        paper_figures["figure_attribution_fingerprint_comparison.pdf"] = str(attribution_figure)
+        paper_figures["figure_attribution_fingerprint_comparison.pdf"] = _repo_rel(
+            attribution_figure, root
+        )
 
     manifest = {
         "package_version": "tosem_v1",
@@ -825,14 +841,17 @@ def export_tosem_empirical_package(
         "combined_summaries": FROZEN_COMBINED_SUMMARIES,
         "gpt_f1_condition_runs": GPT_F1_CONDITION_RUNS,
         "paper_tables": {
-            "claude_sonnet_tools_n100_summary.tex": str(tables_dir / "claude_sonnet_tools_n100_summary.tex"),
-            "gpt_tools_n100_summary.tex": str(tables_dir / "gpt_tools_n100_summary.tex"),
-            "frontier_tools_comparison_n100.tex": str(tables_dir / "frontier_tools_comparison_n100.tex"),
-            "knowing_showing_gap_n100.tex": str(tables_dir / "knowing_showing_gap_n100.tex"),
-            "failure_stage_n100.tex": str(tables_dir / "failure_stage_n100.tex"),
-            "f1_gpt_ablations.tex": str(tables_dir / "f1_gpt_ablations.tex"),
-            "results_paired_mcnemar.tex": str(tables_dir / "results_paired_mcnemar.tex"),
-            "local_matrix_n100_summary.tex": str(tables_dir / "local_matrix_n100_summary.tex"),
+            name: _repo_rel(tables_dir / name, root)
+            for name in (
+                "claude_sonnet_tools_n100_summary.tex",
+                "gpt_tools_n100_summary.tex",
+                "frontier_tools_comparison_n100.tex",
+                "knowing_showing_gap_n100.tex",
+                "failure_stage_n100.tex",
+                "f1_gpt_ablations.tex",
+                "results_paired_mcnemar.tex",
+                "local_matrix_n100_summary.tex",
+            )
         },
         "analysis_json": {
             "gpt_tools_summary": "docs/frontier_gpt_tools_n100_v1_summary.json",

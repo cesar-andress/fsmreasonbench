@@ -17,12 +17,12 @@ htmlcov/
 .idea/
 .vscode/
 *.swp
+.cursor/
 
-# OS
-.DS_Store
-
-# Exploratory batch runs (non-frozen)
-runs/
-
+# Local logs / editor artifacts
 x.log
 *.log
+.DS_Store
+
+# Exploratory batch runs (non-frozen; ship via Zenodo tarball)
+runs/
