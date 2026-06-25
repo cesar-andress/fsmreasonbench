@@ -248,3 +248,13 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.evaluate_baseline_batch --help
 ```
 
 Exploratory outputs under `runs/` are gitignored and must not be treated as release artifacts.
+
+---
+
+## TOSEM extension campaigns (post-freeze v1)
+
+The v1.0.0 Zenodo deposit reflects the **frozen** empirical slice. Optional extension studies
+(replicate frontier campaigns, full GPT attribution ladder) are documented in
+[`../TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](../TOSEM_EXPERIMENT_EXTENSION_PLAN.md).
+They require live API access, write to new run directories, and export `extension_*` tables
+without modifying frozen artifacts.

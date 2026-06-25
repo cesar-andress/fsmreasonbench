@@ -144,3 +144,19 @@ before citing results.
 
 Numerical values must match the frozen `combined_summary.json` sources. If they diverge, check
 that run trees are complete and that export CLIs were run with `PYTHONPATH=src`.
+
+---
+
+## Post-freeze extension experiments (Tier 4 — manual API)
+
+Infrastructure for run-to-run replicates and the full GPT attribution ladder lives outside the
+frozen TOSEM export path. These campaigns write to **new run roots** (`*_replicates/`,
+`ablations_f1_r2_attribution_gpt_n100_v1/`, etc.) and produce `extension_*` manuscript artifacts.
+
+| Step | Command |
+|------|---------|
+| Plan & order | [`../TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](../TOSEM_EXPERIMENT_EXTENSION_PLAN.md) |
+| Launch helper | `./scripts/run_tosem_extension_campaigns.sh help` |
+| Export only | `PYTHONPATH=src python3 -m fsmreasonbench.cli.export_tosem_extension_experiments` |
+
+Extension exports do **not** overwrite frozen tables from `reproduce_tosem_tables.sh`.

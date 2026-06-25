@@ -30,6 +30,7 @@ Use `CITATION.cff` or the DOI above. Git `main` is for development; **do not cit
 | **Evaluation pipeline** | R0/R1/R2 tracks, attribution ablations, failure inspection |
 | **Paper-support analyses** | Verifier audit ($16/16$), hash-mismatch decomposition, bootstrap/McNemar exports |
 | **TOSEM package** | [`docs/tosem_empirical_package_v1/`](docs/tosem_empirical_package_v1/) — Claude+GPT+local TOSEM tables |
+| **Extension experiments (manual)** | [`docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md) — replicates + GPT ladder (post-freeze) |
 | **Historical TMLR package** | [`docs/tmlr_empirical_package_v1/`](docs/tmlr_empirical_package_v1/) — Claude ablations (still used by export) |
 | **Documentation** | Normative spec, reproducibility policies, dataset card |
 
@@ -67,6 +68,10 @@ Primary frozen runs are listed in
 Regeneration uses frozen `scores.jsonl` / `combined_summary.json` files;
 **no model API calls** are required for audit, decomposition, or table export.
 
+**Post-freeze extension campaigns** (replicates, full GPT attribution ladder) require API keys
+and are documented in [`docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md).
+Launch manually via [`scripts/run_tosem_extension_campaigns.sh`](scripts/run_tosem_extension_campaigns.sh).
+
 ---
 
 ## Repository layout
@@ -94,6 +99,8 @@ Detail: [`docs/artifact/repository_layout.md`](docs/artifact/repository_layout.m
 | [`PROJECT_STATUS.md`](PROJECT_STATUS.md) | Current released components and assets |
 | [`docs/tosem/README.md`](docs/tosem/README.md) | TOSEM companion artifact guide |
 | [`docs/EXPERIMENTAL_FREEZE_TOSEM.md`](docs/EXPERIMENTAL_FREEZE_TOSEM.md) | Frozen campaigns (artifact mirror) |
+| [`docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md) | Post-freeze extension study plan |
+| [`docs/tosem_extension_experiments_v1/README.md`](docs/tosem_extension_experiments_v1/README.md) | Extension export manifest |
 | [`docs/specification/BENCHMARK_SPEC.md`](docs/specification/BENCHMARK_SPEC.md) | Normative benchmark definition |
 | [`docs/zenodo/REPRODUCIBILITY.md`](docs/zenodo/REPRODUCIBILITY.md) | Replication tiers and commands |
 | [`docs/dataset_card.md`](docs/dataset_card.md) | Dataset overview |

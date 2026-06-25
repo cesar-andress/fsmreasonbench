@@ -32,3 +32,12 @@ superseded n=20 pilots — full table in the authoritative freeze doc.
 
 No new experiments without explicitly reopening the freeze in `paper/EXPERIMENTAL_FREEZE_TOSEM.md`.
 Scoring, verifier, cohorts, and frozen run outputs must not be edited for release preparation.
+
+---
+
+## Extension campaigns (post-freeze v1)
+
+Additive studies for external TOSEM review — **see authoritative section** in
+[`../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../paper/EXPERIMENTAL_FREEZE_TOSEM.md#extension-campaigns-post-freeze-v1).
+
+Plan: [`TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](TOSEM_EXPERIMENT_EXTENSION_PLAN.md)

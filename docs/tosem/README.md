@@ -50,10 +50,13 @@ Details: [`REPRODUCTION.md`](REPRODUCTION.md)
 ## What is intentionally **not** in the TOSEM manuscript
 
 - Families **F2–F4** and calibration **C1** (specified, not empirically evaluated)
-- Full GPT attribution ladder (no GPT Oracle+Format, R2A, R2B)
+- Full GPT attribution ladder (no GPT Oracle+Format, R2A, R2B) — **extension infrastructure added; campaigns manual**
 - Open-weight attribution ablations (matrix is R0/R1/R2 only)
 - Cross-temperature replication (T=0.2 only)
 - Gemini / DeepSeek frontier results
+
+**Post-freeze extensions (manual):** run-to-run replicates, full GPT ladder, cross-model exports —
+[`../TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](../TOSEM_EXPERIMENT_EXTENSION_PLAN.md)
 
 ---
 
