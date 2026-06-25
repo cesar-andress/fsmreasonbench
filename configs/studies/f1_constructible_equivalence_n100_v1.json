@@ -1,0 +1,34 @@
+{
+  "study_id": "f1_constructible_equivalence_n100_v1",
+  "cohort_root": "cohorts/v0.1-expanded-n100",
+  "temperature": 0.2,
+  "witness_contract": "bisimulation_witness",
+  "subset": "f1_equivalence_n51",
+  "cells": [
+    {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-20250929",
+      "track": "R1",
+      "out_dir": "runs/f1_constructible_equivalence_claude_n100_v1"
+    },
+    {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-20250929",
+      "track": "R2C",
+      "out_dir": "runs/f1_constructible_equivalence_claude_n100_v1"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "track": "R1",
+      "out_dir": "runs/f1_constructible_equivalence_gpt_n100_v1"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "track": "R2C",
+      "out_dir": "runs/f1_constructible_equivalence_gpt_n100_v1"
+    }
+  ],
+  "notes": "Experiment A1: constructible bisimulation witness on F1 equivalence subset only. Optional R2 cells may be added later."
+}
