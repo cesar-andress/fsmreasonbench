@@ -31,6 +31,7 @@ Use `CITATION.cff` or the DOI above. Git `main` is for development; **do not cit
 | **Paper-support analyses** | Verifier audit ($16/16$), hash-mismatch decomposition, bootstrap/McNemar exports |
 | **TOSEM package** | [`docs/tosem_empirical_package_v1/`](docs/tosem_empirical_package_v1/) — Claude+GPT+local TOSEM tables |
 | **Extension experiments (manual)** | [`docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md) — replicates + GPT ladder (post-freeze) |
+| **Constructible equivalence (A1)** | [`docs/TOSEM_A1_EXPERIMENT_PLAN.md`](docs/TOSEM_A1_EXPERIMENT_PLAN.md) — bisimulation witness construct-validity study |
 | **Historical TMLR package** | [`docs/tmlr_empirical_package_v1/`](docs/tmlr_empirical_package_v1/) — Claude ablations (still used by export) |
 | **Documentation** | Normative spec, reproducibility policies, dataset card |
 
