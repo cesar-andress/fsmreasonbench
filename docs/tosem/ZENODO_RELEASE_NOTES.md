@@ -2,7 +2,7 @@
 
 **Status:** preparation notes only — **no DOI minted**, **no upload performed**  
 **Base artifact:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0 ([10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937))  
-**Companion paper:** ACM TOSEM manuscript in [`../../paper/`](../../paper/)
+**Companion paper:** ACM TOSEM manuscript in [`../../../paper/`](../../../paper/)
 
 This document describes what a **follow-on Zenodo deposit** (or v1.0.1 tarball refresh) should
 contain to support TOSEM reviewers. It does not supersede the published v1.0.0 record until a
@@ -59,7 +59,7 @@ Manifests include per-item SHA-256 (`manifest.json`, `sha256sums.txt`).
 
 ## Frozen run paths (TOSEM evidence)
 
-See authoritative list in [`../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../paper/EXPERIMENTAL_FREEZE_TOSEM.md).
+See authoritative list in [`../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md).
 
 Summary:
 

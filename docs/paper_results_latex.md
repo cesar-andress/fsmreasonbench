@@ -3,8 +3,8 @@
 **PAPER FREEZE · 2026-06-20**
 
 Canonical prose: [`paper_results.md`](paper_results.md)  
-LaTeX section: [`../paper/results_frozen.tex`](../paper/results_frozen.tex)  
-Tables: [`../paper/tables/`](../paper/tables/) (`*_n100*.tex`)
+LaTeX manuscript: [`../../paper/main.tex`](../../paper/main.tex) (§6–§7 and appendix)  
+Tables: [`../../paper/tables/`](../../paper/tables/) (`*_n100*.tex`)
 
 Integrate into the manuscript with:
 
@@ -67,7 +67,7 @@ Exploratory cohorts; single frontier model configuration; no bootstrap CIs for n
 
 ## Table 1 — Local matrix summary
 
-See [`../paper/tables/local_matrix_n100_summary.tex`](../paper/tables/local_matrix_n100_summary.tex) (`\label{tab:local-matrix-n100-summary}`).
+See [`../../paper/tables/local_matrix_n100_summary.tex`](../../paper/tables/local_matrix_n100_summary.tex) (`\label{tab:local-matrix-n100-summary}`).
 
 24 rows: all models × C2/F1 × R0/R1/R2. Columns: Model, Family, Track, n, Extract., Verdict, Cert., Full.
 
@@ -75,7 +75,7 @@ See [`../paper/tables/local_matrix_n100_summary.tex`](../paper/tables/local_matr
 
 ## Table 2 — Claude Sonnet summary
 
-See [`../paper/tables/claude_sonnet_tools_n100_summary.tex`](../paper/tables/claude_sonnet_tools_n100_summary.tex) (`\label{tab:claude-sonnet-tools-n100-summary}`).
+See [`../../paper/tables/claude_sonnet_tools_n100_summary.tex`](../../paper/tables/claude_sonnet_tools_n100_summary.tex) (`\label{tab:claude-sonnet-tools-n100-summary}`).
 
 | Fam | Track | Extract | Verdict | Cert | Full |
 |-----|-------|--------:|--------:|-----:|-----:|
@@ -88,7 +88,7 @@ See [`../paper/tables/claude_sonnet_tools_n100_summary.tex`](../paper/tables/cla
 
 ## Table 3 — Knowing–Showing gap
 
-See [`../paper/tables/knowing_showing_gap_n100.tex`](../paper/tables/knowing_showing_gap_n100.tex) (`\label{tab:knowing-showing-gap-n100}`).
+See [`../../paper/tables/knowing_showing_gap_n100.tex`](../../paper/tables/knowing_showing_gap_n100.tex) (`\label{tab:knowing-showing-gap-n100}`).
 
 28 rows (24 local + 4 Claude). Columns: Model, Family, Track, Verdict, Certificate, Full, **Gap = Verdict − Full**.
 
@@ -105,7 +105,7 @@ See [`../paper/tables/knowing_showing_gap_n100.tex`](../paper/tables/knowing_sho
 
 ## Table 4 — Failure-stage decomposition
 
-See [`../paper/tables/failure_stage_n100.tex`](../paper/tables/failure_stage_n100.tex) (`\label{tab:failure-stage-n100}`).
+See [`../../paper/tables/failure_stage_n100.tex`](../../paper/tables/failure_stage_n100.tex) (`\label{tab:failure-stage-n100}`).
 
 Columns: Model, Family, Track, Not Extractable, Verdict Wrong, Certificate Invalid, Correct (counts summing to 100).
 

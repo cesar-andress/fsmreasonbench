@@ -110,7 +110,7 @@ PYTHONPATH=src python3.11 -m fsmreasonbench.cli.validate_cohort \
 
 Exploratory cohorts must not be treated as the final benchmark dataset. See
 [`docs/zenodo/REPRODUCIBILITY.md`](zenodo/REPRODUCIBILITY.md) and
-[`cohorts/MANIFEST_SPEC.md`](../../cohorts/MANIFEST_SPEC.md).
+[`cohorts/MANIFEST_SPEC.md`](../cohorts/MANIFEST_SPEC.md).
 
 ---
 
@@ -162,7 +162,7 @@ Each **item** includes:
 **Internal / evaluator use:** full items via `BenchmarkItem.to_full_dict()` include
 `answer_key` with gold verdict and oracle certificate.
 
-Example items: [`examples/README.md`](../../examples/README.md).
+Example items: [`examples/README.md`](../examples/README.md).
 
 ---
 
@@ -180,7 +180,7 @@ Implemented certificate types:
 | F1 | `equivalence_witness` | Equivalence — minimized language hashes |
 
 All certificates use a typed envelope (`certificate_type`, `payload`, optional `fsm_ids` for F1).
-JSON schemas: [`schema/certificate/`](../../schema/certificate/).
+JSON schemas: [`schema/certificate/`](../schema/certificate/).
 
 The **verifier** re-simulates or recomputes checks independently of the generator and oracle.
 Architectural rule: verifier must not import generator code.
@@ -368,7 +368,7 @@ Threats and design principles are discussed in the companion paper draft (`paper
 
 Release planning: [`docs/zenodo/RELEASE_CHECKLIST.md`](zenodo/RELEASE_CHECKLIST.md),
 [`docs/IMPLEMENTATION_ROADMAP.md`](IMPLEMENTATION_ROADMAP.md),
-[`PROJECT_STATUS.md`](../../PROJECT_STATUS.md).
+[`PROJECT_STATUS.md`](../PROJECT_STATUS.md).
 
 ---
 
@@ -378,8 +378,8 @@ Cite the published Zenodo release:
 
 **DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)
 
-See [`CITATION.cff`](../../CITATION.cff) at the repository root. Include cohort identifier
-`v0.1-expanded-n100` and version pins from [`releases/1.0.0/release_manifest.json`](../../releases/1.0.0/release_manifest.json)
+See [`CITATION.cff`](../CITATION.cff) at the repository root. Include cohort identifier
+`v0.1-expanded-n100` and version pins from [`releases/1.0.0/release_manifest.json`](../releases/1.0.0/release_manifest.json)
 when reproducing paper analyses.
 
 ---
@@ -391,5 +391,5 @@ when reproducing paper analyses.
 | Implementation roadmap | [`docs/IMPLEMENTATION_ROADMAP.md`](IMPLEMENTATION_ROADMAP.md) |
 | Versioning | [`docs/versioning_policy.md`](versioning_policy.md) |
 | Release policy | [`docs/artifact/release_policy.md`](artifact/release_policy.md) |
-| Examples and CLIs | [`examples/README.md`](../../examples/README.md) |
-| Project status | [`PROJECT_STATUS.md`](../../PROJECT_STATUS.md) |
+| Examples and CLIs | [`examples/README.md`](../examples/README.md) |
+| Project status | [`PROJECT_STATUS.md`](../PROJECT_STATUS.md) |

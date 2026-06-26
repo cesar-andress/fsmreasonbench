@@ -7,12 +7,6 @@
   },
   {
     "category": "doi",
-    "component": "stale DOI in scripts/archival_qa_audit.py",
-    "status": "fail",
-    "detail": "10.5281/zenodo.20836348"
-  },
-  {
-    "category": "doi",
     "component": "ARTIFACT_VERSION",
     "status": "pass",
     "detail": ""
@@ -409,15 +403,15 @@
   },
   {
     "category": "readme_link",
-    "component": "cohorts/MANIFEST_SPEC.md \u2192 ../artifact/release_policy.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/artifact/release_policy.md"
+    "component": "cohorts/MANIFEST_SPEC.md \u2192 ../docs/artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "cohorts/MANIFEST_SPEC.md \u2192 ../artifact/reproducibility_policy.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/artifact/reproducibility_policy.md"
+    "component": "cohorts/MANIFEST_SPEC.md \u2192 ../docs/artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -439,15 +433,15 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../paper/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper"
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../../paper/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -499,9 +493,9 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -787,15 +781,15 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/artifact/FROZEN_VS_DEVELOPMENT.md \u2192 ../releases/1.0.0/release_manifest.json",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/releases/1.0.0/release_manifest.json"
+    "component": "docs/artifact/FROZEN_VS_DEVELOPMENT.md \u2192 ../../releases/1.0.0/release_manifest.json",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/artifact/FROZEN_VS_DEVELOPMENT.md \u2192 ../ARTIFACT_VERSION",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/ARTIFACT_VERSION"
+    "component": "docs/artifact/FROZEN_VS_DEVELOPMENT.md \u2192 ../../ARTIFACT_VERSION",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1045,15 +1039,15 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../schema/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/schema"
+    "component": "docs/dataset_card.md \u2192 ../schema/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../examples/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/examples"
+    "component": "docs/dataset_card.md \u2192 ../examples/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1081,9 +1075,9 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../cohorts/MANIFEST_SPEC.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/cohorts/MANIFEST_SPEC.md"
+    "component": "docs/dataset_card.md \u2192 ../cohorts/MANIFEST_SPEC.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1111,9 +1105,9 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../examples/README.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/examples/README.md"
+    "component": "docs/dataset_card.md \u2192 ../examples/README.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1123,9 +1117,9 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../schema/certificate/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/schema/certificate"
+    "component": "docs/dataset_card.md \u2192 ../schema/certificate/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1207,21 +1201,21 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../PROJECT_STATUS.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/PROJECT_STATUS.md"
+    "component": "docs/dataset_card.md \u2192 ../PROJECT_STATUS.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../CITATION.cff",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/CITATION.cff"
+    "component": "docs/dataset_card.md \u2192 ../CITATION.cff",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../releases/1.0.0/release_manifest.json",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/releases/1.0.0/release_manifest.json"
+    "component": "docs/dataset_card.md \u2192 ../releases/1.0.0/release_manifest.json",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1243,15 +1237,15 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../examples/README.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/examples/README.md"
+    "component": "docs/dataset_card.md \u2192 ../examples/README.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/dataset_card.md \u2192 ../../PROJECT_STATUS.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/PROJECT_STATUS.md"
+    "component": "docs/dataset_card.md \u2192 ../PROJECT_STATUS.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1297,9 +1291,9 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/historical/README.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+    "component": "docs/historical/README.md \u2192 ../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1393,39 +1387,39 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/paper_results_latex.md \u2192 ../paper/results_frozen.tex",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/results_frozen.tex"
+    "component": "docs/paper_results_latex.md \u2192 ../../paper/main.tex",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables"
+    "component": "docs/paper_results_latex.md \u2192 ../../paper/tables/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/local_matrix_n100_summary.tex",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables/local_matrix_n100_summary.tex"
+    "component": "docs/paper_results_latex.md \u2192 ../../paper/tables/local_matrix_n100_summary.tex",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/claude_sonnet_tools_n100_summary.tex",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables/claude_sonnet_tools_n100_summary.tex"
+    "component": "docs/paper_results_latex.md \u2192 ../../paper/tables/claude_sonnet_tools_n100_summary.tex",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/knowing_showing_gap_n100.tex",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables/knowing_showing_gap_n100.tex"
+    "component": "docs/paper_results_latex.md \u2192 ../../paper/tables/knowing_showing_gap_n100.tex",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/failure_stage_n100.tex",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables/failure_stage_n100.tex"
+    "component": "docs/paper_results_latex.md \u2192 ../../paper/tables/failure_stage_n100.tex",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1435,15 +1429,15 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/release_v1_0_0_zenodo_audit.md \u2192 ../../PROJECT_STATUS.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/PROJECT_STATUS.md"
+    "component": "docs/release_v1_0_0_zenodo_audit.md \u2192 ../PROJECT_STATUS.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/release_v1_0_0_zenodo_audit.md \u2192 ../../releases/1.0.0/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/releases/1.0.0"
+    "component": "docs/release_v1_0_0_zenodo_audit.md \u2192 ../releases/1.0.0/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1705,15 +1699,15 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/tosem/README.md \u2192 ../../paper/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper"
+    "component": "docs/tosem/README.md \u2192 ../../../paper/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
-    "component": "docs/tosem/README.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+    "component": "docs/tosem/README.md \u2192 ../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1813,9 +1807,9 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/tosem/ZENODO_RELEASE_NOTES.md \u2192 ../../paper/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper"
+    "component": "docs/tosem/ZENODO_RELEASE_NOTES.md \u2192 ../../../paper/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1825,9 +1819,9 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/tosem/ZENODO_RELEASE_NOTES.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+    "component": "docs/tosem/ZENODO_RELEASE_NOTES.md \u2192 ../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -1927,9 +1921,9 @@
   },
   {
     "category": "readme_link",
-    "component": "docs/zenodo/README.md \u2192 ../../paper/",
-    "status": "fail",
-    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper"
+    "component": "docs/zenodo/README.md \u2192 ../../../paper/",
+    "status": "pass",
+    "detail": ""
   },
   {
     "category": "readme_link",
@@ -2569,9 +2563,9 @@
   },
   {
     "category": "freeze",
-    "component": "run path parity paper \u2194 artifact",
-    "status": "fail",
-    "detail": "only_art=6 only_paper=31"
+    "component": "campaign roots in paper cover artifact summary",
+    "status": "pass",
+    "detail": "[]"
   },
   {
     "category": "freeze_run",
@@ -2613,12 +2607,6 @@
     "category": "freeze_run",
     "component": "runs/frontier_claude_sonnet_tools_n100_v2/",
     "status": "pass",
-    "detail": ""
-  },
-  {
-    "category": "freeze_run",
-    "component": "runs/frontier_gemini_*",
-    "status": "fail",
     "detail": ""
   },
   {

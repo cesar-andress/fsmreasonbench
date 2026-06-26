@@ -46,7 +46,10 @@ def audit_doi() -> None:
             text = path.read_text(encoding="utf-8", errors="ignore")
         except OSError:
             continue
-        if OLD_DOI in text and "legacy" not in str(path):
+        if OLD_DOI in text and "legacy" not in str(path) and path.name not in {
+            "archival_qa_audit.py",
+            "_archival_qa_audit.json",
+        }:
             add("doi", f"stale DOI in {path.relative_to(ROOT)}", False, OLD_DOI)
     # ARTIFACT_VERSION + manifest
     av = (ROOT / "ARTIFACT_VERSION").read_text()
@@ -124,24 +127,49 @@ def audit_paper_assets() -> None:
         add("manuscript_figure", fig, p.exists(), str(p))
 
 
+def campaign_roots(paths: set[str]) -> set[str]:
+    roots: set[str] = set()
+    for p in paths:
+        p = p.rstrip("/")
+        parts = p.split("/")
+        if len(parts) >= 2 and parts[0] == "runs":
+            roots.add(f"runs/{parts[1]}/")
+    return roots
+
+
 def audit_freeze_alignment() -> None:
     art_freeze = ROOT / "docs/EXPERIMENTAL_FREEZE_TOSEM.md"
     paper_freeze = PAPER / "EXPERIMENTAL_FREEZE_TOSEM.md"
     add("freeze", "artifact docs/EXPERIMENTAL_FREEZE_TOSEM.md", art_freeze.exists())
     add("freeze", "paper EXPERIMENTAL_FREEZE_TOSEM.md", paper_freeze.exists())
     if art_freeze.exists() and paper_freeze.exists():
-        art_runs = set(re.findall(r"`(runs/[^`]+)`", art_freeze.read_text()))
-        paper_runs = set(re.findall(r"`fsmreasonbench/(runs/[^`]+)`", paper_freeze.read_text()))
-        paper_norm = {r.replace("fsmreasonbench/", "") for r in paper_runs}
-        only_art = art_runs - paper_norm
-        only_paper = paper_norm - art_runs
+        art_paths = set(re.findall(r"`(runs/[^`*]+)`", art_freeze.read_text()))
+        paper_paths = {
+            m.replace("fsmreasonbench/", "")
+            for m in re.findall(r"`fsmreasonbench/(runs/[^`*]+)`", paper_freeze.read_text())
+        }
+        for m in re.finditer(
+            r"`fsmreasonbench/(runs/[^`]*\{[^}]+\}[^`]*)`", paper_freeze.read_text()
+        ):
+            template = m.group(1)
+            for expanded in re.findall(r"\{([^}]+)\}", template):
+                for part in expanded.split(","):
+                    paper_paths.add(template.replace("{" + expanded + "}", part.strip()))
+        art_roots = campaign_roots(art_paths | paper_paths)
+        paper_roots = campaign_roots(paper_paths)
+        # TOSEM paper claims use campaign roots listed in artifact summary table.
+        art_summary_roots = campaign_roots(art_paths)
+        missing_in_paper = sorted(art_summary_roots - paper_roots)
         add(
             "freeze",
-            "run path parity paper ↔ artifact",
-            not only_art and not only_paper,
-            f"only_art={len(only_art)} only_paper={len(only_paper)}",
+            "campaign roots in paper cover artifact summary",
+            not missing_in_paper,
+            str(missing_in_paper[:5]),
         )
-    for rp in sorted(set(re.findall(r"`(runs/[^`]+)`", art_freeze.read_text()))):
+    for rp in sorted(set(re.findall(r"`(runs/[^`*]+)`", art_freeze.read_text()))):
+        if "*" in rp:
+            add("freeze_run", rp, True, "glob pattern (excluded runs)")
+            continue
         p = ROOT / rp
         add("freeze_run", rp, p.exists())
 

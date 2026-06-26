@@ -15,6 +15,6 @@ ACM TOSEM companion study.
 
 - [`../tosem/README.md`](../tosem/README.md)
 - [`../EXPERIMENTAL_FREEZE_TOSEM.md`](../EXPERIMENTAL_FREEZE_TOSEM.md)
-- [`../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../paper/EXPERIMENTAL_FREEZE_TOSEM.md)
+- [`../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md)
 
 Nothing in this index should be deleted without archiving provenance elsewhere.

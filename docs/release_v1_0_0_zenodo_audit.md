@@ -2,8 +2,8 @@
 
 > **Superseded for publication status.** FSMReasonBench v1.0.0 was published on Zenodo with
 > DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937). This report records
-> the **pre-publication** audit snapshot (2026-06-20). See [`PROJECT_STATUS.md`](../../PROJECT_STATUS.md)
-> and [`releases/1.0.0/`](../../releases/1.0.0/) for current state.
+> the **pre-publication** audit snapshot (2026-06-20). See [`PROJECT_STATUS.md`](../PROJECT_STATUS.md)
+> and [`releases/1.0.0/`](../releases/1.0.0/) for current state.
 
 **Audit date:** 2026-06-20  
 **Auditor role:** release-quality check (not research review)  
