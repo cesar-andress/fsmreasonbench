@@ -1,0 +1,2648 @@
+[
+  {
+    "category": "doi",
+    "component": "canonical DOI 10.5281/zenodo.20897937",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "doi",
+    "component": "stale DOI in scripts/archival_qa_audit.py",
+    "status": "fail",
+    "detail": "10.5281/zenodo.20836348"
+  },
+  {
+    "category": "doi",
+    "component": "ARTIFACT_VERSION",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "doi",
+    "component": "release_manifest.json zenodo.primary_doi",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 ../paper/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 ../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 releases/1.0.0/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 CITATION.cff",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 LICENSE",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 cohorts/v0.1-expanded-n100/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/f1_equivalence_witness_verifier_audit.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/equivalence_hash_mismatch_decomposition.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/certificate_class_complexity_analysis.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/tmlr_empirical_package_v1/uncertainty/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/tosem_empirical_package_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/tmlr_empirical_package_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/paper_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 cohorts/v0.1-exploratory/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/releases/v0.1-exploratory.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 README-RELEASE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 scripts/reproduce_tosem_tables.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/specification/evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/release_v1_0_0_zenodo_audit.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/PAPER_FREEZE_AUDIT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/historical/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "PROJECT_STATUS.md \u2192 docs/tosem/ZENODO_RELEASE_NOTES.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README-RELEASE.md \u2192 REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README-RELEASE.md \u2192 docs/REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README-RELEASE.md \u2192 docs/tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README-RELEASE.md \u2192 docs/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README-RELEASE.md \u2192 docs/artifact/FROZEN_VS_DEVELOPMENT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README-RELEASE.md \u2192 CITATION.cff",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 LICENSE",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 pyproject.toml",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 ARTIFACT_VERSION",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 releases/1.0.0/release_manifest.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/artifact/FROZEN_VS_DEVELOPMENT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/specification/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 cohorts/v0.1-expanded-n100/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 src/fsmreasonbench/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 runs/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/tosem_empirical_package_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/a1_constructible_equivalence_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 scripts/reproduce_tosem_tables.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/artifact/repository_layout.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 ../paper/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 ../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/tosem/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 README-RELEASE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 docs/artifact/FROZEN_VS_DEVELOPMENT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 CITATION.cff",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "README.md \u2192 LICENSE",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "REVIEWER.md \u2192 docs/REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "REVIEWER.md \u2192 docs/tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "REVIEWER.md \u2192 docs/artifact/FROZEN_VS_DEVELOPMENT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "cohorts/MANIFEST_SPEC.md \u2192 ../artifact/release_policy.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/artifact/release_policy.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "cohorts/MANIFEST_SPEC.md \u2192 ../artifact/reproducibility_policy.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/artifact/reproducibility_policy.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "cohorts/README.md \u2192 MANIFEST_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "cohorts/README.md \u2192 v0.1-expanded-n100/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "cohorts/README.md \u2192 v0.1-exploratory/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../paper/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../README-RELEASE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 tosem_empirical_package_v1/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 historical/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/ARTIFACT_RELEASE_REPORT.md \u2192 ../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/EXPERIMENTAL_FREEZE_TOSEM.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/EXPERIMENTAL_FREEZE_TOSEM.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/EXPERIMENTAL_FREEZE_TOSEM.md \u2192 TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 ../REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 ../README-RELEASE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 ../scripts/reproduce_tosem_tables.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 tosem/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 tosem_empirical_package_v1/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 a1_constructible_equivalence_v1/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 specification/evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 dataset_card.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 artifact/FROZEN_VS_DEVELOPMENT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 artifact/repository_layout.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 zenodo/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 ../releases/1.0.0/RELEASE_NOTES.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/README.md \u2192 historical/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 artifact/FROZEN_VS_DEVELOPMENT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 artifact/repository_layout.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 tosem/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 ../README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 ../README-RELEASE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/REVIEWER.md \u2192 ../CITATION.cff",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_A1_EXPERIMENT_PLAN.md \u2192 constructible_equivalence_witness_experiment.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_A1_EXPERIMENT_PLAN.md \u2192 TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_A1_EXPERIMENT_PLAN.md \u2192 f1_equivalence_witness_verifier_audit.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 tosem/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 tosem/ZENODO_RELEASE_NOTES.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 historical/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 paper_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 frontier_gpt_campaign.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 ../scripts/reproduce_tosem_tables.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/TOSEM_ARTIFACT_BRANCH_READINESS.md \u2192 ../scripts/reproduce_table.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/FROZEN_VS_DEVELOPMENT.md \u2192 ../releases/1.0.0/release_manifest.json",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/releases/1.0.0/release_manifest.json"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/FROZEN_VS_DEVELOPMENT.md \u2192 ../ARTIFACT_VERSION",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/docs/ARTIFACT_VERSION"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/FROZEN_VS_DEVELOPMENT.md \u2192 github_vs_zenodo.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 FROZEN_VS_DEVELOPMENT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 artifact_philosophy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 repository_layout.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 ../versioning_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 contamination_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 archival_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 github_vs_zenodo.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 zenodo_checklist.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/README.md \u2192 ../specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/archival_policy.md \u2192 github_vs_zenodo.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/archival_policy.md \u2192 artifact_philosophy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/archival_policy.md \u2192 release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/archival_policy.md \u2192 reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/artifact_philosophy.md \u2192 release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/artifact_philosophy.md \u2192 ../versioning_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/artifact_philosophy.md \u2192 reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/artifact_philosophy.md \u2192 contamination_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/artifact_philosophy.md \u2192 archival_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/artifact_philosophy.md \u2192 repository_layout.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/contamination_policy.md \u2192 release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/contamination_policy.md \u2192 ../specification/evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/github_vs_zenodo.md \u2192 archival_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/github_vs_zenodo.md \u2192 release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/github_vs_zenodo.md \u2192 ../../PROJECT_STATUS.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/release_policy.md \u2192 zenodo_checklist.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/release_policy.md \u2192 ../versioning_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/release_policy.md \u2192 reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/release_policy.md \u2192 archival_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/release_policy.md \u2192 ../specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/repository_layout.md \u2192 artifact_philosophy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/repository_layout.md \u2192 release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/reproducibility_policy.md \u2192 release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/reproducibility_policy.md \u2192 archival_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/artifact/reproducibility_policy.md \u2192 ../specification/evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/constructible_equivalence_witness_experiment.md \u2192 TOSEM_A1_EXPERIMENT_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 zenodo/DATASET_STRUCTURE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../schema/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/schema"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../examples/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/examples"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 artifact/artifact_philosophy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../cohorts/MANIFEST_SPEC.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/cohorts/MANIFEST_SPEC.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/task_families.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/task_families.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/difficulty_model.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 zenodo/DATASET_STRUCTURE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../examples/README.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/examples/README.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/certificate_formats.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../schema/certificate/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/schema/certificate"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/difficulty_model.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 f1_mixed_failure_taxonomy_report.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 specification/difficulty_model.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 zenodo/RELEASE_CHECKLIST.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 artifact/contamination_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 zenodo/RELEASE_CHECKLIST.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 IMPLEMENTATION_ROADMAP.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../PROJECT_STATUS.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/PROJECT_STATUS.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../CITATION.cff",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/CITATION.cff"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../releases/1.0.0/release_manifest.json",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/releases/1.0.0/release_manifest.json"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 IMPLEMENTATION_ROADMAP.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 versioning_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../examples/README.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/examples/README.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/dataset_card.md \u2192 ../../PROJECT_STATUS.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/PROJECT_STATUS.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/frontier_provider_backends.md \u2192 paper_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/historical/README.md \u2192 ../tmlr_empirical_package_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/historical/README.md \u2192 ../tmlr_empirical_package_v1/narrative_memo.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/historical/README.md \u2192 ../PAPER_FREEZE_AUDIT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/historical/README.md \u2192 ../releases/v0.1-exploratory.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/historical/README.md \u2192 ../tosem/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/historical/README.md \u2192 ../EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/historical/README.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/llm_track_runner_design.md \u2192 local_model_matrix_experiment.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/llm_track_runner_design.md \u2192 local_model_matrix_experiment.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/local_matrix_n100_t02_analysis.md \u2192 paper_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_local_results.md \u2192 paper_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_local_results.md \u2192 paper_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 ../scripts/reproduce_tosem_tables.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 paper_results_latex.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 PAPER_FREEZE_AUDIT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 paper_local_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 local_matrix_n100_t02_analysis.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 paper_local_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results.md \u2192 paper_local_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results_latex.md \u2192 paper_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results_latex.md \u2192 ../paper/results_frozen.tex",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/results_frozen.tex"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/local_matrix_n100_summary.tex",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables/local_matrix_n100_summary.tex"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/claude_sonnet_tools_n100_summary.tex",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables/claude_sonnet_tools_n100_summary.tex"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/knowing_showing_gap_n100.tex",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables/knowing_showing_gap_n100.tex"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/paper_results_latex.md \u2192 ../paper/tables/failure_stage_n100.tex",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/tables/failure_stage_n100.tex"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/q1_readiness_roadmap.md \u2192 local_model_matrix_experiment.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/release_v1_0_0_zenodo_audit.md \u2192 ../../PROJECT_STATUS.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/PROJECT_STATUS.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/release_v1_0_0_zenodo_audit.md \u2192 ../../releases/1.0.0/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/releases/1.0.0"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../dataset_card.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../../examples/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../specification/evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../../PROJECT_STATUS.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../dataset_card.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../zenodo/RELEASE_CHECKLIST.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../../cohorts/MANIFEST_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/releases/v0.1-exploratory.md \u2192 ../../examples/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/repository_documentation_audit.md \u2192 ../README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../artifact/artifact_philosophy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 task_families.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 difficulty_model.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 difficulty_model.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../artifact/contamination_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../artifact/archival_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../versioning_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../../cohorts/MANIFEST_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../artifact/contamination_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../versioning_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 task_families.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 certificate_formats.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 difficulty_model.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 evaluation_protocol.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../artifact/artifact_philosophy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../artifact/repository_layout.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/BENCHMARK_SPEC.md \u2192 ../versioning_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/certificate_formats.md \u2192 BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/difficulty_model.md \u2192 BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/evaluation_protocol.md \u2192 BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/evaluation_protocol.md \u2192 ../artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/evaluation_protocol.md \u2192 ../artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/evaluation_protocol.md \u2192 ../artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/evaluation_protocol.md \u2192 certificate_formats.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/task_families.md \u2192 BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/task_families.md \u2192 ../../cohorts/MANIFEST_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/specification/task_families.md \u2192 ../f2_design_review.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../../REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../../paper/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../tmlr_empirical_package_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../historical/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ZENODO_RELEASE_NOTES.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../tosem_empirical_package_v1/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/README.md \u2192 ../paper_results.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/REPRODUCTION.md \u2192 ../../REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/REPRODUCTION.md \u2192 ../REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/REPRODUCTION.md \u2192 ../../ARTIFACT_VERSION",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/REPRODUCTION.md \u2192 ../artifact/FROZEN_VS_DEVELOPMENT.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/REPRODUCTION.md \u2192 ../tosem_empirical_package_v1/package_manifest.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/REPRODUCTION.md \u2192 ../TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/ZENODO_RELEASE_NOTES.md \u2192 ../../paper/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/ZENODO_RELEASE_NOTES.md \u2192 ../EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem/ZENODO_RELEASE_NOTES.md \u2192 ../../paper/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper/EXPERIMENTAL_FREEZE_TOSEM.md"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem_empirical_package_v1/README.md \u2192 ../tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem_empirical_package_v1/README.md \u2192 ../../scripts/reproduce_tosem_tables.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem_extension_experiments_v1/README.md \u2192 ../EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/tosem_extension_experiments_v1/README.md \u2192 ../TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/versioning_policy.md \u2192 artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/versioning_policy.md \u2192 artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/DATASET_STRUCTURE.md \u2192 ../../schema/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/DATASET_STRUCTURE.md \u2192 ../../examples/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/DATASET_STRUCTURE.md \u2192 ../../schema/question.schema.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/DATASET_STRUCTURE.md \u2192 ../../schema/fsm.schema.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/DATASET_STRUCTURE.md \u2192 ../../schema/answer.schema.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/DATASET_STRUCTURE.md \u2192 ../specification/certificate_formats.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/DATASET_STRUCTURE.md \u2192 ../../examples/transcript_C2_correct.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/DATASET_STRUCTURE.md \u2192 ../artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../../REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../REVIEWER.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../../paper/",
+    "status": "fail",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/paper"
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../tosem/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../specification/BENCHMARK_SPEC.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../artifact/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../../releases/1.0.0/release_manifest.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../../cohorts/v0.1-expanded-n100/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 DATASET_STRUCTURE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 RELEASE_CHECKLIST.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../tosem/ZENODO_RELEASE_NOTES.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../../README-RELEASE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../a1_constructible_equivalence_v1/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../tmlr_empirical_package_v1/README.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/README.md \u2192 ../artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 ../artifact/zenodo_checklist.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 ../artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 DATASET_STRUCTURE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 ../artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 ../artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 ../artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 ../artifact/archival_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 DATASET_STRUCTURE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/RELEASE_CHECKLIST.md \u2192 REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/REPRODUCIBILITY.md \u2192 ../artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/REPRODUCIBILITY.md \u2192 ../tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/REPRODUCIBILITY.md \u2192 ../../scripts/reproduce_tosem_tables.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/REPRODUCIBILITY.md \u2192 ../../examples/transcript_C2_correct.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/REPRODUCIBILITY.md \u2192 RELEASE_CHECKLIST.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "docs/zenodo/REPRODUCIBILITY.md \u2192 ../TOSEM_EXPERIMENT_EXTENSION_PLAN.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "examples/README.md \u2192 ../docs/f2_design_review.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "examples/README.md \u2192 ../docs/local_model_matrix_experiment.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "examples/README.md \u2192 ../docs/local_model_matrix_experiment.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "examples/README.md \u2192 capability_surface_summary_synthetic.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "examples/README.md \u2192 ../docs/publication_readiness.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "paper_reproduction/README.md \u2192 ../../paper/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "paper_reproduction/README.md \u2192 ../docs/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "paper_reproduction/README.md \u2192 ../../paper/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "paper_reproduction/README.md \u2192 ../docs/tosem/REPRODUCTION.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "paper_reproduction/README.md \u2192 ../docs/artifact/reproducibility_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "releases/1.0.0/RELEASE_NOTES.md \u2192 release_manifest.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "releases/1.0.0/RELEASE_NOTES.md \u2192 ../../CITATION.cff",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "releases/1.0.0/RELEASE_NOTES.md \u2192 ../../README-RELEASE.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "releases/1.0.0/RELEASE_NOTES.md \u2192 ../../docs/zenodo/REPRODUCIBILITY.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "releases/README.md \u2192 1.0.0/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "releases/README.md \u2192 TEMPLATE/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "releases/README.md \u2192 1.0.0/release_manifest.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "releases/README.md \u2192 ../docs/artifact/release_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "schema/README.md \u2192 VERSION",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "readme_link",
+    "component": "schema/README.md \u2192 ../docs/versioning_policy.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "script",
+    "component": "scripts/reproduce_tosem_tables.sh",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "script",
+    "component": "scripts/archival_qa_audit.py",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "script",
+    "component": "cli fsmreasonbench.cli.validate_cohort (validate_cohort)",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/src/fsmreasonbench/cli/validate_cohort.py"
+  },
+  {
+    "category": "script",
+    "component": "cli fsmreasonbench.cli.export_tmlr_empirical_package (export_paper_package)",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/src/fsmreasonbench/cli/export_tmlr_empirical_package.py"
+  },
+  {
+    "category": "script",
+    "component": "cli fsmreasonbench.cli.artifact_health (artifact_health)",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/fsmreasonbench/src/fsmreasonbench/cli/artifact_health.py"
+  },
+  {
+    "category": "manuscript",
+    "component": "paper/ directory",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{macros}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/macros.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/01_introduction}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/01_introduction.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/02_background}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/02_background.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/03_problem_framework}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/03_problem_framework.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/04_instrument}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/04_instrument.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/05_experimental_design}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/05_experimental_design.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/06_results_gap}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/06_results_gap.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/07_results_mechanism}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/07_results_mechanism.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/08_discussion}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/08_discussion.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/09_threats}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/09_threats.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/10_conclusion}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/10_conclusion.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/artifact_availability}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/artifact_availability.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{sections/generative_ai_disclosure}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/sections/generative_ai_disclosure.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{appendix/appendix_main}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/appendix/appendix_main.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/scoring_dimensions}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/scoring_dimensions.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/design_local_matrix_cells}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/design_local_matrix_cells.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/knowing_showing_gap_n100}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/knowing_showing_gap_n100.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/frontier_tools_comparison_n100}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/frontier_tools_comparison_n100.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/certificate_complexity}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/certificate_complexity.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/benchmark_families}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/benchmark_families.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/f1_claude_ablations}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/f1_claude_ablations.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/f1_gpt_ablations}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/f1_gpt_ablations.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/c2_claude_ablations}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/c2_claude_ablations.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/oracle_ceiling_summary}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/oracle_ceiling_summary.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/extension_constructible_equivalence_witness}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/extension_constructible_equivalence_witness.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/extension_constructible_equivalence_statistics}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/extension_constructible_equivalence_statistics.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/resource_access_conditions}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/resource_access_conditions.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/confound_by_subtype}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/confound_by_subtype.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/local_matrix_n100_summary}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/local_matrix_n100_summary.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/results_bootstrap_subtypes}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/results_bootstrap_subtypes.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/results_paired_mcnemar}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/results_paired_mcnemar.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/appendix_mcnemar_extended}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/appendix_mcnemar_extended.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/appendix_verifier_audit_full}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/appendix_verifier_audit_full.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/appendix_hash_decomposition}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/appendix_hash_decomposition.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{appendix/appendix_a_scoring_protocol}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/appendix/appendix_a_scoring_protocol.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{appendix/appendix_b_local_matrix}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/appendix/appendix_b_local_matrix.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{appendix/appendix_c_failure_confound}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/appendix/appendix_c_failure_confound.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{appendix/appendix_d_statistical_uncertainty}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/appendix/appendix_d_statistical_uncertainty.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{appendix/appendix_e_certificate_class}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/appendix/appendix_e_certificate_class.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{appendix/appendix_f_verifier_hash_audit}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/appendix/appendix_f_verifier_hash_audit.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{appendix/appendix_g_artifact_index}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/appendix/appendix_g_artifact_index.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/failure_stage_n100}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/failure_stage_n100.tex"
+  },
+  {
+    "category": "manuscript_table",
+    "component": "\\input{tables/appendix_failure_taxonomy}",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/tables/appendix_failure_taxonomy.tex"
+  },
+  {
+    "category": "manuscript_figure",
+    "component": "figures/extension_constructible_equivalence_comparison.pdf",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/figures/extension_constructible_equivalence_comparison.pdf"
+  },
+  {
+    "category": "manuscript_figure",
+    "component": "figures/figure_attribution_fingerprint_comparison.pdf",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/figures/figure_attribution_fingerprint_comparison.pdf"
+  },
+  {
+    "category": "manuscript_figure",
+    "component": "figures/figure_certificate_complexity_frontier_comparison.pdf",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/figures/figure_certificate_complexity_frontier_comparison.pdf"
+  },
+  {
+    "category": "manuscript_figure",
+    "component": "figures/figure_knowing_showing_gap_table_panel.pdf",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/figures/figure_knowing_showing_gap_table_panel.pdf"
+  },
+  {
+    "category": "manuscript_figure",
+    "component": "figures/figure_verdict_witness_gap_comparison.pdf",
+    "status": "pass",
+    "detail": "/home/cesar/papers/fsmreasonbench/paper/figures/figure_verdict_witness_gap_comparison.pdf"
+  },
+  {
+    "category": "freeze",
+    "component": "artifact docs/EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze",
+    "component": "paper EXPERIMENTAL_FREEZE_TOSEM.md",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze",
+    "component": "run path parity paper \u2194 artifact",
+    "status": "fail",
+    "detail": "only_art=6 only_paper=31"
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/ablations_c2_existential_universal_claude_n100_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/ablations_f1_r2_attribution_claude_n100_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/ablations_f1_r2c_gpt_n100_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/f1_constructible_equivalence_claude_n100_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/f1_constructible_equivalence_gpt_n100_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/frontier_claude_sonnet_full_n100_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/frontier_claude_sonnet_tools_n100_v2/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/frontier_gemini_*",
+    "status": "fail",
+    "detail": ""
+  },
+  {
+    "category": "freeze_run",
+    "component": "runs/frontier_gpt_tools_n100_v1/",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "export",
+    "component": "docs/tosem_empirical_package_v1/package_manifest.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "export",
+    "component": "docs/tmlr_empirical_package_v1/package_manifest.json",
+    "status": "pass",
+    "detail": ""
+  },
+  {
+    "category": "export",
+    "component": "docs/a1_constructible_equivalence_v1/constructible_equivalence_analysis.json",
+    "status": "pass",
+    "detail": ""
+  }
+]

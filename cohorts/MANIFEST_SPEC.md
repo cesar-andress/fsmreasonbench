@@ -87,5 +87,5 @@ Once published on Zenodo:
 
 ## 7. Related documents
 
-- [`../artifact/release_policy.md`](../artifact/release_policy.md)
-- [`../artifact/reproducibility_policy.md`](../artifact/reproducibility_policy.md)
+- [`../docs/artifact/release_policy.md`](../docs/artifact/release_policy.md)
+- [`../docs/artifact/reproducibility_policy.md`](../docs/artifact/reproducibility_policy.md)

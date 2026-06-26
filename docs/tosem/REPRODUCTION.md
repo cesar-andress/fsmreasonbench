@@ -1,13 +1,13 @@
 # TOSEM read-only reproduction workflow
 
-> **Reviewers arriving from Zenodo:** start at [`../REVIEWER.md`](../REVIEWER.md) or [`../docs/REVIEWER.md`](../docs/REVIEWER.md)
+> **Reviewers arriving from Zenodo:** start at [`../../REVIEWER.md`](../../REVIEWER.md) or [`../REVIEWER.md`](../REVIEWER.md)
 > (≈5 minutes). This document adds tiered detail.
 
 **Policy:** Regenerate manuscript-facing tables from **frozen run outputs** without model API keys
 and without re-running inference.
 
-**Verify snapshot:** [`../ARTIFACT_VERSION`](../ARTIFACT_VERSION) must list `v1.0.0` and DOI
-`10.5281/zenodo.20897937`. See [`../docs/artifact/FROZEN_VS_DEVELOPMENT.md`](../docs/artifact/FROZEN_VS_DEVELOPMENT.md).
+**Verify snapshot:** [`../../ARTIFACT_VERSION`](../../ARTIFACT_VERSION) must list `v1.0.0` and DOI
+`10.5281/zenodo.20897937`. See [`../artifact/FROZEN_VS_DEVELOPMENT.md`](../artifact/FROZEN_VS_DEVELOPMENT.md).
 
 **Python:** ≥ 3.11 (release checks use 3.12)  
 **Install** (from repository root):

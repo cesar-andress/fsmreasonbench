@@ -1,11 +1,11 @@
 # FSMReasonBench — ACM TOSEM companion artifact
 
-> **Reviewers:** [`../REVIEWER.md`](../REVIEWER.md) · [`../docs/REVIEWER.md`](../docs/REVIEWER.md) · one-command
+> **Reviewers:** [`../../REVIEWER.md`](../../REVIEWER.md) · [`../REVIEWER.md`](../REVIEWER.md) · one-command
 > reproduction: `./scripts/reproduce_tosem_tables.sh`
 
 **Target venue:** ACM Transactions on Software Engineering and Methodology (TOSEM)  
-**Manuscript:** [`../../paper/`](../../paper/) (sibling directory in the monorepo)  
-**Authoritative freeze:** [`../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../paper/EXPERIMENTAL_FREEZE_TOSEM.md)  
+**Manuscript:** [`../../../paper/`](../../../paper/) (sibling directory in the monorepo)  
+**Authoritative freeze:** [`../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../../paper/EXPERIMENTAL_FREEZE_TOSEM.md)  
 **Artifact mirror:** [`../EXPERIMENTAL_FREEZE_TOSEM.md`](../EXPERIMENTAL_FREEZE_TOSEM.md)
 
 This folder documents how the **published FSMReasonBench v1.0.0 artifact** supports the

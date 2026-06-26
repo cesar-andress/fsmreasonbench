@@ -6,8 +6,8 @@
 **Release tag:** `FSMReasonBench v1.0.0`  
 **Release date:** 2026-06-25 (UTC)  
 **Repository:** `fsmreasonbench` (artifact root)  
-**Manuscript:** ACM TOSEM companion in [`../paper/`](../paper/) — feature complete, experiments frozen  
-**Authoritative freeze:** [`../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../paper/EXPERIMENTAL_FREEZE_TOSEM.md)
+**Manuscript:** ACM TOSEM companion in [`../../paper/`](../../paper/) — feature complete, experiments frozen  
+**Authoritative freeze:** [`../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../paper/EXPERIMENTAL_FREEZE_TOSEM.md)
 
 ---
 
@@ -153,7 +153,7 @@ Historical TMLR package paths (`docs/tmlr_empirical_package_v1/`) remain for Cla
 5. **Post-freeze extensions not run** — replicates and full GPT ladder documented but absent.
 6. **Run trees gitignored** — `runs/` must ship in the Zenodo tarball alongside this repository snapshot.
 
-These match the limitations section in [`../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../paper/EXPERIMENTAL_FREEZE_TOSEM.md).
+These match the limitations section in [`../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../paper/EXPERIMENTAL_FREEZE_TOSEM.md).
 
 ---
 

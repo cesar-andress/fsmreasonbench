@@ -5,7 +5,7 @@
 **Published release:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0  
 **Zenodo DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
 **GitHub release:** FSMReasonBench v1.0.0  
-**Companion paper:** ACM TOSEM — see [`../../paper/`](../../paper/) and [`../tosem/README.md`](../tosem/README.md)
+**Companion paper:** ACM TOSEM — see [`../../../paper/`](../../../paper/) and [`../tosem/README.md`](../tosem/README.md)
 
 This folder documents how the published artifact is packaged, structured, and reproduced.
 Git `main` remains a development surface; **cite the Zenodo DOI**, not the git URL.

@@ -39,8 +39,8 @@ evaluation track—not as a single scalar leaderboard.
 | Source repository | `fsmreasonbench/` artifact |
 | Normative spec | [`docs/specification/BENCHMARK_SPEC.md`](specification/BENCHMARK_SPEC.md) |
 | Record layouts | [`docs/zenodo/DATASET_STRUCTURE.md`](zenodo/DATASET_STRUCTURE.md) |
-| JSON schemas | [`schema/`](../../schema/) |
-| Illustrative items | [`examples/`](../../examples/) |
+| JSON schemas | [`schema/`](../schema/) |
+| Illustrative items | [`examples/`](../examples/) |
 
 ---
 

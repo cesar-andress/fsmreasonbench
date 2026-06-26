@@ -13,7 +13,7 @@ Each public benchmark release is identified by:
 FSMReasonBench v<benchmark_version>
 ```
 
-Example: **FSMReasonBench v1.0.0 (Zenodo DOI: 10.5281/zenodo.XXXXXXX)**
+Example: **FSMReasonBench v1.0.0 (Zenodo DOI: 10.5281/zenodo.20897937)**
 
 The Zenodo record is the **citable object**. Git tags MUST mirror `benchmark_version`
 (e.g., `v1.0.0`).
