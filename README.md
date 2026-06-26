@@ -12,9 +12,8 @@ supplied automata under a fixed, auditable contract.
 
 ## Cite the published artifact
 
-**FSMReasonBench v1.0.0** is archived on Zenodo:
-
-**DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)
+**FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0 is archived on Zenodo (DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)).
+GitHub release: **FSMReasonBench v1.0.0**.
 
 Use `CITATION.cff` or the DOI above. Git `main` is for development; **do not cite the git URL**.
 
@@ -97,7 +96,7 @@ Detail: [`docs/artifact/repository_layout.md`](docs/artifact/repository_layout.m
 
 | Document | Purpose |
 |----------|---------|
-| [`PROJECT_STATUS.md`](PROJECT_STATUS.md) | Current released components and assets |
+| [`PROJECT_STATUS.md`](PROJECT_STATUS.md) | Released v1.0.0 components and assets |
 | [`docs/tosem/README.md`](docs/tosem/README.md) | TOSEM companion artifact guide |
 | [`docs/EXPERIMENTAL_FREEZE_TOSEM.md`](docs/EXPERIMENTAL_FREEZE_TOSEM.md) | Frozen campaigns (artifact mirror) |
 | [`docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](docs/TOSEM_EXPERIMENT_EXTENSION_PLAN.md) | Post-freeze extension study plan |

@@ -1,7 +1,8 @@
 # FSMReasonBench — Zenodo archive documentation
 
-**Published release:** FSMReasonBench **v1.0.0**  
-**Zenodo DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Published release:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0  
+**Zenodo DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
+**GitHub release:** FSMReasonBench v1.0.0  
 **Companion paper:** ACM TOSEM — see [`../../paper/`](../../paper/) and [`../tosem/README.md`](../tosem/README.md)
 
 This folder documents how the published artifact is packaged, structured, and reproduced.
@@ -28,7 +29,7 @@ Archival policies: [`docs/artifact/`](../artifact/)
 
 | Aspect | State |
 |--------|-------|
-| Zenodo record / DOI | ✅ [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348) |
+| Zenodo record / DOI | ✅ [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) |
 | Release manifest | ✅ [`releases/1.0.0/release_manifest.json`](../../releases/1.0.0/release_manifest.json) |
 | Paper cohort | ✅ `v0.1-expanded-n100` under [`cohorts/`](../../cohorts/v0.1-expanded-n100/) |
 | Implemented families (empirical) | **C2**, **F1** end-to-end |

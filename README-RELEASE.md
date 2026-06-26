@@ -1,8 +1,9 @@
 # FSMReasonBench — Quickstart (Zenodo tarball)
 
-You downloaded **FSMReasonBench v1.0.0** from Zenodo.
+You downloaded **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0 from Zenodo.
 
-**DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)
+**DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
+**GitHub release:** FSMReasonBench v1.0.0
 
 You do **not** need GitHub for citation or scoring.
 

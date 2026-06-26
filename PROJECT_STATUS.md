@@ -2,8 +2,9 @@
 
 **Repository:** artifact (`fsmreasonbench`)  
 **Last updated:** 2026-06-20  
-**Published release:** **FSMReasonBench v1.0.0**  
-**Zenodo DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Published release:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0  
+**Zenodo DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
+**GitHub release:** FSMReasonBench v1.0.0  
 **Companion paper:** ACM TOSEM — [`../paper/`](../paper/), freeze [`../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../paper/EXPERIMENTAL_FREEZE_TOSEM.md)  
 **Author:** César Andrés (ORCID [0009-0001-8968-3404](https://orcid.org/0009-0001-8968-3404))  
 **Git branch:** `main` (development surface; cite Zenodo, not git)

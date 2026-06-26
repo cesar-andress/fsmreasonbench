@@ -131,7 +131,7 @@ PYTHONPATH=src python3.12 -m pytest tests/unit/test_tosem_empirical_package_expo
 
 | Item | Status |
 |------|--------|
-| v1.0.0 DOI published | ✅ `10.5281/zenodo.20836348` |
+| v1.0.0 DOI published | ✅ `10.5281/zenodo.20897937` |
 | TOSEM companion deposit notes | ✅ `docs/tosem/ZENODO_RELEASE_NOTES.md` |
 | Read-only reproduction script | ✅ `scripts/reproduce_tosem_tables.sh` |
 | Tarball SHA256SUMS refresh for TOSEM runs | ⏳ Manual step before next upload |

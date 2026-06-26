@@ -1,6 +1,6 @@
 # FSMReasonBench — Normative Benchmark Specification (v2.0-draft)
 
-**Status:** published (v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348))  
+**Status:** published (v1.0.0 — DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937))  
 **Version:** 1.0.0 (empirical release; normative spec v2 lineage)  
 **Last updated:** 2026-06-20  
 **Citable archive:** Zenodo tarball per `releases/1.0.0/release_manifest.json`

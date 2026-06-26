@@ -1,7 +1,7 @@
 # Frozen cohort manifests
 
 Cohort item data for the **published v1.0.0 release** is archived on Zenodo (DOI
-[10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)).
+[10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)).
 
 This directory holds committed manifests and JSONL snapshots used for validation and development.
 
@@ -17,7 +17,7 @@ This directory holds committed manifests and JSONL snapshots used for validation
 | benchmark_version | `1.0.0` (Zenodo release) |
 | Families | C2 reachability + F1 mixed |
 | Items | 100 per family directory |
-| Zenodo DOI | [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348) |
+| Zenodo DOI | [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) |
 
 Validate:
 

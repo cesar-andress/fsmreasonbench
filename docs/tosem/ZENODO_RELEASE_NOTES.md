@@ -1,7 +1,7 @@
 # Zenodo release preparation — TOSEM companion update
 
 **Status:** preparation notes only — **no DOI minted**, **no upload performed**  
-**Base artifact:** FSMReasonBench v1.0.0 ([10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348))  
+**Base artifact:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0 ([10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937))  
 **Companion paper:** ACM TOSEM manuscript in [`../../paper/`](../../paper/)
 
 This document describes what a **follow-on Zenodo deposit** (or v1.0.1 tarball refresh) should
@@ -113,6 +113,6 @@ Existing mechanisms:
 
 ## Citation guidance
 
-- **Benchmark artifact:** Zenodo DOI `10.5281/zenodo.20836348` (v1.0.0) until a new version ships
+- **Benchmark artifact:** Zenodo DOI `10.5281/zenodo.20897937` (v1.0.0) until a new version ships
 - **TOSEM paper:** cite the ACM publication when available; until then reference the manuscript preprint path documented by the authors
 - **Do not cite** git `main` URLs as the artifact source of truth

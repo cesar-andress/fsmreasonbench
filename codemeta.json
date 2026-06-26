@@ -1,0 +1,20 @@
+{
+  "@context": "https://doi.org/10.25377/semantic/doc/codemeta",
+  "@type": "SoftwareSourceCode",
+  "name": "FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines",
+  "version": "v1.0.0",
+  "description": "Frozen evaluation release for machine-verifiable finite-state reasoning witnesses.",
+  "identifier": "10.5281/zenodo.20897937",
+  "codeRepository": "https://github.com/cesar-andress/fsmreasonbench",
+  "downloadUrl": "https://doi.org/10.5281/zenodo.20897937",
+  "releaseNotes": "https://github.com/cesar-andress/fsmreasonbench/releases/tag/v1.0.0",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "César",
+      "familyName": "Andrés",
+      "orcid": "https://orcid.org/0009-0001-8968-3404"
+    }
+  ],
+  "license": "https://spdx.org/licenses/Apache-2.0.html"
+}

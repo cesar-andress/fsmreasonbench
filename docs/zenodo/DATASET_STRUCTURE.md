@@ -1,6 +1,6 @@
 # Dataset structure
 
-**Published release:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Published release:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
 **Audience:** Zenodo tarball users and downstream evaluators
 
 This document describes the JSON record layouts used in FSMReasonBench. Normative schema

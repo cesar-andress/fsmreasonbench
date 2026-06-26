@@ -158,7 +158,7 @@ that run trees are complete and that export CLIs were run with `PYTHONPATH=src`.
 
 **Random seeds:** item generation uses fixed seeds in cohort manifests (`cohorts/v0.1-expanded-n100/*/manifest.json`). Inference cells use temperature `T=0.2` and one pass per item (`temp_0.2` directories).
 
-**Version pins:** `releases/1.0.0/release_manifest.json`, `CITATION.cff`, Zenodo DOI `10.5281/zenodo.20836348`.
+**Version pins:** `releases/1.0.0/release_manifest.json`, `CITATION.cff`, Zenodo DOI `10.5281/zenodo.20897937`.
 
 ---
 

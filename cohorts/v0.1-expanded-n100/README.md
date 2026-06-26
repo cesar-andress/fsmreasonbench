@@ -1,6 +1,6 @@
 # Frozen cohort bundle `v0.1-expanded-n100`
 
-**Paper cohort** for the v1.0.0 Zenodo release (DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)).
+**Paper cohort** for the v1.0.0 Zenodo release (DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)).
 Headline empirical analyses in the companion paper use this tier ($n{=}100$ per family, $T{=}0.2$).
 
 | Family | Directory | cohort_id | item_count | fingerprint |

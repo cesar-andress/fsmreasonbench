@@ -1,7 +1,7 @@
 # Zenodo Release Checklist
 
 **Status:** normative gate checklist  
-**Published reference release:** v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)
+**Published reference release:** v1.0.0 — DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)
 
 Use this checklist for **future** benchmark versions. v1.0.0 completed publication on 2026-06-20.
 
@@ -59,7 +59,7 @@ Use this checklist for **future** benchmark versions. v1.0.0 completed publicati
 ## F. Legal and citation
 
 - [ ] `LICENSE` file with SPDX identifier
-- [x] `CITATION.cff` with DOI (v1.0.0: `10.5281/zenodo.20836348`)
+- [x] `CITATION.cff` with DOI (v1.0.0: `10.5281/zenodo.20897937`)
 - [ ] Zenodo metadata: creators, ORCID, keywords, related paper DOI
 - [ ] Embargo date for seeds documented in manifest
 

@@ -1,7 +1,7 @@
 # Paper reproduction supplements
 
-Archived model submissions and table provenance for the FSMReasonBench Zenodo release
-(DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)).
+Archived model submissions and table provenance for **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0
+(DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)).
 
 **Companion paper:** ACM TOSEM — [`../../paper/`](../../paper/)
 

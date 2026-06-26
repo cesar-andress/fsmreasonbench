@@ -1,14 +1,14 @@
 # FSMReasonBench v1.0.0 — Pre-Zenodo Release Audit
 
 > **Superseded for publication status.** FSMReasonBench v1.0.0 was published on Zenodo with
-> DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348). This report records
+> DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937). This report records
 > the **pre-publication** audit snapshot (2026-06-20). See [`PROJECT_STATUS.md`](../../PROJECT_STATUS.md)
 > and [`releases/1.0.0/`](../../releases/1.0.0/) for current state.
 
 **Audit date:** 2026-06-20  
 **Auditor role:** release-quality check (not research review)  
 **Repository audited:** `fsmreasonbench/` (git root: `github.com/cesar-andress/fsmreasonbench`)  
-**Target release:** **FSMReasonBench v1.0.0 — Frozen Evaluation Release**  
+**Target release:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0**  
 **Constraints observed:** no model API calls; frozen runs not modified; no secrets printed
 
 ---
@@ -78,7 +78,7 @@ A realistic path is **READY AFTER MINOR FIXES** only for an **internal frozen-ev
 ### Recommended files to add before release
 
 - `releases/1.0.0/release_manifest.json` (filled from template)
-- `releases/1.0.0/RELEASE_NOTES.md` — title: **FSMReasonBench v1.0.0 — Frozen Evaluation Release**
+- `releases/1.0.0/RELEASE_NOTES.md` — title: **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0**
 - Root `SHA256SUMS` for tarball contents
 - `environment/requirements-lock.txt` (pinned from tested Python 3.11 env)
 - `docs/release_v1_0_0_frozen_runs_manifest.json` — inventory of five valid run roots + checksums
@@ -318,7 +318,7 @@ Assumption: fresh user has Python ≥3.11, repo checkout (or tarball), and **fro
 
 ### Suggested Zenodo upload metadata
 
-**Title:** FSMReasonBench v1.0.0 — Frozen Evaluation Release
+**Title:** FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0
 
 **Description (short):** Frozen evaluation artifact for machine-verifiable finite-state machine reasoning. Includes audited verifier/scoring code, cohort snapshots (`v0.1-expanded-n100`), offline reproduction of TMLR empirical tables (certificate-class analysis, attribution ablations, hash-mismatch decomposition, hostile verifier audit), and documented valid vs excluded model runs. Layered metrics separate verdict accuracy from certificate validity. Not a leaderboard benchmark; single-model frontier evidence with mechanism controls.
 
@@ -391,7 +391,7 @@ Assumption: fresh user has Python ≥3.11, repo checkout (or tarball), and **fro
 
 ## Zenodo metadata checklist
 
-- [ ] Title: FSMReasonBench v1.0.0 — Frozen Evaluation Release
+- [ ] Title: FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0
 - [ ] Description emphasizes machine-verifiable certificates, layered metrics, frozen artifacts, verifier audit
 - [ ] Creators + ORCID + affiliation
 - [ ] Keywords (≥3)
@@ -426,7 +426,7 @@ Assumption: fresh user has Python ≥3.11, repo checkout (or tarball), and **fro
 
 ## Appendix: suggested release title and one-line scope
 
-**FSMReasonBench v1.0.0 — Frozen Evaluation Release**
+**FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0**
 
 *Frozen, auditable evaluation artifact for certificate-based FSM reasoning research—code, cohorts, valid model-run snapshots, and offline table reproduction without new API calls.*
 

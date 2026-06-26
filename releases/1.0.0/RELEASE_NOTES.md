@@ -1,12 +1,13 @@
-# FSMReasonBench v1.0.0 — Frozen Evaluation Release
+# FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0
 
 **Released:** 2026-06-20  
-**Zenodo DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Zenodo DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
+**GitHub release:** FSMReasonBench v1.0.0  
 **Author:** César Andrés
 
 ## Summary
 
-First public archival release of the FSMReasonBench evaluation artifact: verifier, scoring
+First public archival release of **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0: verifier, scoring
 pipeline, frozen cohort `v0.1-expanded-n100`, paper-support analyses, and offline reproduction
 exports for the companion empirical study on certificate synthesis under auditable verification
 contracts.

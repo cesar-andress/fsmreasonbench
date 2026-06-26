@@ -8,10 +8,12 @@
   "python_version": "3.11+",
   "released_at": "2026-06-20T00:00:00Z",
   "zenodo": {
-    "primary_doi": "10.5281/zenodo.20836348",
-    "url": "https://doi.org/10.5281/zenodo.20836348"
+    "primary_doi": "10.5281/zenodo.20897937",
+    "url": "https://doi.org/10.5281/zenodo.20897937"
   },
-  "notes": "Frozen empirical evaluation release supporting the TMLR paper. Paper cohort v0.1-expanded-n100 (C2 + F1, n=100 per family). Cite the Zenodo DOI and version pins in this manifest.",
+  "github_release": "FSMReasonBench v1.0.0",
+  "artifact_name": "FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines",
+  "notes": "Frozen empirical evaluation release supporting the ACM TOSEM companion study. Paper cohort v0.1-expanded-n100 (C2 + F1, n=100 per family). Cite FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0 with DOI 10.5281/zenodo.20897937 and version pins in this manifest.",
   "reproduction": {
     "validate_cohort": "PYTHONPATH=src python -m fsmreasonbench.cli.validate_cohort",
     "export_paper_package": "PYTHONPATH=src python -m fsmreasonbench.cli.export_tmlr_empirical_package",

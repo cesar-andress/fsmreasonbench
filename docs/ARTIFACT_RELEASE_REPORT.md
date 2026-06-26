@@ -1,6 +1,9 @@
 # TOSEM Artifact Release Report
 
-**Release tag:** `tosem-artifact-v1.0`  
+**Artifact:** FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0  
+**Zenodo DOI:** 10.5281/zenodo.20897937  
+**GitHub release:** FSMReasonBench v1.0.0  
+**Release tag:** `FSMReasonBench v1.0.0`  
 **Release date:** 2026-06-25 (UTC)  
 **Repository:** `fsmreasonbench` (artifact root)  
 **Manuscript:** ACM TOSEM companion in [`../paper/`](../paper/) — feature complete, experiments frozen  
@@ -17,7 +20,7 @@
 | Python package | `fsmreasonbench 0.2.0-dev` |
 | Cohort snapshots | `v0.1-expanded-n100` (C2 + F1 mixed, n=100, T=0.2) — validated |
 | Frozen run trees | Present under `runs/` (gitignored; ship via Zenodo tarball) |
-| Zenodo DOI (prior release) | [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348) |
+| Zenodo DOI | [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) |
 | `./scripts/reproduce_tosem_tables.sh` | **PASS** (read-only; no API calls) |
 | `artifact_health` | **PASS** |
 | Full pytest suite | **569 passed** (~9.5 min, Python 3.12) |
@@ -168,7 +171,7 @@ Commits on `main` forming this release (newest first):
 | `93e6732` | docs: document construct-validity experiment |
 | `33c60b8` | analysis: export constructible equivalence witness comparisons |
 
-**Release tag:** `tosem-artifact-v1.0` (annotated) — frozen TOSEM experiments, manuscript v1.0 artifact bundle, read-only reproduction verified.
+**Release tag:** `FSMReasonBench v1.0.0` (annotated) — frozen TOSEM experiments, manuscript v1.0 artifact bundle, read-only reproduction verified.
 
 ---
 
@@ -176,7 +179,7 @@ Commits on `main` forming this release (newest first):
 
 Include in the archival tarball:
 
-- [ ] Full git snapshot at tag `tosem-artifact-v1.0`
+- [ ] Full git snapshot at tag `FSMReasonBench v1.0.0`
 - [ ] Frozen `runs/` trees listed in §2
 - [ ] `cohorts/v0.1-expanded-n100/`
 - [ ] `docs/tosem_empirical_package_v1/` + `docs/tmlr_empirical_package_v1/`

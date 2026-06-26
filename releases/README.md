@@ -1,6 +1,8 @@
 # FSMReasonBench Releases
 
-**Citation target:** Zenodo DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348) — not git branch `main`.
+**Artifact:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0  
+**Citation target:** Zenodo DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) — not git branch `main`.  
+**GitHub release:** FSMReasonBench v1.0.0
 
 This directory records **frozen release manifests** for each citable benchmark version.
 
@@ -10,7 +12,7 @@ This directory records **frozen release manifests** for each citable benchmark v
 
 | benchmark_version | cohort_version | Zenodo DOI | Status |
 |-------------------|----------------|------------|--------|
-| **1.0.0** | `v0.1-expanded-n100` | [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348) | **Published** |
+| **1.0.0** | `v0.1-expanded-n100` | [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) | **Published** |
 
 Manifest and notes: [`1.0.0/`](1.0.0/)
 

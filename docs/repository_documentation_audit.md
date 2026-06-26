@@ -2,7 +2,7 @@
 
 **Generated:** 2026-06-20  
 **Repository:** `fsmreasonbench/`  
-**Published artifact:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Published artifact:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
 **Author identity:** César Andrés (ORCID `0009-0001-8968-3404`) per `~/papers/promts/author_identity_standardization.md`
 
 ---

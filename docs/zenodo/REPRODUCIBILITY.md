@@ -1,6 +1,6 @@
 # Reproducibility
 
-**Published release:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Published release:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
 **Audience:** Zenodo tarball users, evaluators, and paper reviewers
 
 This document describes how FSMReasonBench achieves reproducibility in the **published v1.0.0

@@ -1,6 +1,6 @@
 # Release checklist
 
-**Published:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Published:** FSMReasonBench v1.0.0 — DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
 **Purpose:** gate checklist used for the v1.0.0 Zenodo release; retained for future versions
 
 Extended normative gate: [`docs/artifact/zenodo_checklist.md`](../artifact/zenodo_checklist.md).

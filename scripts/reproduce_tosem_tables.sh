@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Read-only reproduction of ACM TOSEM manuscript tables from frozen runs.
+# Artifact: FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0
+# DOI: 10.5281/zenodo.20897937 (GitHub release: FSMReasonBench v1.0.0)
 # Does NOT call model APIs. Requires Python >= 3.11 and frozen run trees under runs/.
 set -euo pipefail
 

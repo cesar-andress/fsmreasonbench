@@ -14,7 +14,7 @@ pretty_name: FSMReasonBench
 # FSMReasonBench — Dataset Card
 
 **Artifact version:** `1.0.0` (published Zenodo release)  
-**Zenodo DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)  
+**Zenodo DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
 **Card status:** describes the published v1.0.0 empirical slice; adaptable to Hugging Face  
 **Normative specification:** [`docs/specification/BENCHMARK_SPEC.md`](specification/BENCHMARK_SPEC.md)
 
@@ -376,7 +376,7 @@ Release planning: [`docs/zenodo/RELEASE_CHECKLIST.md`](zenodo/RELEASE_CHECKLIST.
 
 Cite the published Zenodo release:
 
-**DOI:** [10.5281/zenodo.20836348](https://doi.org/10.5281/zenodo.20836348)
+**DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)
 
 See [`CITATION.cff`](../../CITATION.cff) at the repository root. Include cohort identifier
 `v0.1-expanded-n100` and version pins from [`releases/1.0.0/release_manifest.json`](../../releases/1.0.0/release_manifest.json)
