@@ -41,7 +41,6 @@ def render_replicate_variability_latex(
         f"  \\caption{{Run-to-run variability ({_latex_escape(campaign_id)}). "
         "Mean [95\\% bootstrap CI] across replicates; CV = coefficient of variation.}",
         f"  \\label{{tab:extension-replicate-variability-{_latex_escape(campaign_id.replace('_', '-'))}}}",
-        "  \\footnotesize",
         "  \\setlength{\\tabcolsep}{3pt}",
         "  \\begin{tabular}{@{}lllrrrr@{}}",
         "    \\toprule",
@@ -298,7 +297,6 @@ def render_stability_vs_cross_model_latex(report: dict[str, Any]) -> str:
         "  \\centering",
         "  \\caption{Attribution cross-model gaps vs run-to-run variability (F1 R2 frontier replicates).}",
         "  \\label{tab:extension-stability-vs-cross-model}",
-        "  \\footnotesize",
         "  \\begin{tabular}{@{}lrrl@{}}",
         "    \\toprule",
         "    Condition & $|\\Delta|$ cert. & Replicate std ceiling & Exceeds variability? \\\\",

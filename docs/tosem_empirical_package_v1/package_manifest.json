@@ -13,14 +13,14 @@
     "R2C": "runs/ablations_f1_r2c_gpt_n100_v1/R2C/scores.jsonl"
   },
   "paper_tables": {
-    "claude_sonnet_tools_n100_summary.tex": "../paper/tables/claude_sonnet_tools_n100_summary.tex",
-    "gpt_tools_n100_summary.tex": "../paper/tables/gpt_tools_n100_summary.tex",
-    "frontier_tools_comparison_n100.tex": "../paper/tables/frontier_tools_comparison_n100.tex",
-    "knowing_showing_gap_n100.tex": "../paper/tables/knowing_showing_gap_n100.tex",
-    "failure_stage_n100.tex": "../paper/tables/failure_stage_n100.tex",
-    "f1_gpt_ablations.tex": "../paper/tables/f1_gpt_ablations.tex",
-    "results_paired_mcnemar.tex": "../paper/tables/results_paired_mcnemar.tex",
-    "local_matrix_n100_summary.tex": "../paper/tables/local_matrix_n100_summary.tex"
+    "claude_sonnet_tools_n100_summary.tex": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/paper_tables/claude_sonnet_tools_n100_summary.tex",
+    "gpt_tools_n100_summary.tex": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/paper_tables/gpt_tools_n100_summary.tex",
+    "frontier_tools_comparison_n100.tex": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/paper_tables/frontier_tools_comparison_n100.tex",
+    "knowing_showing_gap_n100.tex": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/paper_tables/knowing_showing_gap_n100.tex",
+    "failure_stage_n100.tex": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/paper_tables/failure_stage_n100.tex",
+    "f1_gpt_ablations.tex": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/paper_tables/f1_gpt_ablations.tex",
+    "results_paired_mcnemar.tex": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/paper_tables/results_paired_mcnemar.tex",
+    "local_matrix_n100_summary.tex": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/paper_tables/local_matrix_n100_summary.tex"
   },
   "analysis_json": {
     "gpt_tools_summary": "docs/frontier_gpt_tools_n100_v1_summary.json",
@@ -37,7 +37,8 @@
     "cells_exported": 4
   },
   "paper_figures": {
-    "figure_verdict_witness_gap_comparison.pdf": "../paper/figures/figure_verdict_witness_gap_comparison.pdf",
-    "figure_attribution_fingerprint_comparison.pdf": "../paper/figures/figure_attribution_fingerprint_comparison.pdf"
+    "figure_knowing_showing_gap_table_panel.pdf": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/figures/figure_knowing_showing_gap_table_panel.pdf",
+    "figure_verdict_witness_gap_comparison.pdf": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/figures/figure_verdict_witness_gap_comparison.pdf",
+    "figure_attribution_fingerprint_comparison.pdf": "/tmp/pytest-of-cesar/pytest-31/test_export_tosem_empirical_pa0/figures/figure_attribution_fingerprint_comparison.pdf"
   }
 }

@@ -117,19 +117,16 @@ def render_frontier_tools_latex_table(
     table_label: str,
     tracks_caption: str | None = None,
 ) -> str:
-    track_text = tracks_caption or _format_track_caption(row["track"] for row in rows)
     source_path = _latex_escape(campaign_id)
-    caption = (
-        f"Frozen {model_label} tool-track results ($n{{=}}100$; temperature~$0.2$; "
-        f"{track_text}). Source: {source_path}."
-    )
+    from fsmreasonbench.evaluator.paper_table_style import frozen_n100_caption
+
+    caption = frozen_n100_caption(f"{model_label} tool-track rates")
     lines = [
         f"% Frozen frontier tools run. Source: {source_path}/combined_summary.json",
         "\\begin{table}[t]",
         "  \\centering",
         f"  \\caption{{{caption}}}",
         f"  \\label{{{table_label}}}",
-        "  \\footnotesize",
         "  \\setlength{\\tabcolsep}{4pt}",
         "  \\begin{tabular}{@{}llrrrrr@{}}",
         "    \\toprule",

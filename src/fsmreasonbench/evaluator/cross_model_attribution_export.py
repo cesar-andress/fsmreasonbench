@@ -172,7 +172,6 @@ def render_cross_model_attribution_latex(report: dict[str, Any]) -> str:
         "  \\caption{Cross-model F1 attribution comparison (Claude vs GPT-4.1). "
         "Pending cells await new GPT ladder campaigns; frozen R2C remains in partial column.}",
         "  \\label{tab:extension-cross-model-attribution}",
-        "  \\footnotesize",
         "  \\begin{tabular}{@{}lcccc@{}}",
         "    \\toprule",
         "    Condition & Claude cert. & GPT cert. & $\\Delta$ (GPT$-$Claude) & Status \\\\",

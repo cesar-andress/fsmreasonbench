@@ -80,3 +80,45 @@ def plot_verdict_full_pairs(
     style_axes(ax)
     if show_legend:
         ax.legend(loc="upper right", frameon=False)
+
+
+def plot_verdict_full_by_models(
+    ax: Any,
+    *,
+    model_labels: list[str],
+    verdict_rates: list[float],
+    full_rates: list[float],
+    title: str | None = None,
+    show_legend: bool = False,
+    bar_width: float = 0.34,
+) -> None:
+    """Grouped verdict vs full bars for one frozen cell across models."""
+    x = list(range(len(model_labels)))
+    offsets_verdict = [pos - bar_width / 2 for pos in x]
+    offsets_full = [pos + bar_width / 2 for pos in x]
+    ax.bar(
+        offsets_verdict,
+        verdict_rates,
+        width=bar_width,
+        label="Verdict accuracy",
+        color=VERDICT_BAR_COLOR,
+        edgecolor="0.0",
+        linewidth=0.6,
+    )
+    ax.bar(
+        offsets_full,
+        full_rates,
+        width=bar_width,
+        label="Full correctness",
+        color=FULL_BAR_COLOR,
+        edgecolor="0.0",
+        linewidth=0.6,
+    )
+    ax.set_xticks(x, model_labels, rotation=35, ha="right")
+    ax.set_ylim(0.0, 1.05)
+    ax.set_ylabel("Rate")
+    if title:
+        ax.set_title(title)
+    style_axes(ax)
+    if show_legend:
+        ax.legend(loc="upper right", frameon=False, fontsize=7)

@@ -41,3 +41,8 @@ def test_export_tosem_empirical_package_writes_gpt_tables(tmp_path, monkeypatch)
     gap_figure = manifest["paper_figures"].get("figure_verdict_witness_gap_comparison.pdf")
     assert gap_figure is not None
     assert Path(gap_figure).is_file()
+    gap_panel = manifest["paper_figures"].get("figure_knowing_showing_gap_table_panel.pdf")
+    assert gap_panel is not None
+    assert Path(gap_panel).is_file()
+    gap_tex = (paper_tables / "knowing_showing_gap_n100.tex").read_text(encoding="utf-8")
+    assert "figure_knowing_showing_gap_table_panel.pdf" in gap_tex
