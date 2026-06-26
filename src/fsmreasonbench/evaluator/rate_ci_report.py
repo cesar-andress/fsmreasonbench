@@ -16,6 +16,7 @@ from fsmreasonbench.evaluator.bootstrap import (
     _percentile,
     _verdict_accuracy,
 )
+from fsmreasonbench.evaluator.clopper_pearson import proportion_ci_with_boundary_fallback
 from fsmreasonbench.evaluator.io import dump_json
 from fsmreasonbench.evaluator.jsonl import read_jsonl
 from fsmreasonbench.evaluator.models import ScoringRecord
@@ -102,15 +103,49 @@ def bootstrap_rate_cis(
 
     low_q = alpha / 2.0
     high_q = 1.0 - alpha / 2.0
+    extractable = [record for record in records if record.extractable]
+    extractability_successes = len(extractable)
+    verdict_successes = sum(1 for record in extractable if record.verdict_correct is True)
+    certificate_successes = sum(
+        1 for record in extractable if record.certificate_valid is True
+    )
+    fully_correct_successes = sum(1 for record in records if record.fully_correct is True)
+
+    extract_lo = _percentile(extractability_samples, low_q)
+    extract_hi = _percentile(extractability_samples, high_q)
+    verdict_lo = _percentile(verdict_samples, low_q)
+    verdict_hi = _percentile(verdict_samples, high_q)
+    cert_lo = _percentile(certificate_samples, low_q)
+    cert_hi = _percentile(certificate_samples, high_q)
+    full_lo = _percentile(fully_correct_samples, low_q)
+    full_hi = _percentile(fully_correct_samples, high_q)
+
+    extract_lo, extract_hi = proportion_ci_with_boundary_fallback(
+        extractability_successes, sample_size, extract_lo, extract_hi, alpha=alpha
+    )
+    verdict_lo, verdict_hi = proportion_ci_with_boundary_fallback(
+        verdict_successes, len(extractable) if extractable else 0, verdict_lo, verdict_hi, alpha=alpha
+    )
+    cert_lo, cert_hi = proportion_ci_with_boundary_fallback(
+        certificate_successes,
+        len(extractable) if extractable else 0,
+        cert_lo,
+        cert_hi,
+        alpha=alpha,
+    )
+    full_lo, full_hi = proportion_ci_with_boundary_fallback(
+        fully_correct_successes, sample_size, full_lo, full_hi, alpha=alpha
+    )
+
     return {
-        "extractability_rate_ci_low": _percentile(extractability_samples, low_q),
-        "extractability_rate_ci_high": _percentile(extractability_samples, high_q),
-        "verdict_accuracy_ci_low": _percentile(verdict_samples, low_q),
-        "verdict_accuracy_ci_high": _percentile(verdict_samples, high_q),
-        "certificate_valid_rate_ci_low": _percentile(certificate_samples, low_q),
-        "certificate_valid_rate_ci_high": _percentile(certificate_samples, high_q),
-        "fully_correct_rate_ci_low": _percentile(fully_correct_samples, low_q),
-        "fully_correct_rate_ci_high": _percentile(fully_correct_samples, high_q),
+        "extractability_rate_ci_low": extract_lo,
+        "extractability_rate_ci_high": extract_hi,
+        "verdict_accuracy_ci_low": verdict_lo,
+        "verdict_accuracy_ci_high": verdict_hi,
+        "certificate_valid_rate_ci_low": cert_lo,
+        "certificate_valid_rate_ci_high": cert_hi,
+        "fully_correct_rate_ci_low": full_lo,
+        "fully_correct_rate_ci_high": full_hi,
     }
 
 

@@ -178,7 +178,9 @@ def render_local_matrix_summary_latex(rows: list[dict[str, Any]]) -> str:
         "  \\caption{Frozen local open-weight matrix ($n{=}100$ per cell; temperature~$0.2$; "
         "cohorts \\texttt{v0.1-expanded-n100}). "
         "Each cell reports rate [95\\% CI] from percentile bootstrap "
-        "($1000$ resamples; per-cell seed~$4242{+}$index). "
+        "($1000$ resamples; per-cell seed~$4242{+}$index); when the observed rate is $0$ or $1$, "
+        "the interval is exact Clopper--Pearson from the frozen $k/n$ count "
+        "(Appendix~\\ref{app:uncertainty}). "
         "Extract.: extractability rate ($n$ denominator); "
         "Verdict/Cert.: among extractable submissions; Full: fully correct ($n$ denominator). "
         "Source: " + source + ".}",

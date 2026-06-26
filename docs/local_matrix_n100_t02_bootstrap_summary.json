@@ -66,7 +66,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -83,7 +83,7 @@
           "n": 100,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0362,
           "note": ""
         },
         "fully_correct_rate": {
@@ -91,7 +91,7 @@
           "n": 100,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0362,
           "note": ""
         }
       }
@@ -109,7 +109,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -117,7 +117,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -152,7 +152,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -195,7 +195,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -212,7 +212,7 @@
           "n": 100,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0362,
           "note": ""
         },
         "fully_correct_rate": {
@@ -220,7 +220,7 @@
           "n": 100,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0362,
           "note": ""
         }
       }
@@ -246,7 +246,7 @@
           "rate": 1.0,
           "n": 54,
           "successes": 54,
-          "ci_low": 1.0,
+          "ci_low": 0.934,
           "ci_high": 1.0,
           "note": ""
         },
@@ -281,7 +281,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -410,7 +410,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -470,7 +470,7 @@
           "n": 9,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.3363,
           "note": ""
         },
         "fully_correct_rate": {
@@ -478,7 +478,7 @@
           "n": 100,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0362,
           "note": ""
         }
       }
@@ -504,7 +504,7 @@
           "rate": 1.0,
           "n": 7,
           "successes": 7,
-          "ci_low": 1.0,
+          "ci_low": 0.5904,
           "ci_high": 1.0,
           "note": ""
         },
@@ -539,7 +539,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -625,7 +625,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -633,7 +633,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -668,7 +668,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -719,7 +719,7 @@
           "rate": 1.0,
           "n": 4,
           "successes": 4,
-          "ci_low": 1.0,
+          "ci_low": 0.3976,
           "ci_high": 1.0,
           "note": ""
         },
@@ -728,7 +728,7 @@
           "n": 4,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.6024,
           "note": ""
         },
         "fully_correct_rate": {
@@ -736,7 +736,7 @@
           "n": 100,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0362,
           "note": ""
         }
       }
@@ -762,7 +762,7 @@
           "rate": 1.0,
           "n": 6,
           "successes": 6,
-          "ci_low": 1.0,
+          "ci_low": 0.5407,
           "ci_high": 1.0,
           "note": ""
         },
@@ -771,7 +771,7 @@
           "n": 6,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.4593,
           "note": ""
         },
         "fully_correct_rate": {
@@ -779,7 +779,7 @@
           "n": 100,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0362,
           "note": ""
         }
       }
@@ -840,7 +840,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -883,7 +883,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -926,7 +926,7 @@
           "rate": 1.0,
           "n": 100,
           "successes": 100,
-          "ci_low": 1.0,
+          "ci_low": 0.9638,
           "ci_high": 1.0,
           "note": ""
         },
@@ -986,7 +986,7 @@
           "n": 65,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0552,
           "note": ""
         },
         "fully_correct_rate": {
@@ -994,7 +994,7 @@
           "n": 100,
           "successes": 0,
           "ci_low": 0.0,
-          "ci_high": 0.0,
+          "ci_high": 0.0362,
           "note": ""
         }
       }
@@ -1020,7 +1020,7 @@
           "rate": 1.0,
           "n": 66,
           "successes": 66,
-          "ci_low": 1.0,
+          "ci_low": 0.9456,
           "ci_high": 1.0,
           "note": ""
         },

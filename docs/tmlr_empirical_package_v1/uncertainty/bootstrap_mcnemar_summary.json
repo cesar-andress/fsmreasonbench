@@ -16,7 +16,7 @@
     },
     "unreachability_witness_cert": {
       "ci_high": 1.0,
-      "ci_low": 1.0,
+      "ci_low": 0.9289,
       "n": 50,
       "note": "",
       "rate": 1.0,
@@ -34,7 +34,7 @@
       "successes": 46
     },
     "equivalence_witness_cert": {
-      "ci_high": 0.0,
+      "ci_high": 0.0698,
       "ci_low": 0.0,
       "n": 51,
       "note": "",
@@ -300,7 +300,7 @@
       },
       "comparison": "F1 eq-witness R1 vs R2C (n=51 paired items)",
       "first_cert_rate": {
-        "ci_high": 0.0,
+        "ci_high": 0.0698,
         "ci_low": 0.0,
         "n": 51,
         "note": "",

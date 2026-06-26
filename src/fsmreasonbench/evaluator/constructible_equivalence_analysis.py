@@ -447,8 +447,8 @@ def render_constructible_equivalence_statistics_latex(report: dict[str, Any]) ->
         "\\begin{table}[t]",
         "  \\centering",
         "  \\caption{Experiment~A1 statistical analysis on the F1 equivalence subset ($n{=}51$ paired items). "
-        "Bootstrap percentile 95\\% CIs use seed~4242 and 1000 resamples (same settings as "
-        "Appendix~\\ref{app:uncertainty}). "
+        "Bootstrap percentile 95\\% CIs use seed~4242 and 1000 resamples (Appendix~\\ref{app:uncertainty}); "
+        "boundary rates ($0$ or $1$) report exact Clopper--Pearson intervals from frozen $k/n$. "
         "Cert.\\ rate diff is first condition minus second; negative values favour the second condition. "
         "Agreement cells count valid certificates ($+/+$ both valid; $+/-$ first only; $-/+ $ second only; $-/-$ both invalid).}",
         "  \\label{tab:extension-constructible-equivalence-stats}",

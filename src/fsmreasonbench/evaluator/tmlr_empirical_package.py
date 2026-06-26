@@ -10,6 +10,7 @@ from typing import Any, Iterable
 
 from fsmreasonbench.dev.doc_consistency import find_repo_root
 from fsmreasonbench.evaluator.bootstrap import DEFAULT_BOOTSTRAP_ALPHA, DEFAULT_BOOTSTRAP_RESAMPLES
+from fsmreasonbench.evaluator.clopper_pearson import proportion_ci_with_boundary_fallback
 from fsmreasonbench.evaluator.c2_existential_universal_stratified_analysis import (
     load_c2_item_metadata,
     load_condition_outcomes,
@@ -156,12 +157,21 @@ def bootstrap_rate_ci(
         samples.append(sum(sample) / len(sample))
     low_q = alpha / 2.0
     high_q = 1.0 - alpha / 2.0
+    bootstrap_lo = round(_percentile(samples, low_q), 4)
+    bootstrap_hi = round(_percentile(samples, high_q), 4)
+    ci_lo, ci_hi = proportion_ci_with_boundary_fallback(
+        successes,
+        len(values),
+        bootstrap_lo,
+        bootstrap_hi,
+        alpha=alpha,
+    )
     return RateWithCI(
         rate=round(rate, 4),
         n=len(values),
         successes=successes,
-        ci_low=round(_percentile(samples, low_q), 4),
-        ci_high=round(_percentile(samples, high_q), 4),
+        ci_low=round(ci_lo, 4),
+        ci_high=round(ci_hi, 4),
     )
 
 

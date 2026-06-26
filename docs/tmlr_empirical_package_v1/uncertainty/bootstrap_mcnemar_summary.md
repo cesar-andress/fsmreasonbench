@@ -4,13 +4,13 @@
 
 - Note: distinguishing_trace (n=49) and equivalence_witness (n=51) are disjoint item subsets; rates are reported with independent bootstrap CIs (descriptive).
 - **distinguishing_trace_cert**: 0.939 [0.857, 1.000] (k=46/49)
-- **equivalence_witness_cert**: 0.000 [0.000, 0.000] (k=0/51)
+- **equivalence_witness_cert**: 0.000 [0.000, 0.070] (k=0/51)
 
 ## C2 R1 subtype rates (descriptive)
 
 - Note: trace_witness and unreachability_witness are disjoint balanced subsets (50+50); independent bootstrap CIs (descriptive).
 - **trace_witness_cert**: 0.960 [0.900, 1.000] (k=48/50)
-- **unreachability_witness_cert**: 1.000 [1.000, 1.000] (k=50/50)
+- **unreachability_witness_cert**: 1.000 [0.929, 1.000] (k=50/50)
 
 ## Paired condition comparisons (same item IDs)
 
