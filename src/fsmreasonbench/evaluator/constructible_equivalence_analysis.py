@@ -575,7 +575,7 @@ def _render_a1_stats_panel_figure(report: dict[str, Any], figures_dir: Path) -> 
     y = list(range(len(labels)))
     xerr = [[rate - lo for rate, lo in zip(rates, ci_low)], [hi - rate for rate, hi in zip(rates, ci_high)]]
 
-    fig, ax = plt.subplots(figsize=(3.15, 1.85))
+    fig, ax = plt.subplots(figsize=(3.35, 1.95))
     ax.errorbar(
         rates,
         y,
@@ -584,30 +584,23 @@ def _render_a1_stats_panel_figure(report: dict[str, Any], figures_dir: Path) -> 
         color="0.15",
         ecolor="0.35",
         elinewidth=0.9,
-        capsize=2.0,
+        capsize=0,
         markersize=3.8,
         zorder=3,
     )
     for index, (rate, y_pos, color) in enumerate(zip(rates, y, colors)):
         ax.plot(rate, y_pos, "o", color=color, markeredgecolor="0.0", markeredgewidth=0.45, zorder=4)
-    for rate, y_pos, cell in zip(rates, y, cells):
+    for rate, y_pos, lo, hi, cell in zip(rates, y, ci_low, ci_high, cells):
         summary = cell["summary"]
         count = int(summary.get("certificate_valid_count", 0))
         total = int(summary.get("n", 0))
         label = f"{rate:.3f} ({count}/{total})"
-        if rate >= 0.92:
-            x_text = max(rate - 0.04, 0.02)
-            ha = "right"
-        elif rate <= 0.001:
-            x_text = 0.07
-            ha = "left"
-        else:
-            x_text = min(rate + 0.04, 0.96)
-            ha = "left"
-        ax.text(
-            x_text,
-            y_pos,
+        xy, xytext, ha = _a1_stats_label_annotation(rate, lo, hi)
+        ax.annotate(
             label,
+            xy=(xy, y_pos),
+            xytext=xytext,
+            textcoords="offset points",
             va="center",
             ha=ha,
             fontsize=5.5,
@@ -617,7 +610,7 @@ def _render_a1_stats_panel_figure(report: dict[str, Any], figures_dir: Path) -> 
     ax.set_yticks(y, labels, fontsize=6.5)
     ax.set_xticks([0.0, 0.25, 0.5, 0.75, 1.0])
     ax.tick_params(axis="x", labelsize=6.5)
-    ax.set_xlim(-0.01, 1.12)
+    ax.set_xlim(-0.02, 1.05)
     ax.set_xlabel("Valid. (95% CI)", fontsize=7)
     style_axes(ax)
     from matplotlib.lines import Line2D
@@ -626,13 +619,33 @@ def _render_a1_stats_panel_figure(report: dict[str, Any], figures_dir: Path) -> 
         Line2D([0], [0], marker="o", color="w", markerfacecolor=VERDICT_BAR_COLOR, markeredgecolor="0.0", markersize=4, label="hash"),
         Line2D([0], [0], marker="o", color="w", markerfacecolor=FULL_BAR_COLOR, markeredgecolor="0.0", markersize=4, label="bisim"),
     ]
-    ax.legend(handles=legend_handles, loc="lower right", frameon=False, fontsize=6, handlelength=1.0)
-    fig.subplots_adjust(left=0.36, right=0.92, top=0.96, bottom=0.20)
+    ax.legend(
+        handles=legend_handles,
+        loc="upper center",
+        bbox_to_anchor=(0.62, 1.14),
+        ncol=2,
+        frameon=False,
+        fontsize=6,
+        handlelength=1.0,
+        columnspacing=0.8,
+    )
+    fig.subplots_adjust(left=0.36, right=0.98, top=0.82, bottom=0.20)
     figures_dir.mkdir(parents=True, exist_ok=True)
     out_path = figures_dir / f"{EXTENSION_TABLE_PREFIX}constructible_equivalence_stats_panel.pdf"
     fig.savefig(out_path, bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
     return True
+
+
+def _a1_stats_label_annotation(
+    rate: float, ci_low: float, ci_high: float
+) -> tuple[float, tuple[int, int], str]:
+    """Return anchor point, offset (pt), and horizontal alignment for rate labels."""
+    if ci_high >= 0.995:
+        return rate, (-7, 5), "right"
+    if ci_low <= 0.005:
+        return rate, (7, 5), "left"
+    return ci_high, (6, 5), "left"
 
 
 def _render_a1_figure(report: dict[str, Any], figures_dir: Path) -> bool:
