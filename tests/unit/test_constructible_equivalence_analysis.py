@@ -42,7 +42,8 @@ def test_statistics_latex_contains_bootstrap_and_mcnemar() -> None:
     repo = find_repo_root()
     report = build_constructible_equivalence_analysis(repo)
     latex = render_constructible_equivalence_statistics_latex(report)
-    assert "tab:extension-constructible-equivalence-stats" in latex
-    assert "0.353 [0.235, 0.490]" in latex
+    assert "fig:extension-constructible-equivalence-stats" in latex
+    assert "tab:extension-constructible-equivalence-paired" in latex
     assert "hash R1 vs bisim R1" in latex
     assert "$\\ll 0.05$" in latex
+    assert "extension_constructible_equivalence_stats_panel.pdf" in latex

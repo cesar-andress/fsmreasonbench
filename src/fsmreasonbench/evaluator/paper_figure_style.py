@@ -115,10 +115,90 @@ def plot_verdict_full_by_models(
         linewidth=0.6,
     )
     ax.set_xticks(x, model_labels, rotation=35, ha="right")
-    ax.set_ylim(0.0, 1.05)
+    y_max = 1.22 if show_legend else 1.05
+    ax.set_ylim(0.0, y_max)
     ax.set_ylabel("Rate")
     if title:
         ax.set_title(title)
     style_axes(ax)
     if show_legend:
-        ax.legend(loc="upper right", frameon=False, fontsize=7)
+        ax.legend(loc="upper right", frameon=False, fontsize=7, bbox_to_anchor=(1.0, 1.0))
+
+
+def plot_ablation_subtype_panel(
+    ax: Any,
+    *,
+    condition_labels: list[str],
+    subtype_labels: list[str],
+    cert_rates: list[list[float]],
+    title: str | None = None,
+    show_legend: bool = True,
+    bar_width: float = 0.22,
+    ylabel: str = "Witness validity",
+    annotate_rates: bool = False,
+) -> None:
+    """Grouped witness-validity bars by condition and subtype."""
+    import numpy as np
+
+    n_conditions = len(condition_labels)
+    n_subtypes = len(subtype_labels)
+    x = np.arange(n_conditions, dtype=float)
+    for index, subtype_label in enumerate(subtype_labels):
+        offset = x + (index - (n_subtypes - 1) / 2.0) * bar_width
+        rates = [cert_rates[row_index][index] for row_index in range(n_conditions)]
+        bars = ax.bar(
+            offset,
+            rates,
+            width=bar_width,
+            label=subtype_label,
+            color=STAGE_BAR_COLORS[index % len(STAGE_BAR_COLORS)],
+            edgecolor="0.0",
+            linewidth=0.6,
+        )
+        if annotate_rates:
+            for bar, rate in zip(bars, rates):
+                if rate <= 0.001:
+                    continue
+                label_y = _ablation_bar_label_y(rate, index, n_subtypes)
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2.0,
+                    label_y,
+                    f"{rate:.2f}",
+                    ha="center",
+                    va="bottom",
+                    fontsize=5.5,
+                    color="0.25",
+                    clip_on=False,
+                )
+    rotation = 35 if n_conditions > 3 else 25
+    ax.set_xticks(x, condition_labels, rotation=rotation, ha="right")
+    y_top = 1.05
+    if annotate_rates:
+        y_top = 1.24
+    if title:
+        y_top = max(y_top, 1.22)
+    ax.set_ylim(0.0, y_top)
+    ax.set_ylabel(ylabel)
+    if title:
+        ax.set_title(title, fontsize=8)
+    style_axes(ax)
+    if show_legend:
+        ax.legend(
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.28 if n_conditions > 3 else -0.24),
+            ncol=len(subtype_labels),
+            frameon=False,
+            fontsize=6.5,
+            columnspacing=1.0,
+            handlelength=1.0,
+        )
+
+
+def _ablation_bar_label_y(rate: float, subtype_index: int, n_subtypes: int) -> float:
+    """Place rate labels above bars without intra-group overlap."""
+    base = rate + 0.025
+    if rate >= 0.85:
+        base += subtype_index * 0.055
+    elif rate >= 0.40:
+        base += subtype_index * 0.035
+    return min(base, 1.20)
