@@ -186,11 +186,11 @@ def render_cross_model_attribution_latex(report: dict[str, Any]) -> str:
         g = gpt_conds.get(condition, {})
         c_rate = c.get("certificate_valid_rate")
         g_rate = g.get("certificate_valid_rate")
-        c_s = f"{c_rate:.3f}" if c_rate is not None else "---"
-        g_s = f"{g_rate:.3f}" if g_rate is not None else "---"
+        c_s = f"{c_rate:.3f}" if c_rate is not None else ""
+        g_s = f"{g_rate:.3f}" if g_rate is not None else ""
         p = paired.get(condition, {})
         delta = p.get("gpt_minus_claude_cert_rate")
-        d_s = f"{delta:+.3f}" if delta is not None else "---"
+        d_s = f"{delta:+.3f}" if delta is not None else ""
         status = p.get("status", g.get("status", c.get("status", "pending")))
         lines.append(f"    {condition} & {c_s} & {g_s} & {d_s} & {status} \\\\")
     lines.extend(["    \\bottomrule", "  \\end{tabular}", "\\end{table}"])

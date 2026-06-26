@@ -119,7 +119,7 @@ def _format_rate_ci(summary: dict[str, Any]) -> str:
 
 def _format_p_value(p_value: float | None) -> str:
     if p_value is None:
-        return "---"
+        return ""
     if p_value < 0.001:
         return "$\\ll 0.05$"
     return f"{p_value:.3f}"
@@ -429,7 +429,7 @@ def render_constructible_equivalence_latex(report: dict[str, Any]) -> str:
             cell = row.get(cell_key) or {}
             if cell.get("status") != "available":
                 lines.append(
-                    f"    {row['provider']} & {row['track']} & {label} & --- & --- & pending \\\\"
+                    f"    {row['provider']} & {row['track']} & {label} & & & pending \\\\"
                 )
                 continue
             lines.append(
@@ -473,9 +473,9 @@ def render_constructible_equivalence_statistics_latex(report: dict[str, Any]) ->
                     label,
                     _format_rate_ci(summary),
                     f"{summary.get('certificate_valid_count', 0)}/{summary.get('n', 0)}",
-                    "---",
-                    "---",
-                    "---",
+                    "",
+                    "",
+                    "",
                 ]
             )
             + " \\\\"
@@ -492,7 +492,7 @@ def render_constructible_equivalence_statistics_latex(report: dict[str, Any]) ->
             + " & ".join(
                 [
                     row["comparison"],
-                    "---",
+                    "",
                     f"{row['paired_items']}",
                     agree_str,
                     _format_ci(row["cert_diff_first_minus_second"]),

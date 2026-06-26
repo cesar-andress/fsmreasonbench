@@ -59,7 +59,7 @@ def render_replicate_variability_latex(
             cv = stats.get("coefficient_of_variation")
             lo = stats.get("bootstrap_ci_low")
             hi = stats.get("bootstrap_ci_high")
-            cv_s = f"{cv:.3f}" if cv is not None else "---"
+            cv_s = f"{cv:.3f}" if cv is not None else ""
             lines.append(
                 f"    {family} & {track} & {metric.replace('_', ' ')} & "
                 f"{mean:.3f} & {cv_s} & {lo:.3f} & {hi:.3f} \\\\"
@@ -305,10 +305,10 @@ def render_stability_vs_cross_model_latex(report: dict[str, Any]) -> str:
         "    \\midrule",
     ]
     ceiling = report.get("replicate_noise_ceiling_f1_r2_std")
-    ceiling_s = f"{ceiling:.3f}" if ceiling is not None else "---"
+    ceiling_s = f"{ceiling:.3f}" if ceiling is not None else ""
     for row in report.get("conditions") or []:
         delta = row.get("abs_gpt_minus_claude_cert_rate")
-        delta_s = f"{delta:.3f}" if delta is not None else "---"
+        delta_s = f"{delta:.3f}" if delta is not None else ""
         if row.get("status") != "available":
             exceeds_s = "pending"
         elif row.get("difference_exceeds_replicate_variability") is True:
@@ -316,7 +316,7 @@ def render_stability_vs_cross_model_latex(report: dict[str, Any]) -> str:
         elif row.get("difference_exceeds_replicate_variability") is False:
             exceeds_s = "no"
         else:
-            exceeds_s = "---"
+            exceeds_s = ""
         lines.append(
             f"    {row.get('condition')} & {delta_s} & {ceiling_s} & {exceeds_s} \\\\"
         )
