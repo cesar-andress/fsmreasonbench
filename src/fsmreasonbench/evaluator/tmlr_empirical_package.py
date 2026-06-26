@@ -867,17 +867,17 @@ def write_figure_certificate_complexity_frontier_comparison(
         axes[0],
         table1,
         cert_rate_key="Claude_R1_cert",
-        ylabel="R1 certificate\nvalid rate",
+        ylabel="R1 witness\nvalidity",
         title="Claude Sonnet 4.5 R1",
     )
     _plot_complexity_vs_cert_panel(
         axes[1],
         table1,
         cert_rate_key="GPT_R1_cert",
-        ylabel="R1 certificate\nvalid rate",
+        ylabel="R1 witness\nvalidity",
         title="GPT-4.1 R1",
     )
-    axes[0].set_ylabel("R1 certificate\nvalid rate")
+    axes[0].set_ylabel("R1 witness\nvalidity")
     axes[1].set_ylabel("")
     fig.subplots_adjust(top=0.88, bottom=0.16, left=0.10, right=0.98, wspace=0.22)
     png_path = figures_dir / "figure_certificate_complexity_frontier_comparison.png"
@@ -923,8 +923,8 @@ def write_certificate_complexity_figures(
                 ax,
                 table1_frontier,
                 cert_rate_key="GPT_R1_cert",
-                ylabel="GPT-4.1 R1 certificate\nvalid rate",
-                title="Certificate complexity vs GPT-4.1 R1 success",
+                ylabel="GPT-4.1 R1 witness\nvalidity",
+                title="Witness complexity vs GPT-4.1 R1 validity",
             )
             fig.subplots_adjust(top=0.90, bottom=0.13, left=0.17, right=0.98)
             stem = "figure_certificate_complexity_gpt_r1"
