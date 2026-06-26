@@ -1,5 +1,7 @@
 # FSMReasonBench — Zenodo archive documentation
 
+> **Reviewers:** [`../../REVIEWER.md`](../../REVIEWER.md) · [`../REVIEWER.md`](../REVIEWER.md)
+
 **Published release:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0  
 **Zenodo DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
 **GitHub release:** FSMReasonBench v1.0.0  

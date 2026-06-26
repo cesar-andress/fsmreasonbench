@@ -1,0 +1,8 @@
+FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines
+version: v1.0.0
+doi: 10.5281/zenodo.20897937
+url: https://doi.org/10.5281/zenodo.20897937
+github_release: FSMReasonBench v1.0.0
+github_dev: https://github.com/cesar-andress/fsmreasonbench/tree/main
+released: 2026-06-20
+cohort: v0.1-expanded-n100

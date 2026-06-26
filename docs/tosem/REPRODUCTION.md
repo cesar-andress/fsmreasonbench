@@ -1,14 +1,27 @@
 # TOSEM read-only reproduction workflow
 
-**Policy:** Reviewers and artifact evaluators must be able to regenerate manuscript-facing
-tables from **frozen run outputs** without model API keys and without re-running inference.
+> **Reviewers arriving from Zenodo:** start at [`../REVIEWER.md`](../REVIEWER.md) or [`../docs/REVIEWER.md`](../docs/REVIEWER.md)
+> (≈5 minutes). This document adds tiered detail.
 
-**Python:** ≥ 3.11 (project pin in `pyproject.toml`; CI and release checks use 3.12)  
-**Install:**
+**Policy:** Regenerate manuscript-facing tables from **frozen run outputs** without model API keys
+and without re-running inference.
+
+**Verify snapshot:** [`../ARTIFACT_VERSION`](../ARTIFACT_VERSION) must list `v1.0.0` and DOI
+`10.5281/zenodo.20897937`. See [`../docs/artifact/FROZEN_VS_DEVELOPMENT.md`](../docs/artifact/FROZEN_VS_DEVELOPMENT.md).
+
+**Python:** ≥ 3.11 (release checks use 3.12)  
+**Install** (from repository root):
 
 ```bash
-cd fsmreasonbench
 pip install -e ".[dev,plot]"
+```
+
+**Fast path (Tier 0–2):**
+
+```bash
+cat ARTIFACT_VERSION
+PYTHONPATH=src python3.12 -m fsmreasonbench.cli.artifact_health
+./scripts/reproduce_tosem_tables.sh
 ```
 
 ---

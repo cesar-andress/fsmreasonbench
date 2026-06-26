@@ -47,5 +47,6 @@ echo "==> artifact_health"
 "$PYTHON" -m fsmreasonbench.cli.artifact_health
 
 echo
-echo "Done. LaTeX tables: ${REPO_ROOT}/../paper/tables/"
+echo "Done. LaTeX tables: ${REPO_ROOT}/../paper/tables/ (when sibling paper/ exists)"
 echo "TOSEM manifest:     ${REPO_ROOT}/docs/tosem_empirical_package_v1/package_manifest.json"
+echo "Reviewer guide:     ${REPO_ROOT}/REVIEWER.md"

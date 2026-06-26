@@ -1,71 +1,60 @@
-# FSMReasonBench — Quickstart (Zenodo tarball)
+# FSMReasonBench — Zenodo tarball quickstart
 
-You downloaded **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0 from Zenodo.
+You downloaded **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines**
+**v1.0.0** from Zenodo.
 
 **DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
-**GitHub release:** FSMReasonBench v1.0.0
+**GitHub release (mirror):** [FSMReasonBench v1.0.0](https://github.com/cesar-andress/fsmreasonbench/releases/tag/v1.0.0)
 
-You do **not** need GitHub for citation or scoring.
+> **Reviewers:** follow [`REVIEWER.md`](REVIEWER.md) or [`docs/REVIEWER.md`](docs/REVIEWER.md) for the
+> full 5-minute audit path.
 
-## 1. Verify integrity
+---
 
-If the tarball includes checksums:
-
-```bash
-sha256sum -c SHA256SUMS
-```
-
-## 2. Check version pins
-
-Open `releases/1.0.0/release_manifest.json` (or root `release_manifest.json` if flattened) and note:
-
-- `benchmark_version`
-- `cohort_version` (`v0.1-expanded-n100` for the paper cohort)
-- `schema_version`
-- `verifier_version`
-
-Cite the Zenodo DOI and these pins in your paper.
-
-## 3. Validate cohort
+## 1. Verify the frozen snapshot
 
 ```bash
-PYTHONPATH=src python -m fsmreasonbench.cli.validate_cohort \
-  --cohort-dir cohorts/v0.1-expanded-n100/f1-mixed-level3
+cat ARTIFACT_VERSION
+cat releases/1.0.0/release_manifest.json
 ```
 
-Legacy shell wrapper (if present):
+Expected: `version: v1.0.0`, DOI `10.5281/zenodo.20897937`, cohort `v0.1-expanded-n100`.
 
-```bash
-./scripts/validate_cohort_integrity.sh --help
-```
+If the tarball includes checksums: `sha256sum -c SHA256SUMS`
 
-## 4. Score a submission
+---
 
-```bash
-PYTHONPATH=src python -m fsmreasonbench.cli.score_submission \
-  --item examples/item_F1_separation_seed42.json \
-  --submission examples/submission_C2_correct.json
-```
-
-Or `scripts/verify_submission.py` when packaged in the tarball layout.
-
-## 5. Reproduce TOSEM paper tables (offline)
+## 2. Install
 
 ```bash
 pip install -e ".[dev,plot]"
+```
+
+Python ≥ 3.11.
+
+---
+
+## 3. Reproduce TOSEM tables (no API keys)
+
+```bash
 ./scripts/reproduce_tosem_tables.sh
 ```
 
-Outputs: `../paper/tables/` (TOSEM manuscript) and `docs/tosem_empirical_package_v1/`.
-Requires frozen run trees included in the tarball. **No model API calls.**
+**Success:** `docs/tosem_empirical_package_v1/package_manifest.json` exists; script exits 0.
 
-## Documentation
+Optional: `PYTHONPATH=src python3.12 -m fsmreasonbench.cli.artifact_health`
 
-- TOSEM workflow: `docs/tosem/REPRODUCTION.md`
-- Normative spec: `docs/specification/BENCHMARK_SPEC.md`
-- Reproducibility: `docs/zenodo/REPRODUCIBILITY.md`
-- Historical TMLR package: `docs/tmlr_empirical_package_v1/README.md`
+---
+
+## 4. Next steps
+
+| Task | Document |
+|------|----------|
+| Full reproduction tiers | [`docs/tosem/REPRODUCTION.md`](docs/tosem/REPRODUCTION.md) |
+| Documentation index | [`docs/README.md`](docs/README.md) |
+| Frozen vs. `main` | [`docs/artifact/FROZEN_VS_DEVELOPMENT.md`](docs/artifact/FROZEN_VS_DEVELOPMENT.md) |
+| Score a sample submission | `PYTHONPATH=src python -m fsmreasonbench.cli.score_submission --help` |
 
 ## Citation
 
-See `CITATION.cff`.
+[`CITATION.cff`](CITATION.cff)

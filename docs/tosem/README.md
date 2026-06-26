@@ -1,5 +1,8 @@
 # FSMReasonBench — ACM TOSEM companion artifact
 
+> **Reviewers:** [`../REVIEWER.md`](../REVIEWER.md) · [`../docs/REVIEWER.md`](../docs/REVIEWER.md) · one-command
+> reproduction: `./scripts/reproduce_tosem_tables.sh`
+
 **Target venue:** ACM Transactions on Software Engineering and Methodology (TOSEM)  
 **Manuscript:** [`../../paper/`](../../paper/) (sibling directory in the monorepo)  
 **Authoritative freeze:** [`../../paper/EXPERIMENTAL_FREEZE_TOSEM.md`](../../paper/EXPERIMENTAL_FREEZE_TOSEM.md)  
@@ -32,7 +35,6 @@ Requires **Python ≥ 3.11** (tested with 3.12), editable install, and frozen ru
 `runs/` (included in the Zenodo tarball; may be gitignored in development clones).
 
 ```bash
-cd fsmreasonbench
 pip install -e ".[dev,plot]"
 ./scripts/reproduce_tosem_tables.sh
 ```

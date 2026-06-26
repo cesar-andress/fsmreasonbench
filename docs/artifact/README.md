@@ -2,6 +2,7 @@
 
 Normative policies for Zenodo releases. Read in order:
 
+0. [`FROZEN_VS_DEVELOPMENT.md`](FROZEN_VS_DEVELOPMENT.md) — **Zenodo v1.0.0 vs GitHub `main`**
 1. [`artifact_philosophy.md`](artifact_philosophy.md) — what this repository is
 2. [`repository_layout.md`](repository_layout.md) — layer separation
 3. [`release_policy.md`](release_policy.md) — Zenodo deposit structure
