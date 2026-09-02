@@ -2,7 +2,8 @@
 
 **Date:** 2026-09-02  
 **Repo:** `fsmreasonbench/fsmreasonbench` (`main`)  
-**Freeze commit:** `6009e44`  
+**Freeze commit (code):** `6009e44f4d26c4a676b065eb930c165e34a3752f`  
+**Docs pin commit:** `eba0815` (PRE_SPEC hash pointers)  
 **Constraint honored:** no real model/API generation calls.
 
 ---
