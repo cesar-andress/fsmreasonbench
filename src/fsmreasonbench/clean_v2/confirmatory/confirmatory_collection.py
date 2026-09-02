@@ -178,7 +178,8 @@ def _family_completion_from_manifests(
     return out
 
 
-def _load_completed_positions(ledger_path: Path) -> set[int]:
+def _load_finished_positions(ledger_path: Path) -> set[int]:
+    """Positions already attempted to terminal status (completed or unresolved after max_reruns)."""
     done: set[int] = set()
     if not ledger_path.exists():
         return done
@@ -186,9 +187,15 @@ def _load_completed_positions(ledger_path: Path) -> set[int]:
         if not line.strip():
             continue
         row = json.loads(line)
-        if str(row.get("status", "")).startswith("completed"):
+        st = str(row.get("status", ""))
+        if st.startswith("completed") or "unresolved" in st:
             done.add(int(row["planned_position"]))
     return done
+
+
+def _load_completed_positions(ledger_path: Path) -> set[int]:
+    """Backward-compatible alias: finished positions (do not re-dispatch)."""
+    return _load_finished_positions(ledger_path)
 
 
 def run_confirmatory_collection(
