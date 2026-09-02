@@ -2,6 +2,7 @@
 
 **Date:** 2026-09-02  
 **Repo:** `fsmreasonbench/fsmreasonbench` (`main`)  
+**Freeze commit:** `6009e44`  
 **Constraint honored:** no real model/API generation calls.
 
 ---
@@ -155,7 +156,7 @@ Test: `test_pilot_guard_blocks_scientific_rates`.
 
 | File | SHA-256 |
 |---|---|
-| `docs/clean_v2/PRE_SPECIFICATION.md` | `3ecfc718e2150f310440c9c21aab1fcae39c3b45206eec82bbc784da2c0ef594` |
+| `docs/clean_v2/PRE_SPECIFICATION.md` | `9ff312b3b7c3169db7ac4cec6919ff403a2250487b7edff01bc2e973b2f399cd` |
 
 Tag placeholder: `clean_v2-confirmatory-prespec-v1`.
 

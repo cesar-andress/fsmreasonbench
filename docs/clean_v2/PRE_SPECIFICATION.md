@@ -3,8 +3,8 @@
 **Status:** FROZEN before any confirmatory or pilot model generation.  
 **spec_version:** `clean_v2.confirmatory.v1`  
 **spec_frozen_at:** `2026-09-02T13:00:48Z`  
-**harness_commit_at_freeze_draft:** `8e0e8f0d22dea35ab44ae405fe8eff2dea2f5cb0`  
-**analysis_commit_at_freeze_draft:** `8e0e8f0d22dea35ab44ae405fe8eff2dea2f5cb0` (same tree; confirmatory analysis under `src/fsmreasonbench/clean_v2/confirmatory/`)  
+**harness_commit_at_freeze_draft:** `6009e44f4d26c4a676b065eb930c165e34a3752f`  
+**analysis_commit_at_freeze_draft:** `6009e44f4d26c4a676b065eb930c165e34a3752f` (same tree; confirmatory analysis under `src/fsmreasonbench/clean_v2/confirmatory/`)  
 **freeze_git_tag_placeholder:** `clean_v2-confirmatory-prespec-v1` (annotate after commit)  
 **cohort_fingerprint:** `61f1ccaa4bf2927361e140b239ac5aaccf8a1c0ab2370f8f915e13e17b06af9b`  
 **execution_order_seed:** `20260902`  
@@ -21,7 +21,7 @@ This document is the confirmatory pre-data specification. It remains scientifica
 |---|---|
 | spec_version | clean_v2.confirmatory.v1 |
 | timestamp | 2026-09-02T13:00:48Z |
-| harness commit | 8e0e8f0d22dea35ab44ae405fe8eff2dea2f5cb0 (update to post-freeze HEAD if tagging after this file) |
+| harness commit | 6009e44f4d26c4a676b065eb930c165e34a3752f (freeze landing commit) |
 | analysis commit | same |
 | experiment fingerprints | see `docs/clean_v2/manifests/` condition_fingerprint fields |
 | freeze git tag | `clean_v2-confirmatory-prespec-v1` (placeholder until annotated) |
