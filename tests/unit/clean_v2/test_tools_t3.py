@@ -39,7 +39,7 @@ def test_palettes_exclude_builders():
 def test_forbidden_tools_rejected(repo_root):
     item = _eq_item(repo_root)
     evaluatee = build_evaluatee_view(item)
-    results = execute_clean_tool_plan(
+    results, _audit = execute_clean_tool_plan(
         item,
         evaluatee,
         [

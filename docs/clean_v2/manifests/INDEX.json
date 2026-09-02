@@ -1,0 +1,78 @@
+{
+  "manifests": {
+    "CONFIRMATORY_MASTER": {
+      "fingerprint": "c130cf72ae19ad424b52cdfc1f5cee87c462e33318e4351b26b179815bba855a",
+      "n_tasks": 3040,
+      "path": "docs/clean_v2/manifests/manifest_confirmatory_master.json"
+    },
+    "DIGEST": {
+      "fingerprint": "486ae009a3d9044ff0a04d132a9766cd9fcd1db0744e21b63505020baf1742d3",
+      "n_tasks": 510,
+      "path": "docs/clean_v2/manifests/manifest_digest.json"
+    },
+    "PILOT": {
+      "fingerprint": "c641fa3f96a84f90d28f47dcb21dc76b20e53afc90528a4ada073446e73f6a5b",
+      "n_tasks": 100,
+      "path": "docs/clean_v2/manifests/manifest_pilot.json"
+    },
+    "RQ1": {
+      "fingerprint": "156a9f6d88f2467a887635535d3b5fe438ce9c956f040217766a0a3d074aba89",
+      "n_tasks": 1000,
+      "path": "docs/clean_v2/manifests/manifest_rq1.json"
+    },
+    "RQ2": {
+      "fingerprint": "3d4f95873d674559d67ecc114be42e88d19f21e45d11907c470c187f9dd367ac",
+      "n_tasks": 1020,
+      "path": "docs/clean_v2/manifests/manifest_rq2.json"
+    },
+    "RQ3": {
+      "fingerprint": "fb6c95d8f1e76be7b831e43b7e9639993d024726fe6dfbf2f082ff192c1c631e",
+      "n_tasks": 1530,
+      "path": "docs/clean_v2/manifests/manifest_rq3.json"
+    }
+  },
+  "meta": {
+    "caching_policies": {
+      "anthropic": {
+        "cache_status_observable": false,
+        "can_disable": true,
+        "class": "A",
+        "disabled_in_confirmatory": true,
+        "mechanism": "Prompt caching is opt-in via cache_control on content blocks; clean_v2 confirmatory requests omit cache_control (adapter default).",
+        "provider": "anthropic",
+        "sensitivity_analysis": "timestamp_decile_diagnostic"
+      },
+      "openai": {
+        "cache_status_observable": false,
+        "can_disable": false,
+        "class": "C",
+        "disabled_in_confirmatory": false,
+        "mechanism": "OpenAI Chat Completions adapter has no explicit cache-disable field; response cache-hit metadata is not parsed. Record timestamps and run pre-specified drift/cache sensitivity.",
+        "provider": "openai",
+        "sensitivity_analysis": "timestamp_decile_diagnostic"
+      }
+    },
+    "cohort_fingerprint": "61f1ccaa4bf2927361e140b239ac5aaccf8a1c0ab2370f8f915e13e17b06af9b",
+    "execution_order_seed": 20260902,
+    "k_repetitions": 5,
+    "max_tokens": 8192,
+    "max_verifier_calls": 3,
+    "models": [
+      "claude-sonnet-4-5-20250929",
+      "gpt-4.1"
+    ],
+    "n_distinguishing": 49,
+    "n_equivalent": 51,
+    "pilot_item_ids": [
+      "0027e8d7-4960-5973-8266-d7b17f673831",
+      "05f2e4ef-d67e-50f3-9309-6ecd03895d9e",
+      "06d801e1-67d3-52b6-a717-29ba68b012b3",
+      "096163f6-1dda-5903-81b2-2ad407337a9e",
+      "09c9a727-a851-5c5d-965c-d4bd60d38652"
+    ],
+    "provenance_decision": "REUSE_ALL_51",
+    "spec_version": "clean_v2.confirmatory.v1",
+    "temperature": 0.2
+  },
+  "spec_version": "clean_v2.confirmatory.v1"
+}

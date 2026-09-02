@@ -21,6 +21,11 @@
 | `src/fsmreasonbench/clean_v2/sentinel/*` | Mock E2E campaign | `test_sentinel.py` |
 | `src/fsmreasonbench/cli/run_clean_v2_sentinel.py` | Sentinel CLI | sentinel test |
 | `docs/clean_v2/HARNESS_READINESS_REPORT.md` | Readiness audit | — |
+| `src/fsmreasonbench/clean_v2/confirmatory/*` | Pre-data confirmatory design, scheduler, T3 budget, missingness, analysis, manifests, pilot guard | `test_confirmatory_design.py`, `test_t3_budget_first_witness.py` |
+| `docs/clean_v2/PRE_SPECIFICATION.md` | Frozen confirmatory pre-spec | — |
+| `docs/clean_v2/PRE_DATA_FREEZE_REPORT.md` | Pre-data freeze report | — |
+| `docs/clean_v2/manifests/*` | Frozen task manifests | freeze CLI |
+| `src/fsmreasonbench/cli/freeze_clean_v2_confirmatory.py` | Manifest/provenance freeze CLI | — |
 
 ## Human review status
 

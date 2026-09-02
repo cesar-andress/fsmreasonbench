@@ -15,11 +15,16 @@ from fsmreasonbench.clean_v2.artifacts import (
     write_json,
 )
 from fsmreasonbench.clean_v2.condition import ConditionSpec, OracleInfoId, OrchestrationMode, ToolPaletteId
+from fsmreasonbench.clean_v2.confirmatory.constants import MAX_VERIFIER_CALLS
+from fsmreasonbench.clean_v2.confirmatory.t3_budget import (
+    compute_witness_valid_first,
+    strip_silent_audit_for_model_export,
+)
 from fsmreasonbench.clean_v2.fingerprint import fingerprint_condition
 from fsmreasonbench.clean_v2.metrics import summarize_attempt_records
 from fsmreasonbench.clean_v2.prompts import render_final_prompt, render_tool_plan_prompt
 from fsmreasonbench.clean_v2.provenance import WitnessProvenance, assert_model_performance_row_allowed
-from fsmreasonbench.clean_v2.scoring import score_clean_submission
+from fsmreasonbench.clean_v2.scoring import parse_clean_submission, score_clean_submission
 from fsmreasonbench.clean_v2.tools import execute_clean_tool_plan
 from fsmreasonbench.clean_v2.views import build_evaluatee_view, build_evaluator_only
 from fsmreasonbench.items.assembly import BenchmarkItem
@@ -103,6 +108,12 @@ def run_clean_item(
 
     tool_outputs: list[dict[str, Any]] = []
     tool_calls: list[dict[str, Any]] = []
+    tool_audit: dict[str, Any] = {
+        "max_verifier_calls": MAX_VERIFIER_CALLS,
+        "verifier_call_count": 0,
+        "verifier_call_cap_reached": False,
+        "coarse_verifier_responses": [],
+    }
     messages: list[dict[str, Any]] = []
 
     if condition.tool_palette != ToolPaletteId.T0_NONE:
@@ -115,13 +126,14 @@ def run_clean_item(
         messages.append({"role": "user", "phase": "tool_plan", "content": plan_prompt})
         messages.append({"role": "assistant", "phase": "tool_plan", "content": plan_text})
         tool_calls = _parse_tool_plan(plan_text)
-        tool_outputs = execute_clean_tool_plan(
+        tool_outputs, tool_audit = execute_clean_tool_plan(
             item,
             evaluatee,
             tool_calls,
             palette=condition.tool_palette,
             contract=condition.contract,
             tool_call_budget=condition.tool_call_budget,
+            max_verifier_calls=MAX_VERIFIER_CALLS,
         )
 
     final_prompt = render_final_prompt(
@@ -154,6 +166,22 @@ def run_clean_item(
         provenance=provenance,
         tool_outputs=tool_outputs,
     )
+    # Silent first-proposal evaluation: never injected into messages/tool_outputs.
+    submission, _ = parse_clean_submission(final_text)
+    final_cert = submission.get("certificate") if isinstance(submission, dict) else None
+    first_audit = compute_witness_valid_first(
+        item,
+        contract=condition.contract,
+        tool_calls=tool_calls,
+        final_certificate=final_cert if isinstance(final_cert, dict) else None,
+    )
+    score["witness_valid_first"] = first_audit.get("witness_valid_first")
+    score["first_proposal_present"] = first_audit.get("first_proposal_present")
+    score["first_proposal_source"] = first_audit.get("first_proposal_source")
+    score["verifier_call_count"] = tool_audit.get("verifier_call_count", 0)
+    score["verifier_call_cap_reached"] = tool_audit.get("verifier_call_cap_reached", False)
+    score["coarse_verifier_responses"] = tool_audit.get("coarse_verifier_responses", [])
+    score["max_verifier_calls"] = tool_audit.get("max_verifier_calls", MAX_VERIFIER_CALLS)
     score["run_id"] = run_id
     score["condition_fingerprint"] = fingerprint_condition(
         condition, item_manifest_fingerprint=item_manifest_fingerprint
@@ -168,6 +196,9 @@ def run_clean_item(
     }
     assert_model_performance_row_allowed(score)
 
+    # Evaluator-only silent audit (not model-visible).
+    silent_audit = strip_silent_audit_for_model_export(first_audit)
+
     transcript = {
         "run_id": run_id,
         "item_id": item.item_id,
@@ -176,6 +207,8 @@ def run_clean_item(
         "messages": messages,
         "tool_calls": tool_calls,
         "tool_outputs": tool_outputs,
+        "tool_audit": tool_audit,
+        "silent_first_witness_audit": silent_audit,
         "raw_response": final_text,
         "score": score,
         # Evaluator-only gold is stored separately from model-visible evaluatee.

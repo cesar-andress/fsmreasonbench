@@ -12,6 +12,7 @@ from fsmreasonbench.clean_v2.condition import (
     OracleInfoId,
     ToolPaletteId,
 )
+from fsmreasonbench.clean_v2.confirmatory.constants import MAX_VERIFIER_CALLS
 from fsmreasonbench.clean_v2.views import EvaluateeView
 
 
@@ -96,7 +97,9 @@ def tool_docs_for_palette(palette: ToolPaletteId) -> str:
         return (
             "Allowed tools:\n"
             '- "verifier.validate_certificate_coarse": inputs {"certificate": {...}} -> '
-            "coarse status codes only (no gold fragments).\n"
+            "coarse status codes only (no gold fragments). "
+            f"Hard cap: at most {MAX_VERIFIER_CALLS} verifier calls per generation "
+            "(further calls are rejected as max_verifier_calls_exhausted).\n"
         )
     if palette == ToolPaletteId.T3_VERIFY_WITH_STEP:
         return (
@@ -104,7 +107,8 @@ def tool_docs_for_palette(palette: ToolPaletteId) -> str:
             '- "step": inputs {"fsm_id","state","symbol"} -> '
             "{success, next_state?} local transition only.\n"
             '- "verifier.validate_certificate_coarse": inputs {"certificate": {...}} -> '
-            "coarse status codes only (no gold fragments).\n"
+            "coarse status codes only (no gold fragments). "
+            f"Hard cap: at most {MAX_VERIFIER_CALLS} verifier calls per generation.\n"
         )
     raise ValueError(palette)
 
