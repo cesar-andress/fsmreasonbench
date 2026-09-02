@@ -17,7 +17,7 @@
 | collection started_at (UTC) | 2026-09-02T14:08:16Z |
 | collection completed_at | null |
 | stop marker | runs/clean_v2_confirmatory/COLLECTION_STOPPED.json |
-| stopped_at (UTC) | 2026-09-02T20:10:24Z |
+| stopped_at (UTC) | 2026-09-02T20:11:07Z |
 | stop reason | user_requested_stop |
 
 Integrity at start (): ok=true; scientific PRE_SPEC sha256 recorded; no scientific outcomes computed at stop.
@@ -27,11 +27,11 @@ Integrity at start (): ok=true; scientific PRE_SPEC sha256 recorded; no scientif
 | Metric | Count |
 |---|---|
 | Planned tasks (master) | 3040 |
-| Ledger rows written | 2823 |
-| last_planned_position | 2823 |
-| status=completed | 1681 |
+| Ledger rows written | 2826 |
+| last_planned_position | 2826 |
+| status=completed | 1684 |
 | status=unresolved_infrastructure | 1142 |
-| Positions not yet in ledger | 217 |
+| Positions not yet in ledger | 214 |
 
 No witness_valid rates, no per-condition or per-model breakdowns.
 
