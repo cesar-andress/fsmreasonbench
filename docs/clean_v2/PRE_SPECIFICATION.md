@@ -232,7 +232,7 @@ Full provenance answers: `docs/clean_v2/ITEM_PROVENANCE_AUDIT.json`.
 | Snapshot A | Anthropic | `claude-sonnet-4-5-20250929` |
 | Snapshot B | OpenAI | `gpt-4.1` |
 
-- Planned collection window: **TBD at pilot start** (placeholder).
+- Planned collection window: **pilot started 2026-09-02T13:39:29Z** (operational; confirmatory window still TBD).
 - Analyse separately; never pool in a primary significance test.
 - Secondary only: difference between the two model-specific paired RDs with an interval.
 
