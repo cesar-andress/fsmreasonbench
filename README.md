@@ -1,7 +1,7 @@
 # FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20836347.svg)](https://doi.org/10.5281/zenodo.20836347)
-[![Release](https://img.shields.io/badge/release-v2.0.0-blue)](https://github.com/cesar-andress/fsmreasonbench)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23004350.svg)](https://doi.org/10.5281/zenodo.23004350)
+[![Release](https://img.shields.io/badge/release-v2.0.0-blue)](https://github.com/cesar-andress/fsmreasonbench/releases/tag/v2.0.0)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](pyproject.toml)
 
@@ -10,10 +10,11 @@ witness, and full-correctness metrics.
 
 | | |
 |--|--|
-| **Software (concept / all versions)** | [DOI 10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347) |
-| **v1.0.0 archival deposit** | [DOI 10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) |
-| **Active software version** | [`ARTIFACT_VERSION`](ARTIFACT_VERSION) · `2.0.0` (prep; version-specific Zenodo DOI after archival) |
-| **Source** | [GitHub](https://github.com/cesar-andress/fsmreasonbench) |
+| **Cite this release (v2.0.0)** | [DOI 10.5281/zenodo.23004350](https://doi.org/10.5281/zenodo.23004350) |
+| **Concept DOI (all versions)** | [DOI 10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347) |
+| **Historical v1.0.0 deposit** | [DOI 10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) |
+| **Version stamp** | [`ARTIFACT_VERSION`](ARTIFACT_VERSION) |
+| **Source** | [GitHub](https://github.com/cesar-andress/fsmreasonbench) · [Release v2.0.0](https://github.com/cesar-andress/fsmreasonbench/releases/tag/v2.0.0) |
 
 ---
 
@@ -97,7 +98,7 @@ unclear.
 
 ## Citation
 
-Until the v2.0.0 version-specific Zenodo DOI is minted, cite the **concept DOI** (all versions):
+For reproducibility of the current study, cite the **version-specific** archival release:
 
 ```bibtex
 @software{fsmreasonbench,
@@ -105,13 +106,13 @@ Until the v2.0.0 version-specific Zenodo DOI is minted, cite the **concept DOI**
   title   = {{FSMReasonBench}: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems},
   year    = {2026},
   version = {2.0.0},
-  doi     = {10.5281/zenodo.20836347},
-  url     = {https://doi.org/10.5281/zenodo.20836347},
-  note    = {Concept DOI. Version-specific DOI for v2.0.0 will be added after archival.}
+  doi     = {10.5281/zenodo.23004350},
+  url     = {https://doi.org/10.5281/zenodo.23004350}
 }
 ```
 
-The frozen v1.0.0 deposit remains citable at [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937).
+The **concept DOI** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347) resolves across
+versions. Historical v1.0.0 remains at [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937).
 See also [`CITATION.cff`](CITATION.cff).
 
 ---

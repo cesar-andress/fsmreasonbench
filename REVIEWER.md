@@ -1,6 +1,6 @@
 # Reviewer / auditor quickstart
 
-You are verifying **FSMReasonBench** archived layered metrics.
+You are verifying **FSMReasonBench v2.0.0** archived layered metrics.
 
 **→ Full guide:** [`docs/REVIEWER.md`](docs/REVIEWER.md)  
 **→ Offline regeneration details:** [`docs/tosem/REPRODUCTION.md`](docs/tosem/REPRODUCTION.md)
@@ -13,11 +13,13 @@ cat ARTIFACT_VERSION
 cat releases/2.0.0/release_manifest.json
 ```
 
-For the immutable **v1.0.0** archival deposit, use Zenodo
-[10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) or tag `v1.0.0`.
-The **concept DOI** for all versions is [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347).
+Expected: `version: v2.0.0` and DOI `10.5281/zenodo.23004350`.
 
-If you cloned GitHub `main`, confirm `ARTIFACT_VERSION` matches the release you intend to audit.
+| Surface | Identifier |
+|---------|------------|
+| **v2.0.0 version DOI** | [10.5281/zenodo.23004350](https://doi.org/10.5281/zenodo.23004350) |
+| **Concept DOI** | [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347) |
+| **Historical v1.0.0** | [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) |
 
 ## Regenerate archived tables (≈5 minutes, no API keys)
 
@@ -26,8 +28,7 @@ pip install -e ".[dev,plot]"
 ./scripts/reproduce_archived_tables.sh
 ```
 
-**Success:** script exits 0; see `docs/tosem_empirical_package_v1/package_manifest.json`
-(and `paper/tables/` when this repo is checked out beside the manuscript tree).
+**Success:** script exits 0; see `docs/tosem_empirical_package_v1/package_manifest.json`.
 
 **Optional check:**
 
@@ -37,7 +38,7 @@ PYTHONPATH=src python3.12 -m fsmreasonbench.cli.artifact_health
 
 ## What you do not need
 
-- Model API keys (OpenAI, Anthropic, etc.)
+- Model API keys
 - Re-running inference campaigns
 - Manuscript source (to audit reported **numbers** from archived exports)
 

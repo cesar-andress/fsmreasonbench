@@ -2,8 +2,9 @@ cff-version: 1.2.0
 message: "If you use FSMReasonBench, please cite it as below."
 title: "FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems"
 version: "2.0.0"
-doi: 10.5281/zenodo.20836347
-url: https://doi.org/10.5281/zenodo.20836347
+doi: 10.5281/zenodo.23004350
+url: https://doi.org/10.5281/zenodo.23004350
+date-released: 2026-09-28
 license: Apache-2.0
 authors:
   - family-names: Andrés
@@ -28,6 +29,7 @@ preferred-citation:
       given-names: César
       orcid: "https://orcid.org/0009-0001-8968-3404"
   year: 2026
-  doi: 10.5281/zenodo.20836347
-  url: https://doi.org/10.5281/zenodo.20836347
-  notes: "Concept / all-versions DOI. Version-specific Zenodo DOI for v2.0.0 will be added after archival. Historical v1.0.0 deposit: 10.5281/zenodo.20897937. Cite benchmark_version, cohort_version, schema_version, and verifier_version from the release manifest when available."
+  month: 9
+  doi: 10.5281/zenodo.23004350
+  url: https://doi.org/10.5281/zenodo.23004350
+  notes: "Version-specific Zenodo DOI for v2.0.0. Concept DOI (all versions): 10.5281/zenodo.20836347. Historical v1.0.0: 10.5281/zenodo.20897937."

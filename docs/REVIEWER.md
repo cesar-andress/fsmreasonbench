@@ -3,8 +3,9 @@
 This guide is for auditors verifying **FSMReasonBench** archived layered metrics from a Zenodo
 deposit or git tag.
 
-**Primary archival DOI (v1.0.0):** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
-**Concept DOI (all versions):** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)
+**Current archival DOI (v2.0.0):** [10.5281/zenodo.23004350](https://doi.org/10.5281/zenodo.23004350)  
+**Concept DOI (all versions):** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)  
+**Historical v1.0.0:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)
 
 **Goal:** confirm the frozen snapshot and regenerate layered tables from on-disk run outputs —
 **without model API calls**.
@@ -15,11 +16,10 @@ deposit or git tag.
 
 ```bash
 cat ARTIFACT_VERSION
-python3 -c "import json; m=json.load(open('releases/1.0.0/release_manifest.json')); print(m['benchmark_version'], m['zenodo']['primary_doi'])"
+python3 -c "import json; m=json.load(open('releases/2.0.0/release_manifest.json')); print(m['benchmark_version'], m['zenodo']['primary_doi'])"
 ```
 
-For the published **v1.0.0** archive expect `1.0.0` and `10.5281/zenodo.20897937`.  
-For **v2.0.0** prep trees, also inspect `releases/2.0.0/release_manifest.json`.
+For the published **v2.0.0** archive expect `2.0.0` and `10.5281/zenodo.23004350`.
 
 | You opened… | Archived numbers regenerable? |
 |-------------|----------------------------|
@@ -140,6 +140,7 @@ Full layout: [`artifact/repository_layout.md`](artifact/repository_layout.md).
 
 ## Citation
 
-Prefer the concept DOI [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347).
-The published v1.0.0 version DOI remains [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937).
+Cite the v2.0.0 version DOI [10.5281/zenodo.23004350](https://doi.org/10.5281/zenodo.23004350).
+The concept DOI [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347) resolves across versions.
+Historical v1.0.0 remains [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937).
 See [`CITATION.cff`](../CITATION.cff).

@@ -1,7 +1,9 @@
-# FSMReasonBench v2.0.0 — draft release notes
+# FSMReasonBench v2.0.0 — release notes
 
-**Status:** preparation draft for the future GitHub Release body.  
-**Do not treat as published until tag `v2.0.0` is created and archived.**
+**Status:** published archival release.  
+**Version DOI:** [10.5281/zenodo.23004350](https://doi.org/10.5281/zenodo.23004350)  
+**Concept DOI:** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)  
+**GitHub:** [Release v2.0.0](https://github.com/cesar-andress/fsmreasonbench/releases/tag/v2.0.0)
 
 ## Summary
 
@@ -32,18 +34,10 @@ re-execution or repeated-generation reproducibility.
 
 - Legacy export module and directory names (`tosem_*`, `tmlr_*`) remain callable for path stability
 - Machine-readable `certificate_*` fields remain valid; protocol terminology prefers *witness*
-- No intentional change to frozen numerical rates in this preparation
+- No intentional change to frozen numerical rates in this release
 
 ## Citation
 
-Cite the Zenodo **concept DOI** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)
-until the version-specific deposit for v2.0.0 is minted.
-
-The version-specific Zenodo DOI will be added after archival.
+Cite the version-specific DOI [10.5281/zenodo.23004350](https://doi.org/10.5281/zenodo.23004350).
 
 Historical v1.0.0 deposit: [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937).
-
-## Recommendation
-
-Keep this file until the GitHub Release is published; afterwards it may be folded into `CHANGELOG.md`
-and removed from the tree if desired.

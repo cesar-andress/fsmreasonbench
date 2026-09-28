@@ -6,17 +6,18 @@
   "verifier_version": "1.0.0",
   "generator_version": "1.0.0",
   "python_version": "3.11+",
-  "released_at": null,
+  "released_at": "2026-09-28T00:35:02Z",
   "zenodo": {
+    "primary_doi": "10.5281/zenodo.23004350",
     "concept_doi": "10.5281/zenodo.20836347",
-    "primary_doi": null,
-    "primary_doi_status": "pending_archival",
     "prior_version_doi": "10.5281/zenodo.20897937",
+    "url": "https://doi.org/10.5281/zenodo.23004350",
     "url_concept": "https://doi.org/10.5281/zenodo.20836347"
   },
   "github_release": "FSMReasonBench v2.0.0",
+  "github_release_url": "https://github.com/cesar-andress/fsmreasonbench/releases/tag/v2.0.0",
   "artifact_name": "FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems",
-  "notes": "Preparation manifest for v2.0.0. Version-specific Zenodo DOI is not yet minted. Cite concept DOI 10.5281/zenodo.20836347 until archival completes. Frozen empirical outputs from the v1.0.0 calibration remain the offline regeneration source; this release consolidates venue-neutral layered-evaluation identity and documentation.",
+  "notes": "Archival release v2.0.0. Cite version DOI 10.5281/zenodo.23004350 for this snapshot. Concept DOI 10.5281/zenodo.20836347 resolves across versions. Frozen empirical outputs support offline regeneration of layered analyses; primary cells are one archived generation per item under the recorded configuration.",
   "reproduction": {
     "validate_cohort": "PYTHONPATH=src python -m fsmreasonbench.cli.validate_cohort",
     "export_paper_package": "./scripts/reproduce_archived_tables.sh",

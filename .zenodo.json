@@ -41,5 +41,5 @@
       "scheme": "doi"
     }
   ],
-  "notes": "Cite the concept DOI 10.5281/zenodo.20836347 until the version-specific Zenodo DOI for v2.0.0 is minted. Legacy machine-readable schema fields may use certificate_* names; protocol terminology uses witness."
+  "notes": "Cite the version-specific Zenodo DOI 10.5281/zenodo.23004350 for FSMReasonBench v2.0.0. Concept DOI (all versions): 10.5281/zenodo.20836347. Legacy machine-readable schema fields may use certificate_* names; protocol terminology uses witness."
 }

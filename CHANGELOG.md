@@ -2,18 +2,21 @@
 
 All notable changes to the FSMReasonBench research software are documented here.
 
-## [2.0.0] — preparation (tag not yet created)
+## [2.0.0] — 2026-09-28
 
 Venue-neutral release consolidation for the witness-aware layered evaluation framework.
 Archived experimental outputs and frozen cohort manifests are retained; no new model executions
 are introduced in this version.
 
+**Zenodo version DOI:** [10.5281/zenodo.23004350](https://doi.org/10.5281/zenodo.23004350)  
+**Concept DOI:** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)
+
 ### Added
 
 - `.zenodo.json` as authoritative GitHub→Zenodo metadata for the v2.0.0 deposit
 - `scripts/reproduce_archived_tables.sh` venue-neutral entry point for offline table regeneration
-- `releases/2.0.0/release_manifest.json` version pins (version DOI pending archival)
-- `RELEASE_NOTES_v2.0.0.md` draft GitHub release body
+- `releases/2.0.0/release_manifest.json` version pins
+- `RELEASE_NOTES_v2.0.0.md` release documentation
 - `release/v2.0.0_manifest.md` high-level release content inventory
 - Explicit AI-assisted development note in the top-level README
 
@@ -23,7 +26,7 @@ are introduced in this version.
 - `CITATION.cff`, `ARTIFACT_VERSION`, `pyproject.toml`, and package `__version__` set to `2.0.0`
 - README rewritten as venue-neutral research software documentation
 - Reviewer/reproduction entry points no longer framed as a journal-specific submission package
-- Citation guidance uses the Zenodo **concept DOI** until the v2.0.0 version DOI is minted
+- Citation guidance uses the version-specific Zenodo DOI for v2.0.0
 
 ### Reproducibility
 
@@ -34,7 +37,6 @@ are introduced in this version.
 ### Not in this release
 
 - No new model generations, stochastic repetitions, or regenerated canonical rates
-- No version-specific Zenodo DOI yet (created only after tag + archival)
 
 ## [1.0.0] — 2026-06-20
 

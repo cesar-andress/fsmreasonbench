@@ -1,9 +1,8 @@
 # FSMReasonBench — archival tarball quickstart
 
-This guide applies when you download an archival deposit (Zenodo tarball or GitHub release archive).
-
+**v2.0.0 version DOI:** [10.5281/zenodo.23004350](https://doi.org/10.5281/zenodo.23004350)  
 **Concept DOI (all versions):** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)  
-**v1.0.0 version DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)
+**Historical v1.0.0:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)
 
 > **Auditors:** follow [`REVIEWER.md`](REVIEWER.md) or [`docs/REVIEWER.md`](docs/REVIEWER.md).
 
@@ -13,11 +12,10 @@ This guide applies when you download an archival deposit (Zenodo tarball or GitH
 
 ```bash
 cat ARTIFACT_VERSION
-ls releases/
+cat releases/2.0.0/release_manifest.json
 ```
 
-For **v1.0.0** archives expect DOI `10.5281/zenodo.20897937` and cohort `v0.1-expanded-n100`.  
-For **v2.0.0** prep/archives, see `releases/2.0.0/release_manifest.json` (version DOI after archival).
+Expected for this release: `version: v2.0.0`, DOI `10.5281/zenodo.23004350`, cohort `v0.1-expanded-n100`.
 
 If the tarball includes checksums: `sha256sum -c SHA256SUMS`
 
@@ -55,4 +53,4 @@ Optional: `PYTHONPATH=src python3.12 -m fsmreasonbench.cli.artifact_health`
 
 ## Citation
 
-[`CITATION.cff`](CITATION.cff)
+[`CITATION.cff`](CITATION.cff) — version DOI `10.5281/zenodo.23004350`.
