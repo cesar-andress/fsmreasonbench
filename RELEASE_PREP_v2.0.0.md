@@ -69,4 +69,5 @@ LICENSE / `.zenodo.json` / `CITATION.cff` / `pyproject.toml` = Apache-2.0.
 
 ## Recommended tag target
 
-After this prep commit is pushed and inspected: tag **that commit SHA** as `v2.0.0` (immutable).
+Prep commit (this release preparation): `ee5a27dba872db843072354760032a9ccedbdb94`  
+After inspection, tag **that SHA** as `v2.0.0` (immutable). Do not move the tag.
