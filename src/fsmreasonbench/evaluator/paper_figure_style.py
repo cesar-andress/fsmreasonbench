@@ -158,13 +158,19 @@ def plot_ablation_subtype_panel(
             if rate <= 0.001:
                 ax.text(
                     bar.get_x() + bar.get_width() / 2.0,
-                    0.02,
+                    0.18,
                     "0.00",
                     ha="center",
                     va="bottom",
                     fontsize=5.5,
-                    color="0.35",
+                    color="0.20",
                     clip_on=False,
+                    bbox={
+                        "boxstyle": "round,pad=0.12",
+                        "facecolor": "white",
+                        "edgecolor": "none",
+                        "alpha": 0.92,
+                    },
                 )
             elif annotate_rates:
                 label_y = _ablation_bar_label_y(rate, index, n_subtypes)
