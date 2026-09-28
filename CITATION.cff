@@ -10,7 +10,7 @@ authors:
   - family-names: Andrés
     given-names: César
     orcid: "https://orcid.org/0009-0001-8968-3404"
-    affiliation: "Universidad Camilo José Cela"
+    affiliation: "CRIA-BDHS Research Group, Escuela Politécnica Superior de Tecnología y Ciencia, Universidad Camilo José Cela, Spain"
 repository-code: "https://github.com/cesar-andress/fsmreasonbench"
 keywords:
   - finite-state machines
