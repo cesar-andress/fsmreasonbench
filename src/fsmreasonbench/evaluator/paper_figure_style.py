@@ -73,7 +73,7 @@ def plot_verdict_full_pairs(
         linewidth=0.6,
     )
     ax.set_xticks(x, labels, rotation=25, ha="right")
-    ax.set_ylim(0.0, 1.05)
+    ax.set_ylim(0.0, 1.0)
     ax.set_ylabel("Rate")
     if title:
         ax.set_title(title)
@@ -115,8 +115,7 @@ def plot_verdict_full_by_models(
         linewidth=0.6,
     )
     ax.set_xticks(x, model_labels, rotation=35, ha="right")
-    y_max = 1.22 if show_legend else 1.05
-    ax.set_ylim(0.0, y_max)
+    ax.set_ylim(0.0, 1.0)
     ax.set_ylabel("Rate")
     if title:
         ax.set_title(title)
@@ -155,10 +154,19 @@ def plot_ablation_subtype_panel(
             edgecolor="0.0",
             linewidth=0.6,
         )
-        if annotate_rates:
-            for bar, rate in zip(bars, rates):
-                if rate <= 0.001:
-                    continue
+        for bar, rate in zip(bars, rates):
+            if rate <= 0.001:
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2.0,
+                    0.02,
+                    "0.00",
+                    ha="center",
+                    va="bottom",
+                    fontsize=5.5,
+                    color="0.35",
+                    clip_on=False,
+                )
+            elif annotate_rates:
                 label_y = _ablation_bar_label_y(rate, index, n_subtypes)
                 ax.text(
                     bar.get_x() + bar.get_width() / 2.0,
@@ -172,12 +180,7 @@ def plot_ablation_subtype_panel(
                 )
     rotation = 35 if n_conditions > 3 else 25
     ax.set_xticks(x, condition_labels, rotation=rotation, ha="right")
-    y_top = 1.05
-    if annotate_rates:
-        y_top = 1.24
-    if title:
-        y_top = max(y_top, 1.22)
-    ax.set_ylim(0.0, y_top)
+    ax.set_ylim(0.0, 1.0)
     ax.set_ylabel(ylabel)
     if title:
         ax.set_title(title, fontsize=8)
@@ -201,4 +204,4 @@ def _ablation_bar_label_y(rate: float, subtype_index: int, n_subtypes: int) -> f
         base += subtype_index * 0.055
     elif rate >= 0.40:
         base += subtype_index * 0.035
-    return min(base, 1.20)
+    return min(base, 0.98)
