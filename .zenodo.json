@@ -1,0 +1,45 @@
+{
+  "title": "FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems",
+  "version": "2.0.0",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "creators": [
+    {
+      "name": "Andrés, César",
+      "affiliation": "Universidad Camilo José Cela",
+      "orcid": "0009-0001-8968-3404"
+    }
+  ],
+  "keywords": [
+    "finite-state machines",
+    "formal verification",
+    "verifier-gated evaluation",
+    "witness validation",
+    "llm evaluation",
+    "benchmark",
+    "reproducibility"
+  ],
+  "description": "FSMReasonBench is a research-software benchmark and evaluation framework for verifier-gated reasoning tasks. It separates extractability, boolean verdict accuracy, independently checked witness validity, and end-to-end full correctness, and records mutually exclusive failure stages under explicit witness contracts and tool-access conditions. The repository includes the finite-state calibration instrument, deterministic verifiers, frozen benchmark manifests, archived evaluation outputs, and scripts for regenerating reported layered metrics and analyses. Version 2.0.0 consolidates the witness-aware layered evaluation protocol and reproducibility materials used in the current study. The software is intended for auditable evaluation and research reproducibility rather than as a model leaderboard or a claim of stable long-run model performance.",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/cesar-andress/fsmreasonbench",
+      "relation": "isSupplementTo",
+      "resource_type": "software",
+      "scheme": "url"
+    },
+    {
+      "identifier": "10.5281/zenodo.20897937",
+      "relation": "isNewVersionOf",
+      "resource_type": "software",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.5281/zenodo.20836347",
+      "relation": "isVersionOf",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ],
+  "notes": "Cite the concept DOI 10.5281/zenodo.20836347 until the version-specific Zenodo DOI for v2.0.0 is minted. Legacy machine-readable schema fields may use certificate_* names; protocol terminology uses witness."
+}

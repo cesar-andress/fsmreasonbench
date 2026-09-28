@@ -1,27 +1,31 @@
 # Reviewer onboarding (≈5 minutes)
 
-This guide is for **ACM TOSEM artifact evaluators** who arrived from the Zenodo DOI
-[10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937).
+This guide is for auditors verifying **FSMReasonBench** archived layered metrics from a Zenodo
+deposit or git tag.
 
-**Goal:** confirm you hold the **frozen v1.0.0 snapshot** and regenerate manuscript tables from
-on-disk run outputs — **without model API calls**.
+**Primary archival DOI (v1.0.0):** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
+**Concept DOI (all versions):** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)
+
+**Goal:** confirm the frozen snapshot and regenerate layered tables from on-disk run outputs —
+**without model API calls**.
 
 ---
 
-## Step 0 — Confirm you are on v1.0.0 (30 s)
+## Step 0 — Confirm the snapshot (30 s)
 
 ```bash
 cat ARTIFACT_VERSION
 python3 -c "import json; m=json.load(open('releases/1.0.0/release_manifest.json')); print(m['benchmark_version'], m['zenodo']['primary_doi'])"
 ```
 
-Expected: `1.0.0` and `10.5281/zenodo.20897937`.
+For the published **v1.0.0** archive expect `1.0.0` and `10.5281/zenodo.20897937`.  
+For **v2.0.0** prep trees, also inspect `releases/2.0.0/release_manifest.json`.
 
-| You opened… | Paper numbers reproducible? |
+| You opened… | Archived numbers regenerable? |
 |-------------|----------------------------|
-| Zenodo tarball | **Yes** — this is the archival deposit |
-| GitHub release [`v1.0.0`](https://github.com/cesar-andress/fsmreasonbench/releases/tag/v1.0.0) | **Yes** — tag-aligned with Zenodo |
-| GitHub branch `main` | **Maybe not** — ongoing development after the freeze |
+| Zenodo tarball | **Yes** — archival deposit |
+| GitHub release tag | **Yes** when tag-aligned with the deposit |
+| GitHub branch `main` | Confirm `ARTIFACT_VERSION`; may include post-freeze development |
 
 Details: [`artifact/FROZEN_VS_DEVELOPMENT.md`](artifact/FROZEN_VS_DEVELOPMENT.md).
 
@@ -49,10 +53,10 @@ Confirms frozen run summaries expected by the export pipeline are present under 
 
 ---
 
-## Step 3 — Regenerate TOSEM tables (2–4 min)
+## Step 3 — Regenerate archived tables (2–4 min)
 
 ```bash
-./scripts/reproduce_tosem_tables.sh
+./scripts/reproduce_archived_tables.sh
 ```
 
 This script:
@@ -88,13 +92,13 @@ PYTHONPATH=src python3.12 -m pytest \
 
 A **frozen evaluation artifact** for verifier-gated formal reasoning on finite-state tasks.
 It separates **verdict accuracy**, **witness validity**, and **full correctness** — the layered
-metrics used in the companion TOSEM paper.
+metrics used by the witness-aware evaluation protocol.
 
 | Question | Answer |
 |----------|--------|
 | What is in this deposit? | Cohort `v0.1-expanded-n100`, verifier/scorer, frozen runs, export pipelines |
-| Relation to the paper? | **Calibration instrument** for witness-aware layered evaluation (methodology = paper; numbers = this artifact) |
-| Where are run roots listed? | [`EXPERIMENTAL_FREEZE_TOSEM.md`](EXPERIMENTAL_FREEZE_TOSEM.md) |
+| Relation to accompanying studies? | **Calibration instrument** for witness-aware layered evaluation |
+| Where are run roots listed? | [`EXPERIMENTAL_FREEZE_TOSEM.md`](EXPERIMENTAL_FREEZE_TOSEM.md) (legacy filename) |
 | Normative benchmark spec? | [`specification/BENCHMARK_SPEC.md`](specification/BENCHMARK_SPEC.md) |
 
 ---
@@ -102,15 +106,16 @@ metrics used in the companion TOSEM paper.
 ## Directory map (reviewer essentials)
 
 ```
-ARTIFACT_VERSION          ← frozen version + DOI (read first)
+ARTIFACT_VERSION          ← software version + DOI pointers (read first)
 REVIEWER.md               ← one-screen entry (repo root)
 docs/REVIEWER.md          ← this guide
-releases/1.0.0/           ← release manifest and notes
+releases/1.0.0/           ← historical release manifest
+releases/2.0.0/           ← current prep manifest
 cohorts/v0.1-expanded-n100/
 runs/                     ← frozen campaign outputs (in Zenodo tarball)
 src/fsmreasonbench/       ← verifier, scorer, exporters
-scripts/reproduce_tosem_tables.sh
-docs/tosem/REPRODUCTION.md
+scripts/reproduce_archived_tables.sh
+docs/tosem/REPRODUCTION.md   ← legacy directory name; offline workflow
 docs/tosem_empirical_package_v1/
 ```
 
@@ -122,18 +127,19 @@ Full layout: [`artifact/repository_layout.md`](artifact/repository_layout.md).
 
 | Document | When to read |
 |----------|--------------|
-| [`tosem/REPRODUCTION.md`](tosem/REPRODUCTION.md) | Full tiered workflow, expected outputs, runtime table |
-| [`tosem/README.md`](tosem/README.md) | TOSEM companion artifact overview |
-| [`EXPERIMENTAL_FREEZE_TOSEM.md`](EXPERIMENTAL_FREEZE_TOSEM.md) | Frozen campaign index (artifact mirror) |
+| [`tosem/REPRODUCTION.md`](tosem/REPRODUCTION.md) | Full tiered offline workflow (legacy path) |
+| [`tosem/README.md`](tosem/README.md) | Historical companion-study overview (legacy path) |
+| [`EXPERIMENTAL_FREEZE_TOSEM.md`](EXPERIMENTAL_FREEZE_TOSEM.md) | Frozen campaign index (artifact mirror; legacy name) |
 | [`zenodo/REPRODUCIBILITY.md`](zenodo/REPRODUCIBILITY.md) | Archival policy and replication tiers |
 | [`README.md`](../README.md) | Project landing page |
 | [`README-RELEASE.md`](../README-RELEASE.md) | Tarball-only quickstart |
 
-**Do not use for paper-number audit:** [`TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](TOSEM_EXPERIMENT_EXTENSION_PLAN.md) (post-freeze, requires API keys).
+**Do not use for archived-number audit:** [`TOSEM_EXPERIMENT_EXTENSION_PLAN.md`](TOSEM_EXPERIMENT_EXTENSION_PLAN.md) (post-freeze plans; may require API keys).
 
 ---
 
 ## Citation
 
-Use DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) and version **v1.0.0**.
+Prefer the concept DOI [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347).
+The published v1.0.0 version DOI remains [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937).
 See [`CITATION.cff`](../CITATION.cff).

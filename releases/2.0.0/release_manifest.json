@@ -1,0 +1,30 @@
+{
+  "manifest_kind": "fsmreasonbench_release_manifest",
+  "benchmark_version": "2.0.0",
+  "cohort_version": "v0.1-expanded-n100",
+  "schema_version": "1.0.0",
+  "verifier_version": "1.0.0",
+  "generator_version": "1.0.0",
+  "python_version": "3.11+",
+  "released_at": null,
+  "zenodo": {
+    "concept_doi": "10.5281/zenodo.20836347",
+    "primary_doi": null,
+    "primary_doi_status": "pending_archival",
+    "prior_version_doi": "10.5281/zenodo.20897937",
+    "url_concept": "https://doi.org/10.5281/zenodo.20836347"
+  },
+  "github_release": "FSMReasonBench v2.0.0",
+  "artifact_name": "FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems",
+  "notes": "Preparation manifest for v2.0.0. Version-specific Zenodo DOI is not yet minted. Cite concept DOI 10.5281/zenodo.20836347 until archival completes. Frozen empirical outputs from the v1.0.0 calibration remain the offline regeneration source; this release consolidates venue-neutral layered-evaluation identity and documentation.",
+  "reproduction": {
+    "validate_cohort": "PYTHONPATH=src python -m fsmreasonbench.cli.validate_cohort",
+    "export_paper_package": "./scripts/reproduce_archived_tables.sh",
+    "legacy_export_alias": "./scripts/reproduce_tosem_tables.sh",
+    "artifact_health": "PYTHONPATH=src python -m fsmreasonbench.cli.artifact_health"
+  },
+  "legacy_identifiers": {
+    "note": "tosem_* and tmlr_* path/module names are retained for reproducibility of frozen export commands",
+    "schema_alias": "certificate_* fields are legacy machine-readable names for witness validity outcomes"
+  }
+}

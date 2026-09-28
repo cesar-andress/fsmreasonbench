@@ -1,8 +1,8 @@
-FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines
-version: v1.0.0
-doi: 10.5281/zenodo.20897937
-url: https://doi.org/10.5281/zenodo.20897937
-github_release: FSMReasonBench v1.0.0
+FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems
+version: v2.0.0
+doi: 10.5281/zenodo.20836347
+url: https://doi.org/10.5281/zenodo.20836347
+doi_note: concept DOI (all versions); version-specific Zenodo DOI for v2.0.0 will be added after archival
+prior_version_doi: 10.5281/zenodo.20897937
 github_dev: https://github.com/cesar-andress/fsmreasonbench/tree/main
-released: 2026-06-20
 cohort: v0.1-expanded-n100

@@ -1,10 +1,10 @@
 # FSMReasonBench Releases
 
-**Artifact:** **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines** v1.0.0  
-**Citation target:** Zenodo DOI [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) — not git branch `main`.  
-**GitHub release:** FSMReasonBench v1.0.0
+**Software:** FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems  
+**Concept DOI:** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)  
+**Do not cite git `main` as an archival snapshot.**
 
-This directory records **frozen release manifests** for each citable benchmark version.
+This directory records **frozen release manifests** for each citable software version.
 
 ---
 
@@ -13,8 +13,9 @@ This directory records **frozen release manifests** for each citable benchmark v
 | benchmark_version | cohort_version | Zenodo DOI | Status |
 |-------------------|----------------|------------|--------|
 | **1.0.0** | `v0.1-expanded-n100` | [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937) | **Published** |
+| **2.0.0** | `v0.1-expanded-n100` | pending archival (cite concept DOI until minted) | **Prep** |
 
-Manifest and notes: [`1.0.0/`](1.0.0/)
+Manifests: [`1.0.0/`](1.0.0/), [`2.0.0/`](2.0.0/)
 
 ---
 
@@ -23,13 +24,10 @@ Manifest and notes: [`1.0.0/`](1.0.0/)
 ```
 releases/
 ├── README.md
-└── <benchmark_version>/
-    ├── release_manifest.json
-    ├── RELEASE_NOTES.md
-    └── ERRATA.md                (if post-release corrections)
+├── 1.0.0/
+├── 2.0.0/
+└── TEMPLATE/
 ```
-
-Template for future versions: [`TEMPLATE/`](TEMPLATE/)
 
 ---
 
@@ -37,7 +35,5 @@ Template for future versions: [`TEMPLATE/`](TEMPLATE/)
 
 | State | Location | Citable? |
 |-------|----------|----------|
-| Development | `main` branch | **No** — cite Zenodo |
-| Published | Zenodo tarball + [`1.0.0/release_manifest.json`](1.0.0/release_manifest.json) | **Yes** |
-
-See [`docs/artifact/release_policy.md`](../docs/artifact/release_policy.md).
+| Development | `main` branch | Prefer Zenodo concept/version DOI |
+| Published | Zenodo + git tag | **Yes** |

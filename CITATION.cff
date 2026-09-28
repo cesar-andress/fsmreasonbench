@@ -1,10 +1,9 @@
 cff-version: 1.2.0
 message: "If you use FSMReasonBench, please cite it as below."
-title: "FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines"
-version: "1.0.0"
-doi: 10.5281/zenodo.20897937
-url: https://doi.org/10.5281/zenodo.20897937
-date-released: 2026-06-20
+title: "FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems"
+version: "2.0.0"
+doi: 10.5281/zenodo.20836347
+url: https://doi.org/10.5281/zenodo.20836347
 license: Apache-2.0
 authors:
   - family-names: Andrés
@@ -15,17 +14,20 @@ repository-code: "https://github.com/cesar-andress/fsmreasonbench"
 keywords:
   - finite-state machines
   - formal verification
+  - verifier-gated evaluation
+  - witness validation
+  - llm evaluation
   - benchmark
   - reproducibility
-  - certificate verification
 preferred-citation:
   type: software
-  title: "FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines"
-  version: "1.0.0"
+  title: "FSMReasonBench: Witness-Aware Evaluation for Verifier-Gated Reasoning Systems"
+  version: "2.0.0"
   authors:
     - family-names: Andrés
       given-names: César
+      orcid: "https://orcid.org/0009-0001-8968-3404"
   year: 2026
-  doi: 10.5281/zenodo.20897937
-  url: https://doi.org/10.5281/zenodo.20897937
-  notes: "Cite benchmark_version, cohort_version, schema_version, and verifier_version from release_manifest.json."
+  doi: 10.5281/zenodo.20836347
+  url: https://doi.org/10.5281/zenodo.20836347
+  notes: "Concept / all-versions DOI. Version-specific Zenodo DOI for v2.0.0 will be added after archival. Historical v1.0.0 deposit: 10.5281/zenodo.20897937. Cite benchmark_version, cohort_version, schema_version, and verifier_version from the release manifest when available."

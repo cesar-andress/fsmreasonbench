@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Read-only reproduction of ACM TOSEM manuscript tables from frozen runs.
-# Artifact: FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines v1.0.0
-# DOI: 10.5281/zenodo.20897937 (GitHub release: FSMReasonBench v1.0.0)
+# Legacy script name retained for path stability.
+# Prefer: scripts/reproduce_archived_tables.sh
+# Read-only regeneration of layered evaluation tables/figures from frozen runs.
 # Does NOT call model APIs. Requires Python >= 3.11 and frozen run trees under runs/.
 set -euo pipefail
 
@@ -15,7 +15,7 @@ fi
 
 export PYTHONPATH=src
 
-echo "==> FSMReasonBench TOSEM table reproduction (read-only)"
+echo "==> FSMReasonBench archived table regeneration (read-only; legacy script name)"
 echo "    Python: $($PYTHON --version 2>&1)"
 echo "    Repo:   $REPO_ROOT"
 echo

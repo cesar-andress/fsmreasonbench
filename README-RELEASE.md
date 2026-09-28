@@ -1,24 +1,23 @@
-# FSMReasonBench — Zenodo tarball quickstart
+# FSMReasonBench — archival tarball quickstart
 
-You downloaded **FSMReasonBench: Evaluating Reasoning over Executable Finite-State Machines**
-**v1.0.0** from Zenodo.
+This guide applies when you download an archival deposit (Zenodo tarball or GitHub release archive).
 
-**DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)  
-**GitHub release (mirror):** [FSMReasonBench v1.0.0](https://github.com/cesar-andress/fsmreasonbench/releases/tag/v1.0.0)
+**Concept DOI (all versions):** [10.5281/zenodo.20836347](https://doi.org/10.5281/zenodo.20836347)  
+**v1.0.0 version DOI:** [10.5281/zenodo.20897937](https://doi.org/10.5281/zenodo.20897937)
 
-> **Reviewers:** follow [`REVIEWER.md`](REVIEWER.md) or [`docs/REVIEWER.md`](docs/REVIEWER.md) for the
-> full 5-minute audit path.
+> **Auditors:** follow [`REVIEWER.md`](REVIEWER.md) or [`docs/REVIEWER.md`](docs/REVIEWER.md).
 
 ---
 
-## 1. Verify the frozen snapshot
+## 1. Verify the snapshot
 
 ```bash
 cat ARTIFACT_VERSION
-cat releases/1.0.0/release_manifest.json
+ls releases/
 ```
 
-Expected: `version: v1.0.0`, DOI `10.5281/zenodo.20897937`, cohort `v0.1-expanded-n100`.
+For **v1.0.0** archives expect DOI `10.5281/zenodo.20897937` and cohort `v0.1-expanded-n100`.  
+For **v2.0.0** prep/archives, see `releases/2.0.0/release_manifest.json` (version DOI after archival).
 
 If the tarball includes checksums: `sha256sum -c SHA256SUMS`
 
@@ -34,10 +33,10 @@ Python ≥ 3.11.
 
 ---
 
-## 3. Reproduce TOSEM tables (no API keys)
+## 3. Regenerate archived tables (no API keys)
 
 ```bash
-./scripts/reproduce_tosem_tables.sh
+./scripts/reproduce_archived_tables.sh
 ```
 
 **Success:** `docs/tosem_empirical_package_v1/package_manifest.json` exists; script exits 0.
@@ -50,10 +49,9 @@ Optional: `PYTHONPATH=src python3.12 -m fsmreasonbench.cli.artifact_health`
 
 | Task | Document |
 |------|----------|
-| Full reproduction tiers | [`docs/tosem/REPRODUCTION.md`](docs/tosem/REPRODUCTION.md) |
+| Offline regeneration tiers | [`docs/tosem/REPRODUCTION.md`](docs/tosem/REPRODUCTION.md) (legacy path name) |
 | Documentation index | [`docs/README.md`](docs/README.md) |
 | Frozen vs. `main` | [`docs/artifact/FROZEN_VS_DEVELOPMENT.md`](docs/artifact/FROZEN_VS_DEVELOPMENT.md) |
-| Score a sample submission | `PYTHONPATH=src python -m fsmreasonbench.cli.score_submission --help` |
 
 ## Citation
 
