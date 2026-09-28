@@ -20,9 +20,11 @@ Post-release DOI synchronization after Zenodo archival of FSMReasonBench v2.0.0.
 | Check | SHA |
 |-------|-----|
 | `v2.0.0` before sync | `040cbcea2bb34242e663b54c820e55140b3a40ca` |
-| `v2.0.0` after sync | must match (verified at end of phase) |
+| `v2.0.0` after sync | `040cbcea2bb34242e663b54c820e55140b3a40ca` |
+| Unchanged | YES |
 
-DOI sync commits are **after** the tagged commit. Tag not moved.
+DOI sync commit (software): `33cbc73ee134198caf3c90fb2a47a41e0b933737` (after tagged commit).  
+Paper monorepo commit: `2e46a3888c06dbab22f6ebdc8557d06ab3db5146` (local only; no push).
 
 ## Software updates
 
